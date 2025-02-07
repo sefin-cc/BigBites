@@ -39,6 +39,17 @@ const globalStyles = StyleSheet.create({
     justifyContent: 'center',
     
   },
+
+
+  headerStyle: {
+    alignItems: "center",
+    backgroundColor: '#FB7F3B',
+  },
+  headerTitleStyle:{
+    fontFamily: 'MadimiOne',
+    color: '#FFEEE5',
+    fontSize: 20,
+  }
 });
 
 export default globalStyles;

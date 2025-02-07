@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 interface Order {
   costumer: any | null;
   type: string;
-  takeout: boolean;
+  pickUpType: string | null;
   location: string;
   order: any[]; // Adjust type as needed
 }
@@ -28,7 +28,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [order, setOrder] = useState<Order>({
     costumer: null,
     type: "",
-    takeout: false,
+    pickUpType: null,
     location: "",
     order: [],
   });

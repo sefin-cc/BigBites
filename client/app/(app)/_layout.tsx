@@ -2,6 +2,8 @@ import { Stack, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { AppContext } from "../context/AppContext";
+import globalStyle from "../../assets/styles/globalStyle";
+import { BackButton } from "@/components/BackButton";
 
 export default function AppLayout() {
     // const context = useContext(AppContext);
@@ -50,8 +52,24 @@ export default function AppLayout() {
 
         {/* Order Screens */}
         <Stack.Screen name="order/order-type"  options={{ headerShown: false }}/>
-        <Stack.Screen name="order/order-step3"  options={{ headerShown: false }}/>
-        <Stack.Screen name="order/order-step4"  options={{ headerShown: false }}/>
+        <Stack.Screen name="order/order-step3"  options={{ 
+          headerShown: true,
+          headerTitle: "ENTER YOUR FULL ADDRESS",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+           }}/>
+        <Stack.Screen name="order/order-step4"  options={{
+          headerShown: true,
+          headerTitle: "SELECT PROVINCE AND CITY",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+            }}/>
         
         {/* Menu Screens */}
         <Stack.Screen name="menu/menu-categories"  options={{ headerShown: false }}/>
@@ -67,16 +85,3 @@ export default function AppLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-    loadingContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "#fff",
-    },
-    loadingText: {
-      marginTop: 10,
-      fontSize: 16,
-      color: "#333",
-    },
-  });

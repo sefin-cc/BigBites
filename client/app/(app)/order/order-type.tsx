@@ -12,25 +12,33 @@ export default function OrderType() {
   }
   const { order, setOrder} = context;
   const [isOrderOne, setIsOrderOne] = useState(true);
-
-  //use contextAPI for order details
-   
-
-  const setOrderType = (type: string) => {
-    setOrder(prev => ({
-      ...prev,
-      type: type
-    }));
-    setIsOrderOne(false);
-  };
   
 
-  const setOrderisTakeout = (takeout: boolean) => {
+  const setOrderisPickUptype = (pickUpType: string) => {
     setOrder(prev => ({
       ...prev,
-      takeout: takeout
+      pickUpType: pickUpType
     }));
+    router.push("/(app)/order/order-step4");
   };
+
+  const navigateOrder = (type : string) => {
+    if(type === "PickUp"){
+      setOrder(prev => ({
+        ...prev,
+        type: type
+      }));
+      setIsOrderOne(false);
+    }else if(type === "Delivery") {
+      setOrder(prev => ({
+        ...prev,
+        type: type
+      }));
+      router.push("/(app)/order/order-step3");
+    }else {
+      console.log("Something went wrong");
+    }
+  }
   
 
   useEffect(() => {
@@ -44,13 +52,13 @@ export default function OrderType() {
       {isOrderOne ? 
         <View style={styles.containerButton}>
           <TouchableOpacity
-            onPress={() => setOrderType("PickUp")}
+            onPress={() => navigateOrder("PickUp")}
             style={[globalStyle.button, {width: "100%"}]}>
             <Text style={globalStyle.buttonText}>PICK UP</Text>
           </TouchableOpacity>
   
           <TouchableOpacity
-            onPress={() => setOrderType("Delivery")}
+            onPress={() => navigateOrder("Delivery")}
             style={[globalStyle.button, {width: "100%"}]}>
             <Text style={globalStyle.buttonText}>DELIVERY</Text>
           </TouchableOpacity>
@@ -58,13 +66,13 @@ export default function OrderType() {
       :
         <View style={styles.containerButton}>
           <TouchableOpacity
-            onPress={() => setOrderisTakeout(false)}
+            onPress={() => setOrderisPickUptype("DineIn")}
             style={[globalStyle.button, {width: "100%"}]}>
             <Text style={globalStyle.buttonText}>DINE IN</Text>
           </TouchableOpacity>
   
           <TouchableOpacity
-            onPress={() => setOrderisTakeout(true)}
+            onPress={() => setOrderisPickUptype("TakeOut")}
             style={[globalStyle.button, {width: "100%"}]}>
             <Text style={globalStyle.buttonText}>TAKE OUT</Text>
           </TouchableOpacity>

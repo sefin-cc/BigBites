@@ -1,15 +1,12 @@
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-export default function Login() {
+export default function MapLocationStep3() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Setup 3</Text>
+    <View>
+      <Text>Map - Setup 3</Text>
     </View>
   );
 }
+const styles = StyleSheet.create({
+
+});
