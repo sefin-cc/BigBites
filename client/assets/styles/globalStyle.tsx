@@ -25,15 +25,20 @@ const globalStyles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 16,
     alignItems: 'center',
-    marginVertical: 40,
-    borderWidth: 4,
-    borderColor: "#FFEEE5",
+    borderWidth: 5,
+    borderColor: "white",
   },
   buttonText: {
     fontFamily: 'MadimiOne',
     color: '#FFEEE5',
     fontSize: 20,
-  }
+  },
+  menuGrid: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'center',
+    
+  },
 });
 
 export default globalStyles;

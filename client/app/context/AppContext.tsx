@@ -1,12 +1,22 @@
 import React, { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+interface Order {
+  costumer: any | null;
+  type: string;
+  takeout: boolean;
+  location: string;
+  order: any[]; // Adjust type as needed
+}
+
 // Define the context type
 interface AppContextType {
   token: string | null;
   setToken: React.Dispatch<React.SetStateAction<string | null>>;
   user: any | null; 
   setUser: React.Dispatch<React.SetStateAction<any>>;
+  order: Order;
+  setOrder: React.Dispatch<React.SetStateAction<Order>>;
 }
 
 // Create the context with a default value
@@ -15,6 +25,13 @@ export const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [order, setOrder] = useState<Order>({
+    costumer: null,
+    type: "",
+    takeout: false,
+    location: "",
+    order: [],
+  });
 
   // Load token from AsyncStorage
   useEffect(() => {
@@ -42,6 +59,10 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         if (res.ok) {
           const data = await res.json();
           setUser(data);
+          setOrder(prev => ({
+            ...prev,
+            costumer: data
+          }));
         } else {
           console.error("Failed to fetch user:", res.status);
         }
@@ -54,7 +75,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   }, [token]);
 
   return (
-    <AppContext.Provider value={{ token, setToken, user, setUser }}>
+    <AppContext.Provider value={{ token, setToken, user, setUser, order, setOrder}}>
       {children}
     </AppContext.Provider>
   );
