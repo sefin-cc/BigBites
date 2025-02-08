@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import TitleDashed from "@/components/titledashed";
 import MenuContainer from "@/components/menuContainer";
 import { useRouter } from "expo-router";
+import Slideshow from "@/components/slideShow";
 
 
 export default function Index() {
@@ -12,32 +13,33 @@ export default function Index() {
     
     <View style={globalStyle.container}>
       <ScrollView>
-      <LinearGradient
-        colors={['transparent', '#C1272D']}
-        style={styles.mainContainer}>
-          
-        <Image
-        style={[styles.image]}
-        source={require('../../../assets/images/home.png')}
-        />
-
-        <View style={{justifyContent: "center", alignItems: "center"}}>
+        <LinearGradient
+          colors={['transparent', '#C1272D']}
+          style={styles.mainContainer}>
+            
           <Image
-          style={styles.logo}
-          source={require('../../../assets/images/logo.png')}
+          style={[styles.image]}
+          source={require('../../../assets/images/home.png')}
           />
-          <TouchableOpacity
-            onPress={() =>{router.replace(`/order/order-type`);}}
-            // disabled={isPosting}
-            style={[globalStyle.button]}>
-              <Text style={globalStyle.buttonText}>
-                  ORDER NOW!
-              </Text>
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
-      
+
+          <View style={{justifyContent: "center", alignItems: "center"}}>
+            <Image
+            style={styles.logo}
+            source={require('../../../assets/images/logo.png')}
+            />
+            <TouchableOpacity
+              onPress={() =>{router.replace(`/order/order-type`);}}
+              // disabled={isPosting}
+              style={[globalStyle.button]}>
+                <Text style={globalStyle.buttonText}>
+                    ORDER NOW!
+                </Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+        
       <View style={styles.contentContainer}>
+        <Slideshow />
         <TitleDashed title="BEST SELLERS" />
         <MenuContainer />
       </View>
