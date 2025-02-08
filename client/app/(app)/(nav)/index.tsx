@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 60,
     borderBottomRightRadius: 60,
     height: 450,
+    padding: "5%"
   },
   contentContainer: {
     margin: "5%",
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     resizeMode: 'contain',
     position: "absolute", 
-    top: -20
+    top: -60
   }
 });
 
