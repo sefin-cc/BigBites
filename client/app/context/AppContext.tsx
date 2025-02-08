@@ -5,7 +5,8 @@ interface Order {
   costumer: any | null;
   type: string;
   pickUpType: string | null;
-  location: string;
+  location: string | null;
+  branch: object | null;
   order: any[]; // Adjust type as needed
 }
 
@@ -29,7 +30,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     costumer: null,
     type: "",
     pickUpType: null,
-    location: "",
+    location: null,
+    branch: null,
     order: [],
   });
 

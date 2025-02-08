@@ -8,6 +8,7 @@ const lightTheme = {
   red: '#C1272D',
   yellow: '#FCE600',
   black: '#2C2C2C',
+  light: "#f2aa83",
 };
 
 const darkTheme = {
@@ -16,6 +17,7 @@ const darkTheme = {
     red: '#C1272D',
     yellow: '#FCE600',
     black: '#2C2C2C',
+    light: "#f2aa83",
 };
 
 // Create a context with a default value
