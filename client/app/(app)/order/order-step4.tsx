@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import globalStyle from "../../../assets/styles/globalStyle";
 import { useContext, useEffect, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -67,6 +67,7 @@ export default function BranchesStep3() {
         ...prev,
         branch: item,
       }));
+      router.push("/(app)/menu/menu-categories");
     }
 
     useEffect(() => {
@@ -89,6 +90,9 @@ export default function BranchesStep3() {
             textStyle={dropdownStyles.text}
             containerStyle={dropdownStyles.dropdownContainer}
             selectedItemContainerStyle={dropdownStyles.selectedItemContainerStyle} 
+            scrollViewProps={{
+              showsVerticalScrollIndicator: true,  // Enables scroll indicator
+            }}
           />
           <DropDownPicker
             open={cityOpen}
@@ -103,6 +107,9 @@ export default function BranchesStep3() {
             textStyle={dropdownStyles.text}
             containerStyle={dropdownStyles.dropdownContainer}
             selectedItemContainerStyle={dropdownStyles.selectedItemContainerStyle} 
+            scrollViewProps={{
+              showsVerticalScrollIndicator: true,  // Enables scroll indicator
+            }}
           />
       </View>
     
