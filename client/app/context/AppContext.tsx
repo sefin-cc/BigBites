@@ -5,7 +5,7 @@ interface Order {
   costumer: any | null;
   type: string;
   pickUpType: string | null;
-  location: string | null;
+  location: object | null;
   branch: object | null;
   order: any[]; // Adjust type as needed
 }
