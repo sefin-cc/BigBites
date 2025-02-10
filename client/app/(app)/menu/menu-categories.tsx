@@ -16,7 +16,7 @@ export default function Categories() {
 
         <View style={{padding: 10, justifyContent: "center",backgroundColor: "#C1272D"}}>
           <TextInput
-            style={styles.input}
+            style={globalStyle.searchMenu}
             value={search}
             placeholder="SEARCH..."
             onChangeText={handleSearch}  
@@ -47,17 +47,6 @@ export default function Categories() {
 }
 
 const styles = StyleSheet.create({
-  input: {
-    height: 45,
-    backgroundColor: "white",
-    borderColor: '#C1272D',
-    borderWidth: 2,
-    paddingLeft: 10,
-    borderRadius: 5,
-    fontFamily: 'MadimiOne',
-    color: "#2C2C2C",
-    flexGrow: 1
-  },
   featuredContainer: {
     padding: "5%",
     backgroundColor: "#C1272D"

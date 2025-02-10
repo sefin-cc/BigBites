@@ -5,12 +5,12 @@ import CatergoryIcon from './catergoryIcons';
 import { router } from "expo-router";
 
 const DATA = [
-  { id: '1',  categoryId: '1', name: 'FAVOURITES'},
-  { id: '2',  categoryId: '2', name: 'BURGERS' },
-  { id: '3',  categoryId: '3', name: 'BARKADAS' },
-  { id: '4',  categoryId: '4', name: 'SIDES' },
-  { id: '5',  categoryId: '5', name: 'DRINKS' },
-  { id: '6',  categoryId: '6', name: 'DESSERTS'},
+  { id: '0', name: 'FAVOURITES'},
+  { id: '1', name: 'BURGERS' },
+  { id: '2', name: 'BARKADAS' },
+  { id: '3', name: 'SIDES' },
+  { id: '4', name: 'DRINKS' },
+  { id: '5', name: 'DESSERTS'},
 ];
 
 export default function CategoriesItems() {
@@ -19,7 +19,7 @@ export default function CategoriesItems() {
     <View style={styles.grid}>
       {DATA.map((item) => (
 
-        <TouchableOpacity onPress={() => {router.push(`/(app)/menu/menu?categoryId=${item.categoryId}`)}} key={item.id} style={styles.card}>
+        <TouchableOpacity onPress={() => {router.push(`/(app)/menu/menu?id=${item.id}`)}} key={item.id} style={styles.card}>
           <View style={{ flex: 1, justifyContent: "center"}}>
            <CatergoryIcon name={item.name} />
           </View>

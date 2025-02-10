@@ -49,7 +49,19 @@ const globalStyles = StyleSheet.create({
     fontFamily: 'MadimiOne',
     color: '#FFEEE5',
     fontSize: 20,
-  }
+  },
+
+  searchMenu: {
+    height: 45,
+    backgroundColor: "white",
+    borderColor: '#C1272D',
+    borderWidth: 2,
+    paddingLeft: 10,
+    borderRadius: 5,
+    fontFamily: 'MadimiOne',
+    color: "#2C2C2C",
+    flexGrow: 1
+  },
 });
 
 export default globalStyles;
