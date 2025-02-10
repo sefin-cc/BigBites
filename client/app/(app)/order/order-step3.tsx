@@ -166,7 +166,7 @@ export default function MapLocationStep3() {
   
   
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, position: "relative" }}>
       {/* Search Input */}
       <View style={{ flexDirection: "row", margin: 10 }}>
         <TextInput
@@ -288,7 +288,7 @@ export default function MapLocationStep3() {
 
 const styles = StyleSheet.create({
   input: {
-    height: 40,
+    height: 45,
     borderColor: '#C1272D',
     borderWidth: 2,
     paddingLeft: 10,
