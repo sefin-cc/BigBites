@@ -1,25 +1,31 @@
 import React from 'react';
-import { View, ImageBackground, StyleSheet } from 'react-native';
+import { View, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Text } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const DATA = [
-  { id: '1', name: 'Item 1', image: require('../assets/images/fries.jpg') },
-  { id: '2', name: 'Item 2', image: require('../assets/images/fries.jpg') },
-  { id: '3', name: 'Item 3', image: require('../assets/images/fries.jpg') },
-  { id: '4', name: 'Item 4', image: require('../assets/images/fries.jpg') },
-];
 
-export default function MenuContainer() {
+
+interface MenuData {
+  id: string;
+  name: string;
+  image: string;  // Now using a string for URL
+}
+
+interface Props {
+  menuData: MenuData[];  // Array of MenuData
+  handleTapItem: () => void;
+}
+
+export default function MenuContainer({ menuData, handleTapItem }: Props) {
   return (
-    <View style={styles.grid}>
-      {DATA.map((item) => (
-        <View key={item.id} style={styles.card}>
+    <View style={styles.grid} >
+      {menuData.map((item) => (
+        <TouchableOpacity key={item.id} style={styles.card} onPress={handleTapItem}>
           <ImageBackground 
-            source={item.image}
+            source={{ uri: item.image }}  // Update to handle URL images
             style={styles.image} 
             imageStyle={styles.imageStyle} 
-            resizeMode="contain"
+            resizeMode="cover"
           >
             <LinearGradient
               colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0)']}
@@ -27,16 +33,13 @@ export default function MenuContainer() {
               end={{ x: 0, y: 0 }}
               style={styles.gradient} 
             />
-
-
-
             {/* Text (Above Gradient) */}
             <View style={styles.textContainer}>
               <Svg height="45" width="100%">
                 <Text
                   fill="#C1272D"
                   stroke="#FFEEE5"
-                  fontSize="30"
+                  fontSize="20"
                   fontFamily="MadimiOne"
                   x="50%"
                   y="50%"
@@ -49,7 +52,7 @@ export default function MenuContainer() {
               </Svg>
             </View>
           </ImageBackground>
-        </View>
+        </TouchableOpacity>
       ))}
     </View>
   );
@@ -59,18 +62,16 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-evenly', 
-    
+    justifyContent: "space-between",
   },
   card: {
-    width: '45%', 
-    aspectRatio: 1, 
-    marginBottom: 10,
-    overflow: 'hidden', 
+    width: '45%',
+    aspectRatio: 1,
+    marginBottom: "8%",
+    overflow: 'hidden',
     borderRadius: 25,
     borderWidth: 4,
-    borderColor: "#C1272D"
-
+    borderColor: "#C1272D",
   },
   image: {
     width: "100%",
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   imageStyle: {
-    borderRadius: 20, 
+    borderRadius: 20,
   },
   gradient: {
     ...StyleSheet.absoluteFillObject,

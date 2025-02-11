@@ -5,10 +5,26 @@ import TitleDashed from "@/components/titledashed";
 import MenuContainer from "@/components/menuContainer";
 import { useRouter } from "expo-router";
 import Slideshow from "@/components/slideShow";
+import { useContext } from "react";
+import { AppContext } from "@/app/context/AppContext";
 
+const DATA = [
+  { id: '1', name: 'Item 1', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
+  { id: '2', name: 'Item 2', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
+  { id: '3', name: 'Item 3', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
+  // { id: '4', name: 'Item 4', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
+];
 
 export default function Index() {
+  const context = useContext(AppContext);
+  if (!context) {
+    return <Text>Error: AppContext is not available</Text>;
+  }
+  const { order, setOrder} = context;
   const router = useRouter();
+  const handleTapItem = () =>{
+    router.replace(`/order/order-type`);
+  }
   return (
     
     <View style={globalStyle.container}>
@@ -41,7 +57,10 @@ export default function Index() {
       <View style={styles.contentContainer}>
         <Slideshow />
         <TitleDashed title="BEST SELLERS" />
-        <MenuContainer />
+      
+        <MenuContainer menuData={DATA} handleTapItem={handleTapItem}/>
+
+        
       </View>
      
       </ScrollView>

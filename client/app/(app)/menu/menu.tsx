@@ -1,11 +1,14 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Text, TextInput, View, FlatList } from "react-native";
+import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
-import menuData from "../../../data/menu.json"; // Assuming your menu data is in a file
+import menuData from "../../../data/menu.json";
 import Feather from "@expo/vector-icons/Feather";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import TitleDashed from "@/components/titledashed";
-import React from "react";
+import MenuContainer from "@/components/menuContainer";
+import { BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Modalize } from "react-native-modalize";
 
 interface AddOns {
   label: string;
@@ -36,20 +39,25 @@ interface Menu {
   subCategories: Array<SubCategories>;
 }
 
-// Assuming menuData is an object with categories as keys
+interface MenuItemCard {
+  id: string;
+  name: string;
+  image: string;
+}
+
 type MenuData = typeof menuData;
 
 export default function Menu() {
   const router = useRouter();
-  const { id } = useLocalSearchParams();  
+  const { id } = useLocalSearchParams();
   const [menu, setMenu] = useState<Menu | null>(null);
   const [search, setSearch] = useState<string>(''); 
+  const modalizeRef = useRef<Modalize>(null);
 
-
-  const setMenuData = () =>{
+  const setMenuData = () => {
     const categoryId = parseInt(id as string);
     setMenu(menuData[categoryId]); 
-  }
+  };
 
   // Handle search logic to filter menu items
   const handleSearch = (query: string) => {
@@ -64,42 +72,83 @@ export default function Menu() {
     )
   );
 
+  const handleTapItem =()=>{
+    modalizeRef.current?.open();
+  }
+
   useEffect(() => {
     setMenuData();
-    console.log(menu);
+    console.log(menu?.subCategories);
   }, [setMenuData]);
 
   return (
-    <View style={[globalStyle.container, { paddingTop: 0 }]}>
-      
-      <View style={{ padding: 10, justifyContent: "center", backgroundColor: "#C1272D" }}>
-        <TextInput
-          style={globalStyle.searchMenu}
-          value={search}
-          placeholder="SEARCH..."
-          onChangeText={handleSearch}
-        />
-        <Feather size={23} name="search" color="#C1272D" style={{ position: "absolute", right: 20 }} />
-      </View>
-
-      {menu && (
-        <>
-          <TitleDashed title={menu.category} />
-          
-          <FlatList
-            data={filteredItems}
-            keyExtractor={(item) => item.itemId}
-            renderItem={({ item }) => (
-              <View style={{ padding: 10, borderBottomWidth: 1, borderColor: '#ddd' }}>
-                <Text style={{ fontWeight: 'bold' }}>{item.label}</Text>
-                <Text>{item.description}</Text>
-                <Text>{`Price: $${item.price}`}</Text>
-                <Text>{`Time: ${item.time}`}</Text>
-              </View>
-            )}
+    <GestureHandlerRootView >
+      <BottomSheetModalProvider>
+      <View style={[globalStyle.container, { paddingTop: 0 }]}>
+        <View style={{ padding: 10, justifyContent: "center", backgroundColor: "#C1272D" }}>
+          <TextInput
+            style={globalStyle.searchMenu}
+            value={search}
+            placeholder="SEARCH..."
+            onChangeText={handleSearch}
           />
-        </>
-      )}
-    </View>
+          <Feather size={23} name="search" color="#C1272D" style={{ position: "absolute", right: 20 }} />
+        </View>
+
+        <ScrollView>
+          <View style={styles.contentContainer}>
+            {menu && (
+              <>
+                {menu.subCategories.map((item, key) => {
+                  const menuData: MenuItemCard[] = item.items.map((menuItem) => ({
+                    id: menuItem.itemId,
+                    name: menuItem.label,
+                    image: menuItem.image
+                  }));
+
+                  return (
+                    <View key={key}>
+                      <View style={{ marginBottom: 10 }}>
+                        <TitleDashed title={item.label} />
+                      </View>
+
+                      {/* Pass the entire menuData array to MenuContainer */}
+                      <MenuContainer
+                        menuData={menuData}  // Pass the array of menu items
+                        handleTapItem={handleTapItem}  // Tap callback to trigger bottom sheet
+                      />
+                    </View>
+                  );
+                })}
+              </>
+            )}
+          </View>
+        </ScrollView>
+
+       
+        <Modalize ref={modalizeRef} snapPoint={500} modalHeight={500}>
+          
+        </Modalize>
+
+      </View>
+    </BottomSheetModalProvider>
+    </GestureHandlerRootView>
+    
   );
 }
+
+const styles = StyleSheet.create({
+  contentContainer: {
+    margin: "5%",
+  },
+  bottomSheetContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+});
