@@ -72,11 +72,43 @@ export default function AppLayout() {
             }}/>
         
         {/* Menu Screens */}
-        <Stack.Screen name="menu/menu-categories"  options={{ headerShown: false }}/>
-        <Stack.Screen name="menu/menu-burgers"  options={{ headerShown: false }}/>
-        <Stack.Screen name="menu/menu-drinks"  options={{ headerShown: false }}/>
-        <Stack.Screen name="menu/menu-favorites"  options={{ headerShown: false }}/>
-        <Stack.Screen name="menu/menu-featured"  options={{ headerShown: false }}/>
+        <Stack.Screen name="menu/menu-categories" options={{
+          headerShown: true,
+          headerTitle: "MENU - CATEGORIES",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+            }}/>
+        <Stack.Screen name="menu/menu"  options={{
+          headerShown: true,
+          headerTitle: "MENU",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+            }}/>
+        <Stack.Screen name="menu/menu-featured" options={{
+          headerShown: true,
+          headerTitle: "MENU - FEATURED",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+            }}/>
+
+          <Stack.Screen name="menu/menu-favourite" options={{
+          headerShown: true,
+          headerTitle: "MENU - FAVOURITE",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+            }}/>
 
         {/* Buying Screens */}
         <Stack.Screen name="view-cart" options={{ headerShown: false }} />

@@ -1,0 +1,352 @@
+{
+    "Luzon": {
+      "provinces": [
+        {
+          "id": "1",
+          "name": "Abra",
+          "cities": [
+            "Bangued",
+            "Lagangilang",
+            "Luba",
+            "Peñarrubia",
+            "Pilar",
+            "San Juan",
+            "San Quintin",
+            "Tineg",
+            "Bucay",
+            "Danglas"
+          ]
+        },
+        {
+          "id": "2",
+          "name": "Albay",
+          "cities": [
+            "Legazpi",
+            "Tabaco",
+            "Daraga",
+            "Ligao",
+            "Santo Domingo",
+            "Guinobatan",
+            "Malilipot",
+            "Rapu-Rapu",
+            "Manito",
+            "Camalig"
+          ]
+        },
+        {
+          "id": "3",
+          "name": "Antique",
+          "cities": [
+            "San Jose de Buenavista",
+            "Sibalom",
+            "Patnongon",
+            "Belison",
+            "Hamtic",
+            "Valderrama",
+            "San Remigio",
+            "Laua-an"
+          ]
+        },
+        {
+          "id": "4",
+          "name": "Aurora",
+          "cities": [
+            "Baler",
+            "Dipaculao",
+            "Casiguran",
+            "Dinalungan",
+            "San Luis",
+            "Maria Aurora"
+          ]
+        },
+        {
+          "id": "5",
+          "name": "Batangas",
+          "cities": [
+            "Batangas City",
+            "Lipa",
+            "Tanauan",
+            "Nasugbu",
+            "San Juan",
+            "Balayan",
+            "Lobo",
+            "Taal",
+            "Ibaan",
+            "Tuy"
+          ]
+        },
+        {
+          "id": "6",
+          "name": "Benguet",
+          "cities": [
+            "Baguio",
+            "Itogon",
+            "La Trinidad",
+            "Tuba",
+            "Tublay",
+            "Buguias"
+          ]
+        },
+        {
+          "id": "7",
+          "name": "Bulacan",
+          "cities": [
+            "Malolos",
+            "Meycauayan",
+            "San Jose del Monte",
+            "Plaridel",
+            "Hagonoy",
+            "Marilao",
+            "Balagtas",
+            "Angat",
+            "Bocaue"
+          ]
+        },
+        {
+          "id": "8",
+          "name": "Cagayan",
+          "cities": [
+            "Tuguegarao",
+            "Cauayan",
+            "Santo Niño",
+            "Gattaran",
+            "Enrile",
+            "Amulung",
+            "Solana",
+            "Piat"
+          ]
+        },
+        {
+          "id": "9",
+          "name": "Camarines Norte",
+          "cities": [
+            "Daet",
+            "Mercedes",
+            "Jose Panganiban",
+            "Talisay",
+            "Vinzons",
+            "Labo"
+          ]
+        },
+        {
+          "id": "10",
+          "name": "Camarines Sur",
+          "cities": [
+            "Naga",
+            "Iriga",
+            "Caramoan",
+            "Baao",
+            "Bula",
+            "Gainza",
+            "Libmanan",
+            "Lupi"
+          ]
+        },
+        {
+          "id": "11",
+          "name": "Catanduanes",
+          "cities": [
+            "Virac",
+            "Panganiban",
+            "San Andres",
+            "San Miguel"
+          ]
+        },
+        {
+          "id": "12",
+          "name": "Cavite",
+          "cities": [
+            "Tagaytay",
+            "Dasmariñas",
+            "Imus",
+            "Bacoor",
+            "Cavite City",
+            "General Trias",
+            "Trece Martires",
+            "Silang",
+            "Kawit"
+          ]
+        },
+        {
+          "id": "13",
+          "name": "Ifugao",
+          "cities": [
+            "Nayon",
+            "Hingyon",
+            "Lamut",
+            "Alfonso Lista",
+            "Mayoyao"
+          ]
+        },
+        {
+          "id": "14",
+          "name": "Isabela",
+          "cities": [
+            "Ilagan",
+            "Santiago",
+            "Cauayan",
+            "Roxas",
+            "Tumauini",
+            "Angadanan"
+          ]
+        },
+        {
+          "id": "15",
+          "name": "Kalinga",
+          "cities": [
+            "Tabuk",
+            "Pasil",
+            "Balbalan",
+            "Lubuagan"
+          ]
+        },
+        {
+          "id": "16",
+          "name": "La Union",
+          "cities": [
+            "San Fernando",
+            "Agoo",
+            "Bauang",
+            "Aringay",
+            "Naguilian"
+          ]
+        },
+        {
+          "id": "17",
+          "name": "Laguna",
+          "cities": [
+            "Santa Rosa",
+            "Biñan",
+            "San Pablo",
+            "Cabuyao",
+            "Calamba",
+            "San Pedro"
+          ]
+        },
+        {
+          "id": "18",
+          "name": "Marinduque",
+          "cities": [
+            "Boac",
+            "Gasan",
+            "Mogpog",
+            "Buenavista"
+          ]
+        },
+        {
+          "id": "19",
+          "name": "Masbate",
+          "cities": [
+            "Masbate City",
+            "Mobo",
+            "Dimasalang",
+            "Placer",
+            "Milagros"
+          ]
+        },
+        {
+          "id": "20",
+          "name": "Mindoro Occidental",
+          "cities": [
+            "Mamburao",
+            "Rizal",
+            "Sablayan",
+            "San Jose"
+          ]
+        },
+        {
+          "id": "21",
+          "name": "Mindoro Oriental",
+          "cities": [
+            "Calapan",
+            "Baco",
+            "Puerto Galera",
+            "Bansud",
+            "Victoria"
+          ]
+        },
+        {
+          "id": "22",
+          "name": "Mountain Province",
+          "cities": [
+            "Bontoc",
+            "Sagada",
+            "Tadian",
+            "Besao"
+          ]
+        },
+        {
+          "id": "23",
+          "name": "Nueva Ecija",
+          "cities": [
+            "Cabanatuan",
+            "Gapan",
+            "San Jose City",
+            "Palayan",
+            "Cabiao"
+          ]
+        },
+        {
+          "id": "24",
+          "name": "Nueva Vizcaya",
+          "cities": [
+            "Bayombong",
+            "Solano",
+            "Aritao"
+          ]
+        },
+        {
+          "id": "25",
+          "name": "Pangasinan",
+          "cities": [
+            "Dagupan",
+            "Lingayen",
+            "San Carlos",
+            "Alaminos",
+            "Urdaneta"
+          ]
+        },
+        {
+          "id": "26",
+          "name": "Quezon",
+          "cities": [
+            "Lucena",
+            "Tiaong",
+            "Candelaria",
+            "Sariaya",
+            "San Pablo"
+          ]
+        },
+        {
+          "id": "27",
+          "name": "Rizal",
+          "cities": [
+            "Antipolo",
+            "Rodriguez",
+            "Binangonan",
+            "Cainta"
+          ]
+        },
+        {
+          "id": "28",
+          "name": "Tarlac",
+          "cities": [
+            "Tarlac City",
+            "Capas",
+            "Paniqui"
+          ]
+        },
+        {
+          "id": "29",
+          "name": "Zambales",
+          "cities": [
+            "Olongapo",
+            "Iba",
+            "Masinloc",
+            "Subic"
+          ]
+        }
+      ]
+    }
+  }
+  
