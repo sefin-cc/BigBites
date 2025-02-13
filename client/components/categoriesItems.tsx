@@ -5,7 +5,7 @@ import CatergoryIcon from './catergoryIcons';
 import { router } from "expo-router";
 
 const DATA = [
-  { id: '0', name: 'FAVOURITES'},
+
   { id: '1', name: 'BURGERS' },
   { id: '2', name: 'BARKADAS' },
   { id: '3', name: 'SIDES' },
@@ -17,6 +17,30 @@ export default function CategoriesItems() {
  
   return (
     <View style={styles.grid}>
+      <TouchableOpacity onPress={() => {router.push(`/(app)/menu/menu-favourite`)}} style={styles.card}>
+          <View style={{ flex: 1, justifyContent: "center"}}>
+           <CatergoryIcon name={"FAVOURITES"} />
+          </View>
+  
+            {/* Text (Above Gradient) */}
+            <View style={styles.textContainer}>
+              <Svg height="45" width="100%">
+                <Text
+                  fill="#C1272D"
+                  stroke="#FFEEE5"
+                  fontSize="20"
+                  fontFamily="MadimiOne"
+                  x="50%"
+                  y="50%"
+                  textAnchor="middle"
+                  strokeWidth="1"
+                  strokeLinejoin="round"
+                >
+                  FAVOURITES
+                </Text>
+              </Svg>
+            </View>
+        </TouchableOpacity>
       {DATA.map((item) => (
 
         <TouchableOpacity onPress={() => {router.push(`/(app)/menu/menu?id=${item.id}`)}} key={item.id} style={styles.card}>

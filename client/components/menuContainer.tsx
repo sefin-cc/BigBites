@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 interface MenuData {
   id: string;
+  subId: string;
   name: string;
   image: string;  // Now using a string for URL
 }
@@ -14,13 +15,15 @@ interface MenuData {
 interface Props {
   menuData: MenuData[];  // Array of MenuData
   handleTapItem: () => void;
+  setItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  setSubCategoryId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export default function MenuContainer({ menuData, handleTapItem }: Props) {
+export default function MenuContainer({ menuData, handleTapItem, setItemId, setSubCategoryId }: Props) {
   return (
     <View style={styles.grid} >
       {menuData.map((item) => (
-        <TouchableOpacity key={item.id} style={styles.card} onPress={handleTapItem}>
+        <TouchableOpacity key={item.id} style={styles.card} onPress={() =>{handleTapItem(); setItemId(item.id); setSubCategoryId(item.subId)}}>
           <ImageBackground 
             source={{ uri: item.image }}  // Update to handle URL images
             style={styles.image} 

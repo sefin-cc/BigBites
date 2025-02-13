@@ -22,13 +22,13 @@
         "items": [
           {
             "itemId": "1",
+            "subId": "1",
             "label": "AFORDA JR",
             "fullLabel": "AFORDA JR BURGER",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             "price": 99,
             "time": "15mins",
             "image": "",
-            "favourite": false,
             "addOns": [
               {
                 "id": "1",
@@ -45,13 +45,13 @@
         "items": [
           {
             "itemId": "2",
+            "subId": "2",
             "label": "BIGBOY BEEF",
             "fullLabel": "BIGBOY BEEF BURGER",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
             "price": 299,
             "time": "30mins",
             "image": "",
-            "favourite": true,
             "addOns": [
               {
                 "id": "2",
@@ -79,13 +79,13 @@
         "items": [
           {
             "itemId": "1",
+            "subId": "1",
             "label": "AFORDA FEST",
             "fullLabel": "BARKADA AFORDA JR FEST",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             "price": 390,
             "time": "60mins",
             "image": "",
-            "favourite": true,
             "addOns": [
               {
                 "id": "1",
@@ -108,13 +108,13 @@
         "items": [
           {
             "itemId": "1",
+            "subId": "1",
             "label": "FRIES",
             "fullLabel": "FRIES",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             "price": 75,
             "time": "10mins",
             "image": "",
-            "favourite": true,
             "addOns": [
               {
                 "id": "4",
@@ -137,13 +137,13 @@
         "items": [
           {
             "itemId": "1",
+            "subId": "1",
             "label": "SPRITE",
             "fullLabel": "SPRITE",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             "price": 25,
             "time": "3mins",
             "image": "",
-            "favourite": false,
             "addOns": [
               {
                 "id": "4",
@@ -166,13 +166,13 @@
         "items": [
           {
             "itemId": "1",
+            "subId": "1",
             "label": "SUNDAE",
             "fullLabel": "SUNDAE",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             "price": 25,
             "time": "3mins",
             "image": "",
-            "favourite": true,
             "addOns": [
               {
                 "id": "4",
@@ -195,13 +195,13 @@
         "items": [
           {
             "itemId": "1",
+            "subId": "1",
             "label": "SUNDAE",
             "fullLabel": "SUNDAE",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             "price": 25,
             "time": "3mins",
             "image": "",
-            "favourite": true,
             "addOns": [
               {
                 "id": "4",

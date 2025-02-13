@@ -100,6 +100,16 @@ export default function AppLayout() {
           ),
             }}/>
 
+          <Stack.Screen name="menu/menu-favourite" options={{
+          headerShown: true,
+          headerTitle: "MENU - FAVOURITE",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+            }}/>
+
         {/* Buying Screens */}
         <Stack.Screen name="view-cart" options={{ headerShown: false }} />
         <Stack.Screen name="checkout" options={{ headerShown: false }} />

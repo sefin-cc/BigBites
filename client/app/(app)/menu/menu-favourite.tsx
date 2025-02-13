@@ -20,6 +20,7 @@ interface AddOns {
 
 interface MenuItems {
   [x: string]: any;
+  subId: string;
   itemId: string;
   label: string;
   fullLabel: string;
@@ -30,19 +31,7 @@ interface MenuItems {
   addOns: Array<AddOns>;
 }
 
-interface SubCategories {
-  subId: string;
-  label: string;
-  items: Array<MenuItems>;
-}
-
-interface Menu {
-  id: string;
-  category: string;
-  subCategories: Array<SubCategories>;
-}
-
-interface MenuItemCard {
+interface MenuData {
   id: string;
   subId: string;
   name: string;
@@ -53,17 +42,15 @@ interface User {
   favourites: MenuItems[];
 }
 
-type MenuData = typeof menuData;
 
-export default function Menu() {
+export default function MenuFavourite() {
   const context = useContext(AppContext);
   if (!context) {
     return <Text>Error: AppContext is not available</Text>;
   }
   const { order, setOrder, setUser, user} = context;
   const router = useRouter();
-  const { id } = useLocalSearchParams();
-  const [menu, setMenu] = useState<Menu | null>(null);
+  const [menu, setMenu] = useState<any[] | null>(null);
   const [search, setSearch] = useState<string>(''); 
   const modalizeRef = useRef<Modalize>(null);
   const [itemId, setItemId] = useState<string | null>(null);
@@ -71,12 +58,11 @@ export default function Menu() {
   const [favourite, toggleFavourite] = useState(false);
   const [qtyCount, setQtyCount] = useState(1);
   const [tappedItems, setTappedItems] = useState<{ [key: number]: boolean }>({}); 
-
+  const [favMenu, setfavMenu] = useState<MenuData[]>();
 
 
   const setMenuData = () => {
-    const categoryId = parseInt(id as string);
-    setMenu(menuData[categoryId]); 
+    setMenu(user.favourites); 
   };
 
   // Handle search logic to filter menu items
@@ -85,12 +71,12 @@ export default function Menu() {
   };
 
   // Filtered items based on search query
-  const filteredItems = menu?.subCategories?.flatMap(subCategory => 
-    subCategory.items.filter(item => 
-      item.label.toLowerCase().includes(search.toLowerCase()) || 
-      item.fullLabel.toLowerCase().includes(search.toLowerCase())
-    )
-  );
+  // const filteredItems = menu?.subCategories?.flatMap(subCategory => 
+  //   subCategory.items.filter(item => 
+  //     item.label.toLowerCase().includes(search.toLowerCase()) || 
+  //     item.fullLabel.toLowerCase().includes(search.toLowerCase())
+  //   )
+  // );
 
   const handleTapItem =()=>{
     setQtyCount(1);
@@ -100,10 +86,8 @@ export default function Menu() {
 
 
   const getSelectedItem = () => {
-    if (!menu || !subCategoryId || !itemId) return null;
-    const subCategory = menu.subCategories.find(sub => sub.subId === subCategoryId);
-    if (subCategory) {
-      return subCategory.items.find(item => item.itemId === itemId);
+    if (menu){
+      return menu.find(item => item.itemId === itemId);
     }
     return null;
   }
@@ -118,6 +102,25 @@ export default function Menu() {
   useEffect(() => {
     console.log(order);
   }, [order]);
+
+  
+  useEffect(() => {
+    if (menu) {
+      const favourites = menu.map((item: MenuItems) => ({
+        id: item.itemId,
+        subId: item.subId,
+        name: item.label,
+        image: item.image
+      }));
+      setfavMenu(favourites);
+      console.log("favourites:", favourites);  // Improved log
+    }
+  }, [menu]);  
+
+  useEffect(() => {
+    console.log(order);
+  }, [order]);
+
 
   useEffect(() => {
     if (selectedItem) {
@@ -217,9 +220,10 @@ export default function Menu() {
   
   
   return (
+    <View style={[globalStyle.container, { paddingTop: 0 }]}>
     <GestureHandlerRootView >
       <BottomSheetModalProvider>
-      <View style={[globalStyle.container, { paddingTop: 0, flex: 1}]}>
+    
         <View style={{ padding: 10, justifyContent: "center", backgroundColor: "#C1272D" }}>
           <TextInput
             style={globalStyle.searchMenu}
@@ -232,51 +236,30 @@ export default function Menu() {
 
         {/* Menu */}
         <ScrollView style={{flexGrow: 1}}>
+          
           <View style={styles.contentContainer}>
-            {menu && (
-              <>
-                {menu.subCategories.map((item, key) => {
-                  const menuData: MenuItemCard[] = item.items.map((menuItem) => ({
-                    id: menuItem.itemId,
-                    subId:menuItem.subId,
-                    name: menuItem.label,
-                    image: menuItem.image,
-                  }));
-
-                  return (
-                    <View key={key}>
-                      <View style={{ marginBottom: 10 }}>
-                        <TitleDashed title={item.label} />
-                      </View>
-
-                      {/* Pass the entire menuData array to MenuContainer */}
-                      <MenuContainer
-                        menuData={menuData}  // Pass the array of menu items
-                        handleTapItem={() => handleTapItem()}  // Tap callback to trigger bottom sheet
-                        setItemId={setItemId}
-                        setSubCategoryId={setSubCategoryId}
-                      />
-                    </View>
-                  );
-                })}
-              </>
-            )}
+            <View style={{ marginBottom: 10 }}>
+              <TitleDashed title="MY FAVOURITES" />
+            </View>
+        {menu && (
+               <>
+                  {favMenu && (
+        <>
+              <View>
+                <MenuContainer
+                  menuData={favMenu}
+                  handleTapItem={handleTapItem}
+                  setItemId={setItemId}
+                  setSubCategoryId={setSubCategoryId}
+                />
+              </View>  
+        </>
+      )}
+               </>
+             )}
           </View>
         </ScrollView>
 
-        {/* View Cart */}
-        <View style={styles.viewCartBtnCard}>
-          <TouchableOpacity
-                onPress={() =>{}}
-                style={[styles.btnViewCart]}>
-                  <View style={{flexDirection: "row", justifyContent: "center",alignItems: "center", gap: 10, flexGrow: 1}}>
-                    <FontAwesome6 name="cart-shopping" size={16} color="white" />
-                    <Text style={styles.textViewCart}>VIEW CART</Text>
-                  </View>
-                  <Text style={styles.textViewCart}>PHP 0</Text>
-            </TouchableOpacity>
-        </View>
-          
         {/* Modal */}
         <Modalize ref={modalizeRef} snapPoint={600} modalHeight={600}>
           {selectedItem &&
@@ -311,7 +294,7 @@ export default function Menu() {
                     <View style={styles.addOnsContainer}>
                       {
 
-                            selectedItem.addOns.map((item, key) => {
+                            selectedItem.addOns.map((item: AddOns, key: number) => {
                               return (
                                 <TouchableOpacity 
                                   key={key} 
@@ -346,9 +329,25 @@ export default function Menu() {
 
         </Modalize>
 
-      </View>
+        {/* View Cart */}
+        <View style={styles.viewCartBtnCard}>
+          <TouchableOpacity
+                onPress={() =>{}}
+                style={[styles.btnViewCart]}>
+                  <View style={{flexDirection: "row", justifyContent: "center",alignItems: "center", gap: 10, flexGrow: 1}}>
+                    <FontAwesome6 name="cart-shopping" size={16} color="white" />
+                    <Text style={styles.textViewCart}>VIEW CART</Text>
+                  </View>
+                  <Text style={styles.textViewCart}>PHP 0</Text>
+            </TouchableOpacity>
+        </View>
+          
+      
     </BottomSheetModalProvider>
+    
     </GestureHandlerRootView>
+    
+    </View>
     
   );
 }

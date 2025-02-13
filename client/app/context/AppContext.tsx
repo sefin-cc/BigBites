@@ -25,7 +25,13 @@ export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    favourites: []
+  });
   const [order, setOrder] = useState<Order>({
     costumer: null,
     type: "",

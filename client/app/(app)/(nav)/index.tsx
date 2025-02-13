@@ -5,13 +5,13 @@ import TitleDashed from "@/components/titledashed";
 import MenuContainer from "@/components/menuContainer";
 import { useRouter } from "expo-router";
 import Slideshow from "@/components/slideShow";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AppContext } from "@/app/context/AppContext";
 
 const DATA = [
-  { id: '1', name: 'Item 1', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
-  { id: '2', name: 'Item 2', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
-  { id: '3', name: 'Item 3', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
+  { id: '1', subId: "1", name: 'Item 1', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
+  { id: '2', subId: "1", name: 'Item 2', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
+  { id: '3', subId: "1", name: 'Item 3', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
   // { id: '4', name: 'Item 4', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
 ];
 
@@ -25,6 +25,8 @@ export default function Index() {
   const handleTapItem = () =>{
     router.replace(`/order/order-type`);
   }
+  const [itemId, setItemId] = useState<string | null>(null);
+  const [subCategoryId, setSubCategoryId] = useState<string | null>(null);
   return (
     
     <View style={globalStyle.container}>
@@ -58,8 +60,11 @@ export default function Index() {
         <Slideshow />
         <TitleDashed title="BEST SELLERS" />
       
-        <MenuContainer menuData={DATA} handleTapItem={handleTapItem}/>
-
+        <MenuContainer menuData={DATA} 
+          handleTapItem={handleTapItem}
+          setItemId={setItemId}
+          setSubCategoryId={setSubCategoryId}
+        />
         
       </View>
      
