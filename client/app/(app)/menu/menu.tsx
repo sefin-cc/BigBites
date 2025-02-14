@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity } from "react-native";
+import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity, SafeAreaView, Dimensions } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
 import menuData from "../../../data/menu.json";
 import Feather from "@expo/vector-icons/Feather";
@@ -12,6 +12,8 @@ import { Modalize } from "react-native-modalize";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { AppContext } from "@/app/context/AppContext";
+import ViewCartContainer from "@/components/ViewCartContainer";
+
 
 interface AddOns {
   label: string;
@@ -217,9 +219,13 @@ export default function Menu() {
   
   
   return (
-    <GestureHandlerRootView >
-      <BottomSheetModalProvider>
-      <View style={[globalStyle.container, { paddingTop: 0, flex: 1}]}>
+
+    <View style={[globalStyle.container]}>
+      <BottomSheetModalProvider >
+      <GestureHandlerRootView >
+ 
+      
+      
         <View style={{ padding: 10, justifyContent: "center", backgroundColor: "#C1272D" }}>
           <TextInput
             style={globalStyle.searchMenu}
@@ -230,8 +236,10 @@ export default function Menu() {
           <Feather size={23} name="search" color="#C1272D" style={{ position: "absolute", right: 20 }} />
         </View>
 
+     
+       
         {/* Menu */}
-        <ScrollView style={{flexGrow: 1}}>
+        <ScrollView >
           <View style={styles.contentContainer}>
             {menu && (
               <>
@@ -245,37 +253,28 @@ export default function Menu() {
 
                   return (
                     <View key={key}>
-                      <View style={{ marginBottom: 10 }}>
-                        <TitleDashed title={item.label} />
-                      </View>
+                        <View style={{ marginBottom: 10 }}>
+                          <TitleDashed title={item.label} />
+                        </View>
 
-                      {/* Pass the entire menuData array to MenuContainer */}
-                      <MenuContainer
-                        menuData={menuData}  // Pass the array of menu items
-                        handleTapItem={() => handleTapItem()}  // Tap callback to trigger bottom sheet
-                        setItemId={setItemId}
-                        setSubCategoryId={setSubCategoryId}
-                      />
+                        {/* Pass the entire menuData array to MenuContainer */}
+                        <MenuContainer
+                          menuData={menuData}  // Pass the array of menu items
+                          handleTapItem={() => handleTapItem()}  // Tap callback to trigger bottom sheet
+                          setItemId={setItemId}
+                          setSubCategoryId={setSubCategoryId}
+                        />
                     </View>
                   );
                 })}
               </>
             )}
           </View>
+
+
         </ScrollView>
 
-        {/* View Cart */}
-        <View style={styles.viewCartBtnCard}>
-          <TouchableOpacity
-                onPress={() =>{}}
-                style={[styles.btnViewCart]}>
-                  <View style={{flexDirection: "row", justifyContent: "center",alignItems: "center", gap: 10, flexGrow: 1}}>
-                    <FontAwesome6 name="cart-shopping" size={16} color="white" />
-                    <Text style={styles.textViewCart}>VIEW CART</Text>
-                  </View>
-                  <Text style={styles.textViewCart}>PHP 0</Text>
-            </TouchableOpacity>
-        </View>
+
           
         {/* Modal */}
         <Modalize ref={modalizeRef} snapPoint={600} modalHeight={600}>
@@ -343,20 +342,30 @@ export default function Menu() {
                   </View>
             </View>
           }
-
         </Modalize>
+    
+ 
 
+
+
+          <ViewCartContainer />
+        
+        
+        </GestureHandlerRootView> 
+        </BottomSheetModalProvider>
       </View>
-    </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+      
+
     
   );
 }
+
 
 const styles = StyleSheet.create({
   contentContainer: {
     margin: "5%",
   },
+
   bottomSheetContent: {
     flex: 1,
     justifyContent: 'center',
@@ -364,31 +373,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
- //View Cart
-  viewCartBtnCard: {
-    flex:1,
-    padding: 15,
-    justifyContent: "center",
-    alignItems: "flex-start",
-    flexDirection: "row",
-    backgroundColor: "#FB7F3B",
-
-  },
-  btnViewCart: {
-    flex: 1,
-    backgroundColor: "#2C2C2C",
-    borderRadius: 10,
-    padding: 10, 
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 10
-  },
-  textViewCart: {
-    color: "white",
-    fontFamily: 'MadimiOne',
-    fontSize: 20
-  },
   // image modal
   image: {
     backgroundColor: "#C1272D",

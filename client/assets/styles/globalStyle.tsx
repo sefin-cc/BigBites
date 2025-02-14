@@ -4,7 +4,6 @@ const globalStyles = StyleSheet.create({
  container: {
     flex: 1,
     backgroundColor: "#FFEEE5",
-    paddingTop: StatusBar.currentHeight,
   },
   loading: {
     flex: 1,

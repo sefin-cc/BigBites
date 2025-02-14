@@ -12,6 +12,7 @@ import { Modalize } from "react-native-modalize";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { AppContext } from "@/app/context/AppContext";
+import ViewCartContainer from "@/components/ViewCartContainer";
 
 interface AddOns {
   label: string;
@@ -49,7 +50,6 @@ export default function MenuFavourite() {
     return <Text>Error: AppContext is not available</Text>;
   }
   const { order, setOrder, setUser, user} = context;
-  const router = useRouter();
   const [menu, setMenu] = useState<any[] | null>(null);
   const [search, setSearch] = useState<string>(''); 
   const modalizeRef = useRef<Modalize>(null);
@@ -329,18 +329,7 @@ export default function MenuFavourite() {
 
         </Modalize>
 
-        {/* View Cart */}
-        <View style={styles.viewCartBtnCard}>
-          <TouchableOpacity
-                onPress={() =>{}}
-                style={[styles.btnViewCart]}>
-                  <View style={{flexDirection: "row", justifyContent: "center",alignItems: "center", gap: 10, flexGrow: 1}}>
-                    <FontAwesome6 name="cart-shopping" size={16} color="white" />
-                    <Text style={styles.textViewCart}>VIEW CART</Text>
-                  </View>
-                  <Text style={styles.textViewCart}>PHP 0</Text>
-            </TouchableOpacity>
-        </View>
+       <ViewCartContainer />
           
       
     </BottomSheetModalProvider>

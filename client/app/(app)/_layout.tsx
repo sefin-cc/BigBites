@@ -111,7 +111,16 @@ export default function AppLayout() {
             }}/>
 
         {/* Buying Screens */}
-        <Stack.Screen name="view-cart" options={{ headerShown: false }} />
+        <Stack.Screen name="view-cart" options={{
+          headerShown: true,
+          headerTitle: "CART",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+            }}/>
+
         <Stack.Screen name="checkout" options={{ headerShown: false }} />
       </Stack>
   );
