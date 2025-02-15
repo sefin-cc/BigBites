@@ -17,7 +17,8 @@ export default function TitleDashed({title}: TitleDashedProps) {
 }
 const styles = StyleSheet.create({
   component: {
-    flexDirection:"row"
+    flexDirection:"row",
+    flexGrow: 1
   },
   title: {
     fontSize: 24,

@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity } from "react-native";
+import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity, SafeAreaView, Dimensions } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
 import menuData from "../../../data/menu.json";
 import Feather from "@expo/vector-icons/Feather";
@@ -12,6 +12,9 @@ import { Modalize } from "react-native-modalize";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { AppContext } from "@/app/context/AppContext";
+import ViewCartContainer from "@/components/ViewCartContainer";
+import SearchMenu from "@/components/SearchMenu";
+
 
 interface AddOns {
   label: string;
@@ -64,7 +67,7 @@ export default function Menu() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const [menu, setMenu] = useState<Menu | null>(null);
-  const [search, setSearch] = useState<string>(''); 
+
   const modalizeRef = useRef<Modalize>(null);
   const [itemId, setItemId] = useState<string | null>(null);
   const [subCategoryId, setSubCategoryId] = useState<string | null>(null);
@@ -79,18 +82,7 @@ export default function Menu() {
     setMenu(menuData[categoryId]); 
   };
 
-  // Handle search logic to filter menu items
-  const handleSearch = (query: string) => {
-    setSearch(query);
-  };
 
-  // Filtered items based on search query
-  const filteredItems = menu?.subCategories?.flatMap(subCategory => 
-    subCategory.items.filter(item => 
-      item.label.toLowerCase().includes(search.toLowerCase()) || 
-      item.fullLabel.toLowerCase().includes(search.toLowerCase())
-    )
-  );
 
   const handleTapItem =()=>{
     setQtyCount(1);
@@ -217,9 +209,13 @@ export default function Menu() {
   
   
   return (
-    <GestureHandlerRootView >
-      <BottomSheetModalProvider>
-      <View style={[globalStyle.container, { paddingTop: 0, flex: 1}]}>
+
+    <View style={[globalStyle.container]}>
+      <BottomSheetModalProvider >
+      <GestureHandlerRootView >
+ 
+      <SearchMenu  />
+{/*       
         <View style={{ padding: 10, justifyContent: "center", backgroundColor: "#C1272D" }}>
           <TextInput
             style={globalStyle.searchMenu}
@@ -228,10 +224,12 @@ export default function Menu() {
             onChangeText={handleSearch}
           />
           <Feather size={23} name="search" color="#C1272D" style={{ position: "absolute", right: 20 }} />
-        </View>
+        </View> */}
 
+     
+       
         {/* Menu */}
-        <ScrollView style={{flexGrow: 1}}>
+        <ScrollView >
           <View style={styles.contentContainer}>
             {menu && (
               <>
@@ -245,49 +243,40 @@ export default function Menu() {
 
                   return (
                     <View key={key}>
-                      <View style={{ marginBottom: 10 }}>
-                        <TitleDashed title={item.label} />
-                      </View>
+                        <View style={{ marginBottom: 10 }}>
+                          <TitleDashed title={item.label} />
+                        </View>
 
-                      {/* Pass the entire menuData array to MenuContainer */}
-                      <MenuContainer
-                        menuData={menuData}  // Pass the array of menu items
-                        handleTapItem={() => handleTapItem()}  // Tap callback to trigger bottom sheet
-                        setItemId={setItemId}
-                        setSubCategoryId={setSubCategoryId}
-                      />
+                        {/* Pass the entire menuData array to MenuContainer */}
+                        <MenuContainer
+                          menuData={menuData}  // Pass the array of menu items
+                          handleTapItem={() => handleTapItem()}  // Tap callback to trigger bottom sheet
+                          setItemId={setItemId}
+                          setSubCategoryId={setSubCategoryId}
+                        />
                     </View>
                   );
                 })}
               </>
             )}
           </View>
+
+
         </ScrollView>
 
-        {/* View Cart */}
-        <View style={styles.viewCartBtnCard}>
-          <TouchableOpacity
-                onPress={() =>{}}
-                style={[styles.btnViewCart]}>
-                  <View style={{flexDirection: "row", justifyContent: "center",alignItems: "center", gap: 10, flexGrow: 1}}>
-                    <FontAwesome6 name="cart-shopping" size={16} color="white" />
-                    <Text style={styles.textViewCart}>VIEW CART</Text>
-                  </View>
-                  <Text style={styles.textViewCart}>PHP 0</Text>
-            </TouchableOpacity>
-        </View>
+
           
         {/* Modal */}
-        <Modalize ref={modalizeRef} snapPoint={600} modalHeight={600}>
+        <Modalize ref={modalizeRef} snapPoint={630} modalHeight={630}>
           {selectedItem &&
             <View>
                   <Image 
                     source={{ uri: selectedItem.image }}  
-                    style={styles.image}
+                    style={globalStyle.image}
                   />
-                  <View style={styles.modalContainer}>
+                  <View style={globalStyle.modalContainer}>
                     <View style={{flexDirection: "row"}}>
-                      <Text style={styles.modalLabel}>{selectedItem.fullLabel}</Text>
+                      <Text style={globalStyle.modalLabel}>{selectedItem.fullLabel}</Text>
                       <TouchableOpacity
                         onPress={() => {setFavourite(selectedItem)}}
                       >
@@ -298,17 +287,17 @@ export default function Menu() {
                         }
                       </TouchableOpacity>
                     </View>
-                    <View style={styles.dashedLine}/>
+                    <View style={globalStyle.dashedLine}/>
                     <View style={{flexDirection: "row", gap: 10}}>
-                      <Text style={styles.modalPrice}>PHP {selectedItem.price}</Text>
-                      <View style={styles.timeCard}>
+                      <Text style={globalStyle.modalPrice}>PHP {selectedItem.price}</Text>
+                      <View style={globalStyle.timeCard}>
                         <AntDesign name="clockcircle" size={16} color="white" />
-                        <Text style={styles.timeText}>{selectedItem.time}</Text>
+                        <Text style={globalStyle.timeText}>{selectedItem.time}</Text>
                       </View>
                     </View>
-                    <Text style={styles.descriptionText}>{selectedItem.description}</Text>
-                    <Text style={styles.addOnsText}>ADD ONS</Text>
-                    <View style={styles.addOnsContainer}>
+                    <Text style={globalStyle.descriptionText}>{selectedItem.description}</Text>
+                    <Text style={globalStyle.addOnsText}>ADD ONS</Text>
+                    <View style={globalStyle.addOnsContainer}>
                       {
 
                             selectedItem.addOns.map((item, key) => {
@@ -316,9 +305,9 @@ export default function Menu() {
                                 <TouchableOpacity 
                                   key={key} 
                                   onPress={() => toggleAddOnTapped(key)} 
-                                  style={[styles.addOnsItemCard, tappedItems[key] && { backgroundColor: "#FB7F3B" }]} // Conditional background color
+                                  style={[globalStyle.addOnsItemCard, tappedItems[key] && { backgroundColor: "#FB7F3B" }]} // Conditional background color
                                 >
-                                  <Text style={[styles.addOnsItemText, tappedItems[key] && { color: "white" }]}>
+                                  <Text style={[globalStyle.addOnsItemText, tappedItems[key] && { color: "white" }]}>
                                     {item.label} + P {item.price}
                                   </Text>
                                 </TouchableOpacity>
@@ -327,194 +316,47 @@ export default function Menu() {
                       }
                     </View>
                     <View style={{flexDirection: "row", gap: 10}}>
-                      <View style={styles.qtyCard}>
-                        <TouchableOpacity onPress={() => {setQty(qtyCount - 1)}} style={[styles.qtyCardBtns]}><FontAwesome6 name="minus" size={16} color="white" /></TouchableOpacity>
-                        <View style={styles.qtyCardView}><Text style={styles.qtyCardViewText}>{qtyCount}</Text></View>
-                        <TouchableOpacity onPress={() => {setQty(qtyCount + 1)}} style={[styles.qtyCardBtns]}><FontAwesome6 name="plus" size={16} color="white" /></TouchableOpacity>
+                      <View style={globalStyle.qtyCard}>
+                        <TouchableOpacity onPress={() => {setQty(qtyCount - 1)}} style={[globalStyle.qtyCardBtns]}><FontAwesome6 name="minus" size={16} color="white" /></TouchableOpacity>
+                        <View style={globalStyle.qtyCardView}><Text style={globalStyle.qtyCardViewText}>{qtyCount}</Text></View>
+                        <TouchableOpacity onPress={() => {setQty(qtyCount + 1)}} style={[globalStyle.qtyCardBtns]}><FontAwesome6 name="plus" size={16} color="white" /></TouchableOpacity>
                       </View>
                       <TouchableOpacity
                         onPress={() =>{handleAddToCart(selectedItem)}}
-                        style ={styles.btnCart}
+                        style ={globalStyle.btnCart}
                       >
                         <FontAwesome6 name="cart-shopping" size={16} color="white" />
-                        <Text style={styles.cartText}>ADD TO CART</Text>
+                        <Text style={globalStyle.cartText}>ADD TO CART</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
             </View>
           }
-
         </Modalize>
+    
+ 
 
+
+
+          <ViewCartContainer />
+        
+        
+        </GestureHandlerRootView> 
+        </BottomSheetModalProvider>
       </View>
-    </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+      
+
     
   );
 }
+
 
 const styles = StyleSheet.create({
   contentContainer: {
     margin: "5%",
   },
-  bottomSheetContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
 
- //View Cart
-  viewCartBtnCard: {
-    flex:1,
-    padding: 15,
-    justifyContent: "center",
-    alignItems: "flex-start",
-    flexDirection: "row",
-    backgroundColor: "#FB7F3B",
 
-  },
-  btnViewCart: {
-    flex: 1,
-    backgroundColor: "#2C2C2C",
-    borderRadius: 10,
-    padding: 10, 
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 10
-  },
-  textViewCart: {
-    color: "white",
-    fontFamily: 'MadimiOne',
-    fontSize: 20
-  },
-  // image modal
-  image: {
-    backgroundColor: "#C1272D",
-    height: 200,
-  },
-
-  //Modal
-  modalText: {
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  modalContainer: {
-    padding: "3%",
-    gap: 15
-  },
-  modalLabel: {
-    fontFamily: 'MadimiOne',
-    color: '#C1272D',
-    fontSize: 24,
-    flexGrow: 1
-  },
-  modalPrice: {
-    fontFamily: 'MadimiOne',
-    color: '#2C2C2C',
-    fontSize: 24,
-  },
-
-  //Line
-  dashedLine: {          
-    borderBottomWidth: 4,  
-    borderColor: 'rgba(194, 39, 45, 0.5)',
-    borderStyle: 'dashed',
-    flexGrow: 1,
-    top: -6 
-  },
-
-  //Time
-  timeCard: {
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FB7F3B",
-    padding: 5,
-    borderRadius: 5,
-    flexDirection: "row",
-    gap: 5
-  },
-  timeText: {
-    color: "white",
-    fontFamily: 'MadimiOne',
-    fontSize: 16,
-  },
-
-  //Description
-  descriptionText: {
-    color: "#7d7c7c",
-    fontFamily: 'MadimiOne',
-  },
-
-  // AddOns
-  addOnsText:{
-    color: "#C1272D",
-    fontFamily: 'MadimiOne',
-    fontSize: 20,
-  },
-  addOnsContainer: {
-    flex: 1,
-    flexDirection: "row",
-    gap: 5,
-  },
-  addOnsItemCard: {
-    borderWidth: 3,
-    borderRadius: 5,
-    borderColor: "#FB7F3B",
-    padding: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
-  addOnsItemText: {
-    fontFamily: 'MadimiOne',
-    color: "#FB7F3B",
-  },
-
-  //Cart button
-  btnCart: {
-    flex: 1.5,
-    backgroundColor: "#2C2C2C",
-    borderRadius: 10,
-    padding: 10, 
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 10
-  },
-  cartText: {
-    color: "white",
-    fontFamily: 'MadimiOne',
-    fontSize: 20
-  },
-
-  // QTY 
-  qtyCard:{
-    flex: 1,
-    borderRadius: 10,
-    flexDirection: "row",
-    borderWidth: 3,
-    borderColor: "#FB7F3B"
-  },
-  qtyCardBtns:{
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FB7F3B",
-  },
-  qtyCardView:{
-    flex: 1,
-    backgroundColor: "white",
-    fontFamily: 'MadimiOne',
-    color: "#2C2C2C",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  qtyCardViewText:{
-    fontFamily: 'MadimiOne',
-    fontSize: 20,
-  },
 
 
 });
