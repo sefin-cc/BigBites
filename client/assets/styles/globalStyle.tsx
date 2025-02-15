@@ -61,6 +61,139 @@ const globalStyles = StyleSheet.create({
     color: "#2C2C2C",
     flexGrow: 1
   },
+  bottomSheetContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+
+  // image modal
+  image: {
+    backgroundColor: "#C1272D",
+    height: 200,
+  },
+
+  //Modal
+  modalText: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  modalContainer: {
+    padding: "3%",
+    gap: 15
+  },
+  modalLabel: {
+    fontFamily: 'MadimiOne',
+    color: '#C1272D',
+    fontSize: 24,
+    flexGrow: 1
+  },
+  modalPrice: {
+    fontFamily: 'MadimiOne',
+    color: '#2C2C2C',
+    fontSize: 24,
+  },
+
+  //Line
+  dashedLine: {          
+    borderBottomWidth: 4,  
+    borderColor: 'rgba(194, 39, 45, 0.5)',
+    borderStyle: 'dashed',
+    flexGrow: 1,
+    top: -6 
+  },
+
+  //Time
+  timeCard: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FB7F3B",
+    padding: 5,
+    borderRadius: 5,
+    flexDirection: "row",
+    gap: 5
+  },
+  timeText: {
+    color: "white",
+    fontFamily: 'MadimiOne',
+    fontSize: 16,
+  },
+
+  //Description
+  descriptionText: {
+    color: "#7d7c7c",
+    fontFamily: 'MadimiOne',
+  },
+
+  // AddOns
+  addOnsText:{
+    color: "#C1272D",
+    fontFamily: 'MadimiOne',
+    fontSize: 20,
+  },
+  addOnsContainer: {
+    flex: 1,
+    flexDirection: "row",
+    gap: 5,
+  },
+  addOnsItemCard: {
+    borderWidth: 3,
+    borderRadius: 5,
+    borderColor: "#FB7F3B",
+    padding: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+  },
+  addOnsItemText: {
+    fontFamily: 'MadimiOne',
+    color: "#FB7F3B",
+  },
+
+  //Cart button
+  btnCart: {
+    flex: 1.5,
+    backgroundColor: "#2C2C2C",
+    borderRadius: 10,
+    padding: 10, 
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10
+  },
+  cartText: {
+    color: "white",
+    fontFamily: 'MadimiOne',
+    fontSize: 20
+  },
+
+  // QTY 
+  qtyCard:{
+    flex: 1,
+    borderRadius: 10,
+    flexDirection: "row",
+    borderWidth: 3,
+    borderColor: "#FB7F3B"
+  },
+  qtyCardBtns:{
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FB7F3B",
+  },
+  qtyCardView:{
+    flex: 1,
+    backgroundColor: "white",
+    fontFamily: 'MadimiOne',
+    color: "#2C2C2C",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  qtyCardViewText:{
+    fontFamily: 'MadimiOne',
+    fontSize: 20,
+  },
 });
 
 export default globalStyles;

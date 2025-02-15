@@ -55,7 +55,7 @@ export default function Categories() {
       <SafeAreaView>
             <View style={[styles.viewCartBtnCard]}>
             <TouchableOpacity
-                onPress={() =>{ router.replace(`/(app)/view-cart`);}}
+                onPress={() =>{ router.push(`/(app)/view-cart`);}}
                 style={[styles.btnViewCart]}>
                 <View style={{flexDirection: "row", justifyContent: "center",alignItems: "center", gap: 10, flexGrow: 1}}>
                     <FontAwesome6 name="cart-shopping" size={16} color="white" />
@@ -76,7 +76,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#C1272D"
   },
   contentContainer: {
-    margin: "5%"
+    margin: "5%",
+    paddingBottom: 50
   },
   
  //View Cart

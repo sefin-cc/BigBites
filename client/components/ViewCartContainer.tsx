@@ -22,7 +22,7 @@ export default function ViewCartContainer() {
         <SafeAreaView>
             <View style={[styles.viewCartBtnCard,  { paddingBottom: insets.bottom + 70 }]}>
             <TouchableOpacity
-                onPress={() =>{ router.replace(`/(app)/view-cart`);}}
+                onPress={() =>{ router.push(`/(app)/view-cart`);}}
                 style={[styles.btnViewCart]}>
                 <View style={{flexDirection: "row", justifyContent: "center",alignItems: "center", gap: 10, flexGrow: 1}}>
                     <FontAwesome6 name="cart-shopping" size={16} color="white" />

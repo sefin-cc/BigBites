@@ -277,16 +277,16 @@ export default function Menu() {
 
           
         {/* Modal */}
-        <Modalize ref={modalizeRef} snapPoint={600} modalHeight={600}>
+        <Modalize ref={modalizeRef} snapPoint={630} modalHeight={630}>
           {selectedItem &&
             <View>
                   <Image 
                     source={{ uri: selectedItem.image }}  
-                    style={styles.image}
+                    style={globalStyle.image}
                   />
-                  <View style={styles.modalContainer}>
+                  <View style={globalStyle.modalContainer}>
                     <View style={{flexDirection: "row"}}>
-                      <Text style={styles.modalLabel}>{selectedItem.fullLabel}</Text>
+                      <Text style={globalStyle.modalLabel}>{selectedItem.fullLabel}</Text>
                       <TouchableOpacity
                         onPress={() => {setFavourite(selectedItem)}}
                       >
@@ -297,17 +297,17 @@ export default function Menu() {
                         }
                       </TouchableOpacity>
                     </View>
-                    <View style={styles.dashedLine}/>
+                    <View style={globalStyle.dashedLine}/>
                     <View style={{flexDirection: "row", gap: 10}}>
-                      <Text style={styles.modalPrice}>PHP {selectedItem.price}</Text>
-                      <View style={styles.timeCard}>
+                      <Text style={globalStyle.modalPrice}>PHP {selectedItem.price}</Text>
+                      <View style={globalStyle.timeCard}>
                         <AntDesign name="clockcircle" size={16} color="white" />
-                        <Text style={styles.timeText}>{selectedItem.time}</Text>
+                        <Text style={globalStyle.timeText}>{selectedItem.time}</Text>
                       </View>
                     </View>
-                    <Text style={styles.descriptionText}>{selectedItem.description}</Text>
-                    <Text style={styles.addOnsText}>ADD ONS</Text>
-                    <View style={styles.addOnsContainer}>
+                    <Text style={globalStyle.descriptionText}>{selectedItem.description}</Text>
+                    <Text style={globalStyle.addOnsText}>ADD ONS</Text>
+                    <View style={globalStyle.addOnsContainer}>
                       {
 
                             selectedItem.addOns.map((item, key) => {
@@ -315,9 +315,9 @@ export default function Menu() {
                                 <TouchableOpacity 
                                   key={key} 
                                   onPress={() => toggleAddOnTapped(key)} 
-                                  style={[styles.addOnsItemCard, tappedItems[key] && { backgroundColor: "#FB7F3B" }]} // Conditional background color
+                                  style={[globalStyle.addOnsItemCard, tappedItems[key] && { backgroundColor: "#FB7F3B" }]} // Conditional background color
                                 >
-                                  <Text style={[styles.addOnsItemText, tappedItems[key] && { color: "white" }]}>
+                                  <Text style={[globalStyle.addOnsItemText, tappedItems[key] && { color: "white" }]}>
                                     {item.label} + P {item.price}
                                   </Text>
                                 </TouchableOpacity>
@@ -326,17 +326,17 @@ export default function Menu() {
                       }
                     </View>
                     <View style={{flexDirection: "row", gap: 10}}>
-                      <View style={styles.qtyCard}>
-                        <TouchableOpacity onPress={() => {setQty(qtyCount - 1)}} style={[styles.qtyCardBtns]}><FontAwesome6 name="minus" size={16} color="white" /></TouchableOpacity>
-                        <View style={styles.qtyCardView}><Text style={styles.qtyCardViewText}>{qtyCount}</Text></View>
-                        <TouchableOpacity onPress={() => {setQty(qtyCount + 1)}} style={[styles.qtyCardBtns]}><FontAwesome6 name="plus" size={16} color="white" /></TouchableOpacity>
+                      <View style={globalStyle.qtyCard}>
+                        <TouchableOpacity onPress={() => {setQty(qtyCount - 1)}} style={[globalStyle.qtyCardBtns]}><FontAwesome6 name="minus" size={16} color="white" /></TouchableOpacity>
+                        <View style={globalStyle.qtyCardView}><Text style={globalStyle.qtyCardViewText}>{qtyCount}</Text></View>
+                        <TouchableOpacity onPress={() => {setQty(qtyCount + 1)}} style={[globalStyle.qtyCardBtns]}><FontAwesome6 name="plus" size={16} color="white" /></TouchableOpacity>
                       </View>
                       <TouchableOpacity
                         onPress={() =>{handleAddToCart(selectedItem)}}
-                        style ={styles.btnCart}
+                        style ={globalStyle.btnCart}
                       >
                         <FontAwesome6 name="cart-shopping" size={16} color="white" />
-                        <Text style={styles.cartText}>ADD TO CART</Text>
+                        <Text style={globalStyle.cartText}>ADD TO CART</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -366,139 +366,7 @@ const styles = StyleSheet.create({
     margin: "5%",
   },
 
-  bottomSheetContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
 
-  // image modal
-  image: {
-    backgroundColor: "#C1272D",
-    height: 200,
-  },
-
-  //Modal
-  modalText: {
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  modalContainer: {
-    padding: "3%",
-    gap: 15
-  },
-  modalLabel: {
-    fontFamily: 'MadimiOne',
-    color: '#C1272D',
-    fontSize: 24,
-    flexGrow: 1
-  },
-  modalPrice: {
-    fontFamily: 'MadimiOne',
-    color: '#2C2C2C',
-    fontSize: 24,
-  },
-
-  //Line
-  dashedLine: {          
-    borderBottomWidth: 4,  
-    borderColor: 'rgba(194, 39, 45, 0.5)',
-    borderStyle: 'dashed',
-    flexGrow: 1,
-    top: -6 
-  },
-
-  //Time
-  timeCard: {
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FB7F3B",
-    padding: 5,
-    borderRadius: 5,
-    flexDirection: "row",
-    gap: 5
-  },
-  timeText: {
-    color: "white",
-    fontFamily: 'MadimiOne',
-    fontSize: 16,
-  },
-
-  //Description
-  descriptionText: {
-    color: "#7d7c7c",
-    fontFamily: 'MadimiOne',
-  },
-
-  // AddOns
-  addOnsText:{
-    color: "#C1272D",
-    fontFamily: 'MadimiOne',
-    fontSize: 20,
-  },
-  addOnsContainer: {
-    flex: 1,
-    flexDirection: "row",
-    gap: 5,
-  },
-  addOnsItemCard: {
-    borderWidth: 3,
-    borderRadius: 5,
-    borderColor: "#FB7F3B",
-    padding: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
-  addOnsItemText: {
-    fontFamily: 'MadimiOne',
-    color: "#FB7F3B",
-  },
-
-  //Cart button
-  btnCart: {
-    flex: 1.5,
-    backgroundColor: "#2C2C2C",
-    borderRadius: 10,
-    padding: 10, 
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 10
-  },
-  cartText: {
-    color: "white",
-    fontFamily: 'MadimiOne',
-    fontSize: 20
-  },
-
-  // QTY 
-  qtyCard:{
-    flex: 1,
-    borderRadius: 10,
-    flexDirection: "row",
-    borderWidth: 3,
-    borderColor: "#FB7F3B"
-  },
-  qtyCardBtns:{
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FB7F3B",
-  },
-  qtyCardView:{
-    flex: 1,
-    backgroundColor: "white",
-    fontFamily: 'MadimiOne',
-    color: "#2C2C2C",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  qtyCardViewText:{
-    fontFamily: 'MadimiOne',
-    fontSize: 20,
-  },
 
 
 });
