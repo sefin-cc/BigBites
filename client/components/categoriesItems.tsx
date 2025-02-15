@@ -6,11 +6,11 @@ import { router } from "expo-router";
 
 const DATA = [
 
-  { id: '1', name: 'BURGERS' },
-  { id: '2', name: 'BARKADAS' },
-  { id: '3', name: 'SIDES' },
-  { id: '4', name: 'DRINKS' },
-  { id: '5', name: 'DESSERTS'},
+  { id: '0', name: 'BURGERS' },
+  { id: '1', name: 'BARKADAS' },
+  { id: '2', name: 'SIDES' },
+  { id: '3', name: 'DRINKS' },
+  { id: '4', name: 'DESSERTS'},
 ];
 
 export default function CategoriesItems() {

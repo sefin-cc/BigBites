@@ -13,6 +13,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { AppContext } from "@/app/context/AppContext";
 import ViewCartContainer from "@/components/ViewCartContainer";
+import SearchMenu from "@/components/SearchMenu";
 
 interface AddOns {
   label: string;
@@ -51,7 +52,6 @@ export default function MenuFavourite() {
   }
   const { order, setOrder, setUser, user} = context;
   const [menu, setMenu] = useState<any[] | null>(null);
-  const [search, setSearch] = useState<string>(''); 
   const modalizeRef = useRef<Modalize>(null);
   const [itemId, setItemId] = useState<string | null>(null);
   const [subCategoryId, setSubCategoryId] = useState<string | null>(null);
@@ -64,19 +64,6 @@ export default function MenuFavourite() {
   const setMenuData = () => {
     setMenu(user.favourites); 
   };
-
-  // Handle search logic to filter menu items
-  const handleSearch = (query: string) => {
-    setSearch(query);
-  };
-
-  // Filtered items based on search query
-  // const filteredItems = menu?.subCategories?.flatMap(subCategory => 
-  //   subCategory.items.filter(item => 
-  //     item.label.toLowerCase().includes(search.toLowerCase()) || 
-  //     item.fullLabel.toLowerCase().includes(search.toLowerCase())
-  //   )
-  // );
 
   const handleTapItem =()=>{
     setQtyCount(1);
@@ -224,15 +211,7 @@ export default function MenuFavourite() {
     <GestureHandlerRootView >
       <BottomSheetModalProvider>
     
-        <View style={{ padding: 10, justifyContent: "center", backgroundColor: "#C1272D" }}>
-          <TextInput
-            style={globalStyle.searchMenu}
-            value={search}
-            placeholder="SEARCH..."
-            onChangeText={handleSearch}
-          />
-          <Feather size={23} name="search" color="#C1272D" style={{ position: "absolute", right: 20 }} />
-        </View>
+        <SearchMenu />
 
         {/* Menu */}
         <ScrollView style={{flexGrow: 1}}>

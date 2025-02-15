@@ -9,6 +9,7 @@ import ViewCartContainer from "@/components/ViewCartContainer";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import useCartTotal from "@/hooks/useCartTotal";
 import { AppContext } from "@/app/context/AppContext";
+import SearchMenu from "@/components/SearchMenu";
 
 export default function Categories() {
     const context = useContext(AppContext);
@@ -16,23 +17,12 @@ export default function Categories() {
       return <Text>Error: AppContext is not available</Text>;
     }
     const { order } = context;
-  const [search, setSearch] = useState<string>(''); 
-  const handleSearch = async (query: string) => {
-    setSearch(query);
-  }
+
   const orderTotal = useCartTotal(order ? order.order : []);
   return (
     <View style={[globalStyle.container, {paddingTop: 0}]}>
 
-        <View style={{padding: 10, justifyContent: "center",backgroundColor: "#C1272D"}}>
-          <TextInput
-            style={globalStyle.searchMenu}
-            value={search}
-            placeholder="SEARCH..."
-            onChangeText={handleSearch}  
-          />
-          <Feather size={23} name="search"  color="#C1272D"  style={{position: "absolute", right: 20}}/>
-        </View>
+    <SearchMenu />
   
       <ScrollView>
         <TouchableOpacity onPress={() =>router.push(`/(app)/menu/menu-featured`)} style={styles.featuredContainer}>

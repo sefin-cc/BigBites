@@ -1,19 +1,7 @@
 [
+
   {
     "id": "0",
-    "category": "FAVORITES",
-    "subCategories": [
-      {
-        "subId": "1",
-        "label": "MY FAVORITES",
-        "items": [
-          
-        ]
-      }
-    ]
-  },
-  {
-    "id": "1",
     "category": "BURGERS",
     "subCategories": [
       {
@@ -70,7 +58,7 @@
     ]
   },
   {
-    "id": "2",
+    "id": "1",
     "category": "BARKADAS",
     "subCategories": [
       {
@@ -99,7 +87,7 @@
     ]
   },
   {
-    "id": "3",
+    "id": "2",
     "category": "SIDES",
     "subCategories": [
       {
@@ -128,7 +116,7 @@
     ]
   },
   {
-    "id": "4",
+    "id": "3",
     "category": "DRINKS",
     "subCategories": [
       {
@@ -157,41 +145,12 @@
     ]
   },
   {
-    "id": "5",
+    "id": "4",
     "category": "DESSERTS",
     "subCategories": [
       {
         "subId": "1",
         "label": "SWEETS",
-        "items": [
-          {
-            "itemId": "1",
-            "subId": "1",
-            "label": "SUNDAE",
-            "fullLabel": "SUNDAE",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "price": 25,
-            "time": "3mins",
-            "image": "",
-            "addOns": [
-              {
-                "id": "4",
-                "label": "LARGE",
-                "price": 10
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "6",
-    "category": "FEATURED",
-    "subCategories": [
-      {
-        "subId": "1",
-        "label": "FEATURED PROMOS",
         "items": [
           {
             "itemId": "1",

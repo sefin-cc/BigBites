@@ -13,6 +13,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { AppContext } from "@/app/context/AppContext";
 import ViewCartContainer from "@/components/ViewCartContainer";
+import SearchMenu from "@/components/SearchMenu";
 
 
 interface AddOns {
@@ -66,7 +67,7 @@ export default function Menu() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const [menu, setMenu] = useState<Menu | null>(null);
-  const [search, setSearch] = useState<string>(''); 
+
   const modalizeRef = useRef<Modalize>(null);
   const [itemId, setItemId] = useState<string | null>(null);
   const [subCategoryId, setSubCategoryId] = useState<string | null>(null);
@@ -81,18 +82,7 @@ export default function Menu() {
     setMenu(menuData[categoryId]); 
   };
 
-  // Handle search logic to filter menu items
-  const handleSearch = (query: string) => {
-    setSearch(query);
-  };
 
-  // Filtered items based on search query
-  const filteredItems = menu?.subCategories?.flatMap(subCategory => 
-    subCategory.items.filter(item => 
-      item.label.toLowerCase().includes(search.toLowerCase()) || 
-      item.fullLabel.toLowerCase().includes(search.toLowerCase())
-    )
-  );
 
   const handleTapItem =()=>{
     setQtyCount(1);
@@ -224,8 +214,8 @@ export default function Menu() {
       <BottomSheetModalProvider >
       <GestureHandlerRootView >
  
-      
-      
+      <SearchMenu  />
+{/*       
         <View style={{ padding: 10, justifyContent: "center", backgroundColor: "#C1272D" }}>
           <TextInput
             style={globalStyle.searchMenu}
@@ -234,7 +224,7 @@ export default function Menu() {
             onChangeText={handleSearch}
           />
           <Feather size={23} name="search" color="#C1272D" style={{ position: "absolute", right: 20 }} />
-        </View>
+        </View> */}
 
      
        
