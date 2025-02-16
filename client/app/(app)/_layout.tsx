@@ -121,7 +121,15 @@ export default function AppLayout() {
           ),
             }}/>
 
-        <Stack.Screen name="checkout" options={{ headerShown: false }} />
+        <Stack.Screen name="checkout" options={{
+          headerShown: true,
+          headerTitle: "CHECKOUT",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+            }}/>
       </Stack>
   );
 }

@@ -6,11 +6,18 @@ import DropDownPicker from "react-native-dropdown-picker";
 import location from "../../../data/location.json"
 import { AppContext } from "@/app/context/AppContext";
 
-
+interface Branch {
+  id: string;
+  branchName: string;
+  province: string;
+  city: string;
+  fullAddress: string;
+  tags: Array<string | null>; 
+}
 
 export default function BranchesStep3() {
   //This is temporary data
-  const branches = [
+  const branches: Branch[] = [
     { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan", tags: ["CURRENTLY CLOSED", "ADVANCE ORDER"] },
     { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", tags: ["ADVANCE ORDER"] },
     { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan", tags: ["ADVANCE ORDER"] },
@@ -62,10 +69,10 @@ export default function BranchesStep3() {
       return isProvinceMatch && isCityMatch;
     });
   
-    const handleSelectedBranch = (item: object ) => {
+    const handleSelectedBranch = (item: Branch ) => {
       setOrder(prev => ({
         ...prev,
-        branch: item,
+        branch: [item],
       }));
       router.push("/(app)/menu/menu-categories");
     }

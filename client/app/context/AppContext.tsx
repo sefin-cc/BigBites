@@ -1,13 +1,31 @@
 import React, { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+interface Location {
+  description: string;
+  latitude: number;
+  longitude: number;
+}
+
+interface Branch {
+  id: string;
+  branchName: string;
+  province: string;
+  city: string;
+  fullAddress: string;
+  tags: Array<string | null>; 
+}
+
 interface Order {
   costumer: any | null;
   type: string;
   pickUpType: string | null;
-  location: object | null;
-  branch: object | null;
+  location: Location | null;
+  branch: Array<Branch> | null;
   order: any[]; // Adjust type as needed
+  basePrice: number,
+  timestamp: string | null
+
 }
 
 // Define the context type
@@ -39,6 +57,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     location: null,
     branch: null,
     order: [],
+    basePrice: 0,
+    timestamp: null,
   });
 
   // Load token from AsyncStorage

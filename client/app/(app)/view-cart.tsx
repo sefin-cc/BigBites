@@ -156,6 +156,14 @@ export default function ViewCart() {
     console.log("TappedItems: "+ tappedItems);
   }, [tappedItems]);
 
+  const handleCheckOut = () => {
+    setOrder(prev => ({
+      ...prev,
+      basePrice: orderTotal,
+    }));
+    router.push(`/(app)/checkout`); 
+  }
+
   return (
    
     <BottomSheetModalProvider >
@@ -299,7 +307,7 @@ export default function ViewCart() {
             </View>
             <View style={[styles.checkOutBtnCard]}>
               <TouchableOpacity
-                onPress={() => { router.replace(`/(app)/checkout`); }}
+                onPress={() => { handleCheckOut();}}
                 style={[styles.btnViewCart]}>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 10 }}>
                   <FontAwesome6 name="cart-shopping" size={16} color="white" />
