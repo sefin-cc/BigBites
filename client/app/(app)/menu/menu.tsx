@@ -14,6 +14,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { AppContext } from "@/app/context/AppContext";
 import ViewCartContainer from "@/components/ViewCartContainer";
 import SearchMenu from "@/components/SearchMenu";
+import Loading from "@/components/loading";
 
 
 interface AddOns {
@@ -74,8 +75,11 @@ export default function Menu() {
   const [favourite, toggleFavourite] = useState(false);
   const [qtyCount, setQtyCount] = useState(1);
   const [tappedItems, setTappedItems] = useState<{ [key: number]: boolean }>({}); 
+  const [isLoading, setIsLoading] = useState(false);
 
-
+  const getMenuData = () =>{
+    
+  }
 
   const setMenuData = () => {
     const categoryId = parseInt(id as string);
@@ -211,9 +215,10 @@ export default function Menu() {
   return (
 
     <View style={[globalStyle.container]}>
+      <Loading isLoading={isLoading} />
       <BottomSheetModalProvider >
       <GestureHandlerRootView >
- 
+      
       <SearchMenu  />
 {/*       
         <View style={{ padding: 10, justifyContent: "center", backgroundColor: "#C1272D" }}>
