@@ -10,7 +10,7 @@ import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import Loading from "@/components/loading";
 
-// DONT FORGET TO ADD A LOADING FEATURE
+
 
 export default function MapLocationStep3() {
   const context = useContext(AppContext);

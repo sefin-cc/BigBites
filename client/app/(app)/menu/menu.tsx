@@ -239,7 +239,8 @@ export default function Menu() {
       <SearchMenu  />
      
         {/* Menu */}
-        <ScrollView >
+      <View style={{ minHeight: 700}}>
+      <ScrollView >
           <View style={styles.contentContainer}>
             {menu && (
               <>
@@ -291,6 +292,7 @@ export default function Menu() {
          
             
         </ScrollView>
+      </View>
 
 
           

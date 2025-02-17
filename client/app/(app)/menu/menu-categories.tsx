@@ -23,25 +23,26 @@ export default function Categories() {
     <View style={[globalStyle.container, {paddingTop: 0}]}>
 
     <SearchMenu />
-  
       <ScrollView>
-        <TouchableOpacity onPress={() =>router.push(`/(app)/menu/menu-featured`)} style={styles.featuredContainer}>
-          <Slideshow />
-        </TouchableOpacity>
-        <View style={styles.contentContainer}>
+          <TouchableOpacity onPress={() =>{}} style={styles.featuredContainer}>
+            <Slideshow />
+          </TouchableOpacity>
+          <View style={styles.contentContainer}>
 
-          <View style={categoryTitleStyle.component}>
-            <View style={categoryTitleStyle.dashedLine}/>
-              <Text style={categoryTitleStyle.title}>
-                  CATEGORIES
-              </Text>
-            <View style={categoryTitleStyle.dashedLine}/>
+            <View style={categoryTitleStyle.component}>
+              <View style={categoryTitleStyle.dashedLine}/>
+                <Text style={categoryTitleStyle.title}>
+                    CATEGORIES
+                </Text>
+              <View style={categoryTitleStyle.dashedLine}/>
+            </View>
+
+            <CategoriesItems />
           </View>
+        
+        </ScrollView>
 
-          <CategoriesItems />
-        </View>
-      
-      </ScrollView>
+     
       <SafeAreaView>
             <View style={[styles.viewCartBtnCard]}>
             <TouchableOpacity

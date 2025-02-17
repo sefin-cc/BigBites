@@ -10,7 +10,7 @@ export default function RootLayout() {
   });
 
   if (!fontsLoaded) {
-    return <Text>Loading fonts...</Text>;
+    return <Text></Text>;
   }
 
   return (

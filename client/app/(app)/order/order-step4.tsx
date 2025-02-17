@@ -98,7 +98,7 @@ export default function BranchesStep3() {
             containerStyle={dropdownStyles.dropdownContainer}
             selectedItemContainerStyle={dropdownStyles.selectedItemContainerStyle} 
             scrollViewProps={{
-              showsVerticalScrollIndicator: true,  // Enables scroll indicator
+              showsVerticalScrollIndicator: true,  
             }}
           />
           <DropDownPicker
@@ -115,7 +115,7 @@ export default function BranchesStep3() {
             containerStyle={dropdownStyles.dropdownContainer}
             selectedItemContainerStyle={dropdownStyles.selectedItemContainerStyle} 
             scrollViewProps={{
-              showsVerticalScrollIndicator: true,  // Enables scroll indicator
+              showsVerticalScrollIndicator: true,  
             }}
           />
       </View>
@@ -200,7 +200,6 @@ const styles = StyleSheet.create({
 
 const dropdownStyles = StyleSheet.create({
   dropdownMainContainer: {
-    zIndex: 1000, 
     flexDirection: "row",
     justifyContent: "space-between",
     borderColor: "#FB7F3B",
@@ -212,7 +211,6 @@ const dropdownStyles = StyleSheet.create({
     borderColor: "#FB7F3B",
     borderWidth: 3,
     borderRadius: 10,
-    zIndex: 1000, 
   },
   // Text style for the dropdown (label/text when closed)
   text: {
@@ -223,7 +221,6 @@ const dropdownStyles = StyleSheet.create({
   // Style for the container around the dropdown
   dropdownContainer: {
     width: "48%",
-    zIndex: 1000, 
   },
   dropDownStyle: {
     backgroundColor: "white", 
@@ -231,7 +228,6 @@ const dropdownStyles = StyleSheet.create({
     borderColor: "#FB7F3B",
     borderRadius: 10,
     maxHeight: 200, 
-    zIndex: 1000, 
     position: "absolute", 
     borderTopWidth: 1
   },
