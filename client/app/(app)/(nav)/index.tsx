@@ -7,6 +7,9 @@ import { useRouter } from "expo-router";
 import Slideshow from "@/components/slideShow";
 import { useContext, useState } from "react";
 import { AppContext } from "@/app/context/AppContext";
+import Loading from "@/components/loading";
+
+
 
 const DATA = [
   { id: '1', subId: "1", name: 'Item 1', image: 'https://sausagemaker.com/wp-content/uploads/Homemade-French-Fries_8.jpg' },
@@ -27,9 +30,17 @@ export default function Index() {
   }
   const [itemId, setItemId] = useState<string | null>(null);
   const [subCategoryId, setSubCategoryId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const getBestSeller = () =>{
+    //get the data here
+  }
+
+
   return (
     
     <View style={globalStyle.container}>
+      <Loading isLoading={isLoading} />
       <ScrollView>
         <LinearGradient
           colors={['transparent', '#C1272D']}

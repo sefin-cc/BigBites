@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity, SafeAreaView, Dimensions } from "react-native";
+import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity, SafeAreaView, Dimensions, ToastAndroid } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
 import menuData from "../../../data/menu.json";
 import Feather from "@expo/vector-icons/Feather";
@@ -14,6 +14,10 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { AppContext } from "@/app/context/AppContext";
 import ViewCartContainer from "@/components/ViewCartContainer";
 import SearchMenu from "@/components/SearchMenu";
+import Loading from "@/components/loading";
+import { Snackbar } from "react-native-paper";
+
+
 
 
 interface AddOns {
@@ -67,22 +71,23 @@ export default function Menu() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const [menu, setMenu] = useState<Menu | null>(null);
-
+  const [visible, setVisible] = useState<boolean>(false);
   const modalizeRef = useRef<Modalize>(null);
   const [itemId, setItemId] = useState<string | null>(null);
   const [subCategoryId, setSubCategoryId] = useState<string | null>(null);
   const [favourite, toggleFavourite] = useState(false);
   const [qtyCount, setQtyCount] = useState(1);
   const [tappedItems, setTappedItems] = useState<{ [key: number]: boolean }>({}); 
+  const [isLoading, setIsLoading] = useState(false);
 
-
+  const getMenuData = () =>{
+    
+  }
 
   const setMenuData = () => {
     const categoryId = parseInt(id as string);
     setMenu(menuData[categoryId]); 
   };
-
-
 
   const handleTapItem =()=>{
     setQtyCount(1);
@@ -200,36 +205,42 @@ export default function Menu() {
         order: [...prev.order, newItemMenu], // Add the new item to the order
       }));
     }
+    
+    setVisible(true);
+
   
     // Reset the tappedItems and quantity count after adding/updating the cart
     setTappedItems({});
     setQtyCount(1);
+    modalizeRef.current?.close();
   };
   
-  
+   // Function to hide the snackbar
+  const hideSnackbar = () => setVisible(false);
+
+  useEffect(() => {
+    if (visible) {
+      const timer = setTimeout(() => {
+        hideSnackbar(); // Hide snackbar after 3 seconds
+      }, 3000);
+
+      // Cleanup timer on component unmount or when visible changes
+      return () => clearTimeout(timer);
+    }
+  }, [visible]); 
   
   return (
 
     <View style={[globalStyle.container]}>
+      <Loading isLoading={isLoading} />
       <BottomSheetModalProvider >
       <GestureHandlerRootView >
- 
+      
       <SearchMenu  />
-{/*       
-        <View style={{ padding: 10, justifyContent: "center", backgroundColor: "#C1272D" }}>
-          <TextInput
-            style={globalStyle.searchMenu}
-            value={search}
-            placeholder="SEARCH..."
-            onChangeText={handleSearch}
-          />
-          <Feather size={23} name="search" color="#C1272D" style={{ position: "absolute", right: 20 }} />
-        </View> */}
-
      
-       
         {/* Menu */}
-        <ScrollView >
+      <View style={{ minHeight: 700}}>
+      <ScrollView >
           <View style={styles.contentContainer}>
             {menu && (
               <>
@@ -261,8 +272,27 @@ export default function Menu() {
             )}
           </View>
 
-
+            
+          <Snackbar
+            visible={visible}
+            onDismiss={hideSnackbar}
+            duration={Snackbar.DURATION_LONG} 
+            style={{
+              position: 'absolute',  
+              bottom: -90,          
+              left: 60,             
+              right: 60,           
+              backgroundColor: '#2C2C2C', 
+              borderRadius: 10,     
+              zIndex: 10000,          
+            }}
+          >
+            <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> <FontAwesome6 name="check" size={16} color="white" />  SUCCESSFULLY ADDED!</Text>
+          </Snackbar>
+         
+            
         </ScrollView>
+      </View>
 
 
           
@@ -335,8 +365,6 @@ export default function Menu() {
         </Modalize>
     
  
-
-
 
           <ViewCartContainer />
         

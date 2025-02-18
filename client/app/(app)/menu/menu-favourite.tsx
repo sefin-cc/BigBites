@@ -213,31 +213,33 @@ export default function MenuFavourite() {
     
         <SearchMenu />
 
-        {/* Menu */}
-        <ScrollView style={{flexGrow: 1}}>
-          
-          <View style={styles.contentContainer}>
-            <View style={{ marginBottom: 10 }}>
-              <TitleDashed title="MY FAVOURITES" />
+        <View style={{ minHeight: 700}}>
+          {/* Menu */}
+          <ScrollView style={{flexGrow: 1}}>
+            <View style={styles.contentContainer}>
+              <View style={{ marginBottom: 10 }}>
+                <TitleDashed title="MY FAVOURITES" />
+              </View>
+                {menu && (
+                  <>
+                          {favMenu && (
+                     <>
+                      <View>
+                        <MenuContainer
+                          menuData={favMenu}
+                          handleTapItem={handleTapItem}
+                          setItemId={setItemId}
+                          setSubCategoryId={setSubCategoryId}
+                        />
+                      </View>  
+                </>
+              )}
+                </>
+              )}
             </View>
-        {menu && (
-               <>
-                  {favMenu && (
-        <>
-              <View>
-                <MenuContainer
-                  menuData={favMenu}
-                  handleTapItem={handleTapItem}
-                  setItemId={setItemId}
-                  setSubCategoryId={setSubCategoryId}
-                />
-              </View>  
-        </>
-      )}
-               </>
-             )}
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
+       
 
         {/* Modal */}
         <Modalize ref={modalizeRef} snapPoint={600} modalHeight={600}>

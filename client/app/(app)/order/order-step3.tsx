@@ -8,8 +8,9 @@ import { AppContext } from "@/app/context/AppContext";
 import { router } from "expo-router";
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
+import Loading from "@/components/loading";
 
-// DONT FORGET TO ADD A LOADING FEATURE
+
 
 export default function MapLocationStep3() {
   const context = useContext(AppContext);
@@ -24,8 +25,10 @@ export default function MapLocationStep3() {
   const [isDraggable, setIsDraggable] = useState<boolean>(false);  
   const [savedLocation, setSavedLocation] = useState<{ description: string, latitude: number, longitude: number } | null>(null); 
   const [permissionGranted, setPermissionGranted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const reverseGeocode = async (query: string) =>{
+    setIsLoading(true);
     try {
       const response = await geocode({ q: query, key: OPENCAGE_API_KEY });
 
@@ -44,6 +47,8 @@ export default function MapLocationStep3() {
     } catch (err) {
    //   setError('An error occurred while fetching results.');
       console.error(err);  
+    }finally{
+      setIsLoading(false);
     }
     
     setIsDraggable(false);
@@ -52,6 +57,8 @@ export default function MapLocationStep3() {
 
   // Request location permission and get user location
   const getUserLocation = async () => {
+    setSuggestions([]); 
+    setIsLoading(true);
     try {
       // Request permission to access location
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -80,6 +87,8 @@ export default function MapLocationStep3() {
     } catch (err) {
   
       console.error(err);
+    }finally{
+      setIsLoading(false);
     }
   };
 
@@ -96,6 +105,7 @@ export default function MapLocationStep3() {
     }
 
     try {
+
       const response = await geocode({ q: query, key: OPENCAGE_API_KEY });
 
       if (response.status.code === 200 && response.results.length > 0) {
@@ -167,6 +177,7 @@ export default function MapLocationStep3() {
   
   return (
     <View style={{ flex: 1, position: "relative" }}>
+      <Loading isLoading={isLoading} />
       {/* Search Input */}
       <View style={{ flexDirection: "row", margin: 10 }}>
         <TextInput

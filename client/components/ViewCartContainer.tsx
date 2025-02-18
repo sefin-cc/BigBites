@@ -20,7 +20,7 @@ export default function ViewCartContainer() {
 
     return(
         <SafeAreaView>
-            <View style={[styles.viewCartBtnCard,  { paddingBottom: insets.bottom + 70 }]}>
+            <View style={[styles.viewCartBtnCard,  { paddingBottom: insets.bottom + 45 }]}>
             <TouchableOpacity
                 onPress={() =>{ router.push(`/(app)/view-cart`);}}
                 style={[styles.btnViewCart]}>

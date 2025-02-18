@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import TitleDashed from "@/components/titledashed";
 import { format } from 'date-fns';
-import { Checkbox, RadioButton, TextInput } from "react-native-paper";
+import { Checkbox, Dialog, Portal, RadioButton, Snackbar, TextInput, Button as PaperButton } from "react-native-paper";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 interface AddOns {
@@ -39,7 +39,10 @@ export default function Checkout() {
     const [discountDeduction, setDiscountDeduction] = useState(0);
     const [selectedValue, setSelectedValue] = useState("GCASH");
     const [errors, setErrors] = useState({ name: "", card: "" });
-   const currentTimestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+    const currentTimestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+   const [visible, setVisible] = useState<boolean>(false);
+
+   
 
    const validateForm = () => {
     if(discount){
@@ -93,11 +96,48 @@ export default function Checkout() {
         fees: {subTotal: order.basePrice, discountDeduction: discountDeduction, grandTotal: grandTotal},
         timestamp: currentTimestamp
       }));
+   
+      showDialog();
+
     }
+
    
 
     //post to server
   }
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Function to show the dialog
+  const showDialog = () => setModalVisible(true);
+
+  // Function to hide the dialog
+  const hideDialog = () => setModalVisible(false);
+
+    // Function to handle confirmation
+    const handleConfirm = () => {
+      setVisible(true);
+      hideDialog();
+    };
+  
+    // Function to handle cancellation
+    const handleCancel = () => {
+      hideDialog();
+    };
+
+     // Function to hide the snackbar
+    const hideSnackbar = () => setVisible(false);
+
+    useEffect(() => {
+      if (visible) {
+        const timer = setTimeout(() => {
+          hideSnackbar(); // Hide snackbar after 3 seconds
+        }, 3000);
+  
+        // Cleanup timer on component unmount or when visible changes
+        return () => clearTimeout(timer);
+      }
+    }, [visible]); 
 
   return (
     <View style={[globalStyle.container, {padding: "5%"}]}>
@@ -299,7 +339,36 @@ export default function Checkout() {
             </TouchableOpacity>
           </View>
 
+
+        
       </ScrollView>
+        <View style={{flex: 1}}>
+          <Snackbar
+            visible={visible}
+            onDismiss={hideSnackbar}
+            duration={Snackbar.DURATION_LONG} 
+            style={{
+              bottom: 100,            
+              backgroundColor:"#2C2C2C",
+              borderRadius: 10,    
+              zIndex: 10000,     
+            }}
+          >
+            <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> <FontAwesome6 name="check" size={16} color="white" />   ORDER SUCCESSFUL!</Text>
+          </Snackbar>
+        </View>
+      
+
+      <Dialog visible={modalVisible} onDismiss={hideDialog}>
+          <Dialog.Title style={styles.dialogTitle}>Are you sure?</Dialog.Title>
+          <Dialog.Content>
+            <Text style={styles.dialogContent}>Do you want to proceed with this order?</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <PaperButton onPress={handleCancel}><Text style={styles.dialogText}>CANCEL</Text></PaperButton>
+            <PaperButton onPress={handleConfirm} ><Text style={styles.dialogText}>CONFIRM</Text></PaperButton>
+          </Dialog.Actions>
+        </Dialog>
 
 
     </View>
@@ -307,6 +376,22 @@ export default function Checkout() {
 }
 
 const styles = StyleSheet.create({
+  dialogTitle: {
+    fontFamily: 'MadimiOne', // Custom font for the title
+    fontSize: 24,             // Custom font size
+    color: '#2C2C2C',         // Custom font color     
+  },
+  dialogContent: {
+    fontFamily: 'MadimiOne',     // Custom font for the content
+    fontSize: 16,             // Custom font size
+    color: '#5e5e5e',            // Custom font color for the content
+  },
+  dialogText:{
+    fontFamily: 'MadimiOne',     // Custom font for the content
+    fontSize: 16,  
+    color: '#C1272D',  
+  },
+
   text: {
     fontSize: 16,
     color: "#2C2C2C",
