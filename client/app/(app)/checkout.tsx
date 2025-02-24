@@ -73,7 +73,7 @@ export default function Checkout() {
   };
 
     useEffect(() =>{
-      console.log(order);
+      console.log(JSON.stringify(order, null, 2));
     },[order]);
 
     

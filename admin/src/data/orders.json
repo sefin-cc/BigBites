@@ -1,0 +1,1478 @@
+[{
+    "costumer": null,
+    "type": "PickUp",
+    "pickUpType": "DineIn",
+    "location": null,
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "2",
+        "subId": "2",
+        "label": "BIGBOY BEEF",
+        "fullLabel": "BIGBOY BEEF BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+        "price": 299,
+        "time": "30mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA JR",
+        "fullLabel": "AFORDA JR BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 99,
+        "time": "15mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      }
+    ],
+    "basePrice": 423,
+    "timestamp": "2025-02-23 20:18:56",
+    "discountCardDetails": {
+      "name": "",
+      "discountCard": ""
+    },
+    "fees": {
+      "subTotal": 423,
+      "discountDeduction": 0,
+      "grandTotal": 423
+    }
+  },
+  {
+    "costumer": null,
+    "type": "Delivery",
+    "pickUpType": null,
+    "location": {
+      "description": "Manila, Capital District, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621
+    },
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA FEST",
+        "fullLabel": "BARKADA AFORDA JR FEST",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 390,
+        "time": "60mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "SUNDAE",
+        "fullLabel": "SUNDAE",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 25,
+        "time": "3mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "qty": 1
+      }
+    ],
+    "basePrice": 425,
+    "timestamp": "2025-02-23 20:32:15",
+    "discountCardDetails": {
+      "name": "Rogena Sefin Tibegar",
+      "discountCard": "54545464644"
+    },
+    "fees": {
+      "subTotal": 425,
+      "discountDeduction": 42.5,
+      "grandTotal": 382.5
+    }
+  },
+  {
+    "costumer": null,
+    "type": "PickUp",
+    "pickUpType": "DineIn",
+    "location": null,
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "2",
+        "subId": "2",
+        "label": "BIGBOY BEEF",
+        "fullLabel": "BIGBOY BEEF BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+        "price": 299,
+        "time": "30mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA JR",
+        "fullLabel": "AFORDA JR BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 99,
+        "time": "15mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      }
+    ],
+    "basePrice": 423,
+    "timestamp": "2025-02-23 20:18:56",
+    "discountCardDetails": {
+      "name": "",
+      "discountCard": ""
+    },
+    "fees": {
+      "subTotal": 423,
+      "discountDeduction": 0,
+      "grandTotal": 423
+    }
+  },
+  {
+    "costumer": null,
+    "type": "Delivery",
+    "pickUpType": null,
+    "location": {
+      "description": "Manila, Capital District, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621
+    },
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA FEST",
+        "fullLabel": "BARKADA AFORDA JR FEST",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 390,
+        "time": "60mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "SUNDAE",
+        "fullLabel": "SUNDAE",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 25,
+        "time": "3mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "qty": 1
+      }
+    ],
+    "basePrice": 425,
+    "timestamp": "2025-02-23 20:32:15",
+    "discountCardDetails": {
+      "name": "Rogena Sefin Tibegar",
+      "discountCard": "54545464644"
+    },
+    "fees": {
+      "subTotal": 425,
+      "discountDeduction": 42.5,
+      "grandTotal": 382.5
+    }
+  },
+  {
+    "costumer": null,
+    "type": "PickUp",
+    "pickUpType": "DineIn",
+    "location": null,
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "2",
+        "subId": "2",
+        "label": "BIGBOY BEEF",
+        "fullLabel": "BIGBOY BEEF BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+        "price": 299,
+        "time": "30mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA JR",
+        "fullLabel": "AFORDA JR BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 99,
+        "time": "15mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      }
+    ],
+    "basePrice": 423,
+    "timestamp": "2025-02-23 20:18:56",
+    "discountCardDetails": {
+      "name": "",
+      "discountCard": ""
+    },
+    "fees": {
+      "subTotal": 423,
+      "discountDeduction": 0,
+      "grandTotal": 423
+    }
+  },
+  {
+    "costumer": null,
+    "type": "Delivery",
+    "pickUpType": null,
+    "location": {
+      "description": "Manila, Capital District, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621
+    },
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA FEST",
+        "fullLabel": "BARKADA AFORDA JR FEST",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 390,
+        "time": "60mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "SUNDAE",
+        "fullLabel": "SUNDAE",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 25,
+        "time": "3mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "qty": 1
+      }
+    ],
+    "basePrice": 425,
+    "timestamp": "2025-02-23 20:32:15",
+    "discountCardDetails": {
+      "name": "Rogena Sefin Tibegar",
+      "discountCard": "54545464644"
+    },
+    "fees": {
+      "subTotal": 425,
+      "discountDeduction": 42.5,
+      "grandTotal": 382.5
+    }
+  },
+  {
+    "costumer": null,
+    "type": "PickUp",
+    "pickUpType": "DineIn",
+    "location": null,
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "2",
+        "subId": "2",
+        "label": "BIGBOY BEEF",
+        "fullLabel": "BIGBOY BEEF BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+        "price": 299,
+        "time": "30mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA JR",
+        "fullLabel": "AFORDA JR BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 99,
+        "time": "15mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      }
+    ],
+    "basePrice": 423,
+    "timestamp": "2025-02-23 20:18:56",
+    "discountCardDetails": {
+      "name": "",
+      "discountCard": ""
+    },
+    "fees": {
+      "subTotal": 423,
+      "discountDeduction": 0,
+      "grandTotal": 423
+    }
+  },
+  {
+    "costumer": null,
+    "type": "Delivery",
+    "pickUpType": null,
+    "location": {
+      "description": "Manila, Capital District, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621
+    },
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA FEST",
+        "fullLabel": "BARKADA AFORDA JR FEST",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 390,
+        "time": "60mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "SUNDAE",
+        "fullLabel": "SUNDAE",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 25,
+        "time": "3mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "qty": 1
+      }
+    ],
+    "basePrice": 425,
+    "timestamp": "2025-02-23 20:32:15",
+    "discountCardDetails": {
+      "name": "Rogena Sefin Tibegar",
+      "discountCard": "54545464644"
+    },
+    "fees": {
+      "subTotal": 425,
+      "discountDeduction": 42.5,
+      "grandTotal": 382.5
+    }
+  },
+  {
+    "costumer": null,
+    "type": "PickUp",
+    "pickUpType": "DineIn",
+    "location": null,
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "2",
+        "subId": "2",
+        "label": "BIGBOY BEEF",
+        "fullLabel": "BIGBOY BEEF BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+        "price": 299,
+        "time": "30mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA JR",
+        "fullLabel": "AFORDA JR BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 99,
+        "time": "15mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      }
+    ],
+    "basePrice": 423,
+    "timestamp": "2025-02-23 20:18:56",
+    "discountCardDetails": {
+      "name": "",
+      "discountCard": ""
+    },
+    "fees": {
+      "subTotal": 423,
+      "discountDeduction": 0,
+      "grandTotal": 423
+    }
+  },
+  {
+    "costumer": null,
+    "type": "Delivery",
+    "pickUpType": null,
+    "location": {
+      "description": "Manila, Capital District, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621
+    },
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA FEST",
+        "fullLabel": "BARKADA AFORDA JR FEST",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 390,
+        "time": "60mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "SUNDAE",
+        "fullLabel": "SUNDAE",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 25,
+        "time": "3mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "qty": 1
+      }
+    ],
+    "basePrice": 425,
+    "timestamp": "2025-02-23 20:32:15",
+    "discountCardDetails": {
+      "name": "Rogena Sefin Tibegar",
+      "discountCard": "54545464644"
+    },
+    "fees": {
+      "subTotal": 425,
+      "discountDeduction": 42.5,
+      "grandTotal": 382.5
+    }
+  },
+  {
+    "costumer": null,
+    "type": "PickUp",
+    "pickUpType": "DineIn",
+    "location": null,
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "2",
+        "subId": "2",
+        "label": "BIGBOY BEEF",
+        "fullLabel": "BIGBOY BEEF BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+        "price": 299,
+        "time": "30mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA JR",
+        "fullLabel": "AFORDA JR BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 99,
+        "time": "15mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      }
+    ],
+    "basePrice": 423,
+    "timestamp": "2025-02-23 20:18:56",
+    "discountCardDetails": {
+      "name": "",
+      "discountCard": ""
+    },
+    "fees": {
+      "subTotal": 423,
+      "discountDeduction": 0,
+      "grandTotal": 423
+    }
+  },
+  {
+    "costumer": null,
+    "type": "Delivery",
+    "pickUpType": null,
+    "location": {
+      "description": "Manila, Capital District, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621
+    },
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA FEST",
+        "fullLabel": "BARKADA AFORDA JR FEST",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 390,
+        "time": "60mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "SUNDAE",
+        "fullLabel": "SUNDAE",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 25,
+        "time": "3mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "qty": 1
+      }
+    ],
+    "basePrice": 425,
+    "timestamp": "2025-02-23 20:32:15",
+    "discountCardDetails": {
+      "name": "Rogena Sefin Tibegar",
+      "discountCard": "54545464644"
+    },
+    "fees": {
+      "subTotal": 425,
+      "discountDeduction": 42.5,
+      "grandTotal": 382.5
+    }
+  },
+  {
+    "costumer": null,
+    "type": "PickUp",
+    "pickUpType": "DineIn",
+    "location": null,
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "2",
+        "subId": "2",
+        "label": "BIGBOY BEEF",
+        "fullLabel": "BIGBOY BEEF BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+        "price": 299,
+        "time": "30mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA JR",
+        "fullLabel": "AFORDA JR BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 99,
+        "time": "15mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      }
+    ],
+    "basePrice": 423,
+    "timestamp": "2025-02-23 20:18:56",
+    "discountCardDetails": {
+      "name": "",
+      "discountCard": ""
+    },
+    "fees": {
+      "subTotal": 423,
+      "discountDeduction": 0,
+      "grandTotal": 423
+    }
+  },
+  {
+    "costumer": null,
+    "type": "Delivery",
+    "pickUpType": null,
+    "location": {
+      "description": "Manila, Capital District, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621
+    },
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA FEST",
+        "fullLabel": "BARKADA AFORDA JR FEST",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 390,
+        "time": "60mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "SUNDAE",
+        "fullLabel": "SUNDAE",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 25,
+        "time": "3mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "qty": 1
+      }
+    ],
+    "basePrice": 425,
+    "timestamp": "2025-02-23 20:32:15",
+    "discountCardDetails": {
+      "name": "Rogena Sefin Tibegar",
+      "discountCard": "54545464644"
+    },
+    "fees": {
+      "subTotal": 425,
+      "discountDeduction": 42.5,
+      "grandTotal": 382.5
+    }
+  },
+  {
+    "costumer": null,
+    "type": "PickUp",
+    "pickUpType": "DineIn",
+    "location": null,
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "2",
+        "subId": "2",
+        "label": "BIGBOY BEEF",
+        "fullLabel": "BIGBOY BEEF BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+        "price": 299,
+        "time": "30mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA JR",
+        "fullLabel": "AFORDA JR BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 99,
+        "time": "15mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      }
+    ],
+    "basePrice": 423,
+    "timestamp": "2025-02-23 20:18:56",
+    "discountCardDetails": {
+      "name": "",
+      "discountCard": ""
+    },
+    "fees": {
+      "subTotal": 423,
+      "discountDeduction": 0,
+      "grandTotal": 423
+    }
+  },
+  {
+    "costumer": null,
+    "type": "Delivery",
+    "pickUpType": null,
+    "location": {
+      "description": "Manila, Capital District, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621
+    },
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA FEST",
+        "fullLabel": "BARKADA AFORDA JR FEST",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 390,
+        "time": "60mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "SUNDAE",
+        "fullLabel": "SUNDAE",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 25,
+        "time": "3mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "qty": 1
+      }
+    ],
+    "basePrice": 425,
+    "timestamp": "2025-02-23 20:32:15",
+    "discountCardDetails": {
+      "name": "Rogena Sefin Tibegar",
+      "discountCard": "54545464644"
+    },
+    "fees": {
+      "subTotal": 425,
+      "discountDeduction": 42.5,
+      "grandTotal": 382.5
+    }
+  },
+  {
+    "costumer": null,
+    "type": "PickUp",
+    "pickUpType": "DineIn",
+    "location": null,
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "2",
+        "subId": "2",
+        "label": "BIGBOY BEEF",
+        "fullLabel": "BIGBOY BEEF BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+        "price": 299,
+        "time": "30mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "2",
+            "label": "EXTRA CHEESE",
+            "price": 10
+          },
+          {
+            "id": "3",
+            "label": "GUACAMOLE",
+            "price": 15
+          }
+        ],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA JR",
+        "fullLabel": "AFORDA JR BURGER",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 99,
+        "time": "15mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      }
+    ],
+    "basePrice": 423,
+    "timestamp": "2025-02-23 20:18:56",
+    "discountCardDetails": {
+      "name": "",
+      "discountCard": ""
+    },
+    "fees": {
+      "subTotal": 423,
+      "discountDeduction": 0,
+      "grandTotal": 423
+    }
+  },
+  {
+    "costumer": null,
+    "type": "Delivery",
+    "pickUpType": null,
+    "location": {
+      "description": "Manila, Capital District, Philippines",
+      "latitude": 14.5904492,
+      "longitude": 120.9803621
+    },
+    "branch": [
+      {
+        "id": "4",
+        "branchName": "ROBINSONS PLACE LA UNION",
+        "province": "La Union",
+        "city": "San Fernando",
+        "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
+        "tags": [
+          "CURRENTLY CLOSED"
+        ]
+      }
+    ],
+    "order": [
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "AFORDA FEST",
+        "fullLabel": "BARKADA AFORDA JR FEST",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 390,
+        "time": "60mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "1",
+            "label": "EXTRA SAUCE",
+            "price": 5
+          }
+        ],
+        "selectedAddOns": [],
+        "qty": 1
+      },
+      {
+        "itemId": "1",
+        "subId": "1",
+        "label": "SUNDAE",
+        "fullLabel": "SUNDAE",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "price": 25,
+        "time": "3mins",
+        "image": "",
+        "addOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "selectedAddOns": [
+          {
+            "id": "4",
+            "label": "LARGE",
+            "price": 10
+          }
+        ],
+        "qty": 1
+      }
+    ],
+    "basePrice": 425,
+    "timestamp": "2025-02-23 20:32:15",
+    "discountCardDetails": {
+      "name": "Rogena Sefin Tibegar",
+      "discountCard": "54545464644"
+    },
+    "fees": {
+      "subTotal": 425,
+      "discountDeduction": 42.5,
+      "grandTotal": 382.5
+    }
+  }
+
+]

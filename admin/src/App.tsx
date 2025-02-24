@@ -3,13 +3,14 @@ import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './pages/layout'
 import Dashboard from './pages/dashboard'
-import Navigation from './pages/Navigation'
-import Orders from './pages/orders'
+import Navigation from './pages/navigation'
+import Orders from './pages/orders/orders'
 import Menu from './pages/menu'
 import Promos from './pages/promos'
 import Branches from './pages/branches'
 import ManageAdmin from './pages/manageAdmin'
 import UserSettings from './pages/userSettings'
+import Pending from './pages/orders/pending'
 
 function App() {
 
@@ -20,11 +21,13 @@ function App() {
       <Route path="/" element={<Navigation />}  >
         <Route index element={<Dashboard />} />
         <Route path="/orders" element={<Orders/>}  />
+        <Route path="/orders/pending" element={<Pending />}  />
         <Route path="/menu" element={<Menu/>}  />
         <Route path="/promos" element={<Promos/>}  />
         <Route path="/branches" element={<Branches/>}  />
         <Route path="/admin" element={<ManageAdmin/>}  />
         <Route path="/usersettings" element={<UserSettings/>}  />
+        
 
         {/* <Route path="/register" element={user? <Home /> : <Register />} />
         <Route path="/login" element={user ? <Home /> : <Login/>}  />
