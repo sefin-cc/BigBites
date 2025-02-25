@@ -421,12 +421,7 @@ export default function Completed() {
                       </div>
                   </div>
                     
-                  <div className="flex justify-between mt-4 w-full">
-                  
-                    <button className="text text-white  px-4 py-2 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
-                      <p>CANCEL ORDER</p>
-                    </button>
-                  </div>
+      
               </div>
             );
           })()) : <div className="w-full h-full flex justify-center items-center text-center"><p className='text text-gray-800'>Click a row to see the details.</p></div>}

@@ -1,0 +1,176 @@
+[
+
+  {
+    "id": "0",
+    "category": "BURGERS",
+    "subCategories": [
+      {
+        "subId": "1",
+        "label": "JR BURGERS",
+        "items": [
+          {
+            "itemId": "1",
+            "subId": "1",
+            "label": "AFORDA JR",
+            "fullLabel": "AFORDA JR BURGER",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "price": 99,
+            "time": "15mins",
+            "image": "",
+            "addOns": [
+              {
+                "id": "1",
+                "label": "EXTRA SAUCE",
+                "price": 5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "subId": "2",
+        "label": "MONSTER BURGERS",
+        "items": [
+          {
+            "itemId": "2",
+            "subId": "2",
+            "label": "BIGBOY BEEF",
+            "fullLabel": "BIGBOY BEEF BURGER",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et",
+            "price": 299,
+            "time": "30mins",
+            "image": "",
+            "addOns": [
+              {
+                "id": "2",
+                "label": "EXTRA CHEESE",
+                "price": 10
+              },
+              {
+                "id": "3",
+                "label": "GUACAMOLE",
+                "price": 15
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1",
+    "category": "BARKADAS",
+    "subCategories": [
+      {
+        "subId": "1",
+        "label": "BARKADA COMBO MEALS",
+        "items": [
+          {
+            "itemId": "1",
+            "subId": "1",
+            "label": "AFORDA FEST",
+            "fullLabel": "BARKADA AFORDA JR FEST",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "price": 390,
+            "time": "60mins",
+            "image": "",
+            "addOns": [
+              {
+                "id": "1",
+                "label": "EXTRA SAUCE",
+                "price": 5
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "category": "SIDES",
+    "subCategories": [
+      {
+        "subId": "1",
+        "label": "SIDE KICKS",
+        "items": [
+          {
+            "itemId": "1",
+            "subId": "1",
+            "label": "FRIES",
+            "fullLabel": "FRIES",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "price": 75,
+            "time": "10mins",
+            "image": "",
+            "addOns": [
+              {
+                "id": "4",
+                "label": "EXTRA KETCHUP",
+                "price": 5
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "category": "DRINKS",
+    "subCategories": [
+      {
+        "subId": "1",
+        "label": "REFRESHERS",
+        "items": [
+          {
+            "itemId": "1",
+            "subId": "1",
+            "label": "SPRITE",
+            "fullLabel": "SPRITE",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "price": 25,
+            "time": "3mins",
+            "image": "",
+            "addOns": [
+              {
+                "id": "4",
+                "label": "LARGE",
+                "price": 10
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "category": "DESSERTS",
+    "subCategories": [
+      {
+        "subId": "1",
+        "label": "SWEETS",
+        "items": [
+          {
+            "itemId": "1",
+            "subId": "1",
+            "label": "SUNDAE",
+            "fullLabel": "SUNDAE",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "price": 25,
+            "time": "3mins",
+            "image": "",
+            "addOns": [
+              {
+                "id": "4",
+                "label": "LARGE",
+                "price": 10
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
