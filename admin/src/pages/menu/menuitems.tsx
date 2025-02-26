@@ -17,14 +17,22 @@ import menu from '../../data/menu.json';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import AddMenuItemsModal from '../orders/addMenuItemsModal';
 
 // Data Types
 interface Data {
-  id: number;
-  category: string;
-  subId: number;
-  label: string;
-  noitems: number;
+  id: number,
+  category: string,
+  subId: number,
+  subLabel: string,
+  itemId: number,
+  itemLabel: string,
+  itemFullLabel: string,
+  description: string,
+  price: number,
+  time: string,
+  image:  string,
+  addOns: any[]
 }
 
 // Data Row Creation
@@ -32,27 +40,49 @@ function createData(
   id: number,
   category: string,
   subId: number,
-  label: string,
-  noitems: number,
+  subLabel: string,
+  itemId: number,
+  itemLabel: string,
+  itemFullLabel: string,
+  description: string,
+  price: number,
+  time: string,
+  image:  string,
+  addOns: any[]
 ): Data {
   return {
     id,
     category,
     subId,
-    label,
-    noitems,
+    subLabel,
+    itemId,
+    itemLabel,
+    itemFullLabel,
+    description,
+    price,
+    time,
+    image,
+    addOns
   };
 }
 
-// Mapping orders to rows
 const rows = menu.flatMap((category) =>
-  category.subCategories.map((subCategories) =>
-    createData(
-      parseInt(category.id, 10),
-      category.category,
-      parseInt(subCategories.subId, 10),
-      subCategories.label,
-      subCategories.items.length
+  category.subCategories.flatMap((subCategory) =>
+    subCategory.items.map((item) => 
+      createData(
+        parseInt(category.id, 10),             // Parse category id to integer
+        category.category,                     // Category name
+        parseInt(subCategory.subId, 10),       // Parse subcategory id to integer
+        subCategory.label,                     // Subcategory label
+        parseInt(item.itemId, 10),             // Parse item id to integer
+        item.label,                            // Item label
+        item.fullLabel,                        // Full item label
+        item.description,                      // Item description
+        item.price,                            // Item price
+        item.time,                             // Time estimate for item
+        item.image,                            // Image associated with the item
+        item.addOns                            // Additional add-ons for the item
+      )
     )
   )
 );
@@ -94,24 +124,22 @@ interface HeadCell {
 
 // Head Cells
 const headCells: readonly HeadCell[] = [
-  { id: 'category', numeric: false, disablePadding: true, label: 'Category' },
-  { id: 'label', numeric: true, disablePadding: false, label: 'Sub-Category' },
-  { id: 'noitems', numeric: true, disablePadding: false, label: 'No. Items' },
+  { id: 'itemLabel', numeric: false, disablePadding: true, label: 'Item Label' },
+  { id: 'price', numeric: false, disablePadding: false, label: 'Price' },
 ];
 
 // Table Header Component
 interface EnhancedTableProps {
   numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   menuCategory: menuCategory;
   sortBy: string;
   rowCount: number;
-  isAllSelected: boolean;
+
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, menuCategory, sortBy, numSelected, rowCount, onRequestSort, isAllSelected } = props;
+  const {  menuCategory, sortBy, numSelected, rowCount, onRequestSort } = props;
   const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -119,12 +147,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            checked={isAllSelected}
-            onChange={onSelectAllClick}
-          />
-        </TableCell>
+
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -163,13 +186,16 @@ interface EnhancedTableToolbarProps {
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   const { numSelected, onFilterChange, filterValue, onSearchChange, selectedSubCategories, setSelectedSubCategories } = props;
+  const [categoryType, setCategoryType] = React.useState<string>('BURGERS');
 
-  // You can add any logic you need to manage or modify selectedSubCategories here if necessary
+  const handleCategoryChange = (event: SelectChangeEvent<string>) => {
+    setCategoryType(event.target.value);
+  };
 
   return (
     <Toolbar sx={{ flex: 1, flexDirection: "column" }}>
       <Typography variant="h6" component="div" sx={{ margin: 2, fontWeight: "bold", fontFamily: "Madimi One" }}>
-        SUB-CATEGORY MENU
+        MENU ITEMS
       </Typography>
 
       <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
@@ -186,14 +212,14 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           <InputLabel id="type-filter-label">Categories</InputLabel>
           <Select
             labelId="type-filter-label"
-            value={filterValue}
-            onChange={onFilterChange}
+            value={categoryType}
+            onChange={handleCategoryChange}
             label="Categories"
             size="small"
-            sx={{ width: 170 }}
+            sx={{ width: 250 }}
           >
-            <MenuItem value="">All</MenuItem>
             {
+              // Extract unique categories from rows
               [...new Set(rows.map(item => item.category))].map((category, key) => (
                 <MenuItem key={key} value={category}>
                   {category}
@@ -203,13 +229,30 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </Select>
         </FormControl>
 
-        <button
-          className="text text-white"
-          style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: 10, paddingRight: 20 }}
-        >
-          <AddRoundedIcon sx={{ color: "white", marginRight: 1 }} />
-          ADD
-        </button>
+        <FormControl>
+          <InputLabel id="type-filter-label">Sub-Categories</InputLabel>
+          <Select
+            labelId="type-filter-label"
+            value={filterValue}
+            onChange={onFilterChange}
+            label="Sub-Categories"
+            size="small"
+            sx={{ width: 250 }}
+            disabled={!categoryType}  // Disable subcategory dropdown until a category is selected
+          >
+            {
+              // Filter rows based on selected categoryType and extract unique subLabels
+              [...new Set(rows.filter(item => item.category === categoryType).map(item => item.subLabel))]
+                .map((subLabel, key) => (
+                  <MenuItem key={key} value={subLabel}>
+                    {subLabel}
+                  </MenuItem>
+                ))
+            }
+          </Select>
+        </FormControl>
+
+        <AddMenuItemsModal />
 
         {selectedSubCategories.size > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
@@ -235,12 +278,12 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 export default function MenuItems() {
   const [menuCategory, setMenuCategory] = React.useState<menuCategory>('asc');
   const [sortBy, setSortBy] = React.useState<keyof Data>('category');
-  const [selectedCategories, setSelectedCategories] = React.useState<Set<number>>(new Set()); // Tracks selected categories
   const [selectedSubCategories, setSelectedSubCategories] = React.useState<Set<string>>(new Set()); // Tracks selected subcategories
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [filterType, setFilterType] = React.useState<string>('');
+  const [filterType, setFilterType] = React.useState<string>('JR BURGERS');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const [selected, setSelected] = React.useState<readonly number[]>([]);
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
@@ -248,50 +291,22 @@ export default function MenuItems() {
     setSortBy(property);
   };
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const visibleRows = filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-    const newSelectedSubCategories = new Set<string>();
-    visibleRows.forEach((row) => {
-      newSelectedSubCategories.add(`${row.id}-${row.subId}`);
-    });
 
-    if (event.target.checked) {
-      setSelectedSubCategories(newSelectedSubCategories);
+  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: readonly number[] = [];
+    
+    if (selectedIndex === -1) {
+      // Select the clicked row
+      newSelected = [id];
     } else {
-      setSelectedSubCategories(new Set());
+      // Deselect the row if it's already selected
+      newSelected = [];
     }
+  
+    setSelected(newSelected);
   };
-
-  const handleCategorySelect = (event: React.ChangeEvent<HTMLInputElement>, categoryId: number) => {
-    const newSelectedCategories = new Set(selectedCategories);
-    const newSelectedSubCategories = new Set(selectedSubCategories);
-    if (event.target.checked) {
-      newSelectedCategories.add(categoryId);
-      rows
-        .filter((row) => row.id === categoryId)
-        .forEach((row) => newSelectedSubCategories.add(`${row.id}-${row.subId}`));
-    } else {
-      newSelectedCategories.delete(categoryId);
-      rows
-        .filter((row) => row.id === categoryId)
-        .forEach((row) => newSelectedSubCategories.delete(`${row.id}-${row.subId}`));
-    }
-
-    setSelectedCategories(newSelectedCategories);
-    setSelectedSubCategories(newSelectedSubCategories);
-  };
-
-  const handleSubCategorySelect = (event: React.ChangeEvent<HTMLInputElement>, subId: string) => {
-    const newSelectedSubCategories = new Set(selectedSubCategories);
-    if (event.target.checked) {
-      newSelectedSubCategories.add(subId);
-    } else {
-      newSelectedSubCategories.delete(subId);
-    }
-
-    setSelectedSubCategories(newSelectedSubCategories);
-  };
-
+  
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -312,9 +327,9 @@ export default function MenuItems() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const filteredRows = rows.filter(row =>
-    (filterType ? row.category === filterType : true) && 
-    (row.category.toLowerCase().includes(searchTerm.toLowerCase()) || 
-     row.label.toLowerCase().includes(searchTerm.toLowerCase()))
+    (filterType ? row.subLabel === filterType : true) && 
+    (row.itemFullLabel.toLowerCase().includes(searchTerm.toLowerCase()) || 
+     row.subLabel.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const visibleRows = React.useMemo(
@@ -325,14 +340,9 @@ export default function MenuItems() {
     [menuCategory, sortBy, page, rowsPerPage, filteredRows],
   );
 
-  const isAllSelected =
-    visibleRows.length > 0 && visibleRows.every((row) =>
-      selectedSubCategories.has(`${row.id}-${row.subId}`)
-    );
-
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: '70%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
             numSelected={selectedSubCategories.size}
@@ -352,42 +362,26 @@ export default function MenuItems() {
                 numSelected={selectedSubCategories.size}
                 menuCategory={menuCategory}
                 sortBy={sortBy}
-                onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={filteredRows.length}
-                isAllSelected={isAllSelected}
+
               />
               <TableBody>
                 {visibleRows.map((row, index) => {
-                  const isCategorySelected = selectedCategories.has(row.id);
-                  const isSubCategorySelected = selectedSubCategories.has(`${row.id}-${row.subId}`);
+          
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
                       hover
-                      key={`${row.id}-${row.subId}`}
+                      onClick={(event) => handleClick(event, row.id)}
+                      key={`${row.id}-${row.subId}-${row.itemId}`}
                     >
-                      <TableCell padding="checkbox">
-                        {row.subId === 0 ? (
-                          // Category checkbox
-                          <Checkbox
-                            checked={isCategorySelected}
-                            onChange={(e) => handleCategorySelect(e, row.id)}
-                          />
-                        ) : (
-                          // Sub-category checkbox
-                          <Checkbox
-                            checked={isSubCategorySelected}
-                            onChange={(e) => handleSubCategorySelect(e, `${row.id}-${row.subId}`)}
-                          />
-                        )}
+
+                      <TableCell component="th" id={labelId} scope="row">
+                        {row.itemLabel}
                       </TableCell>
-                      <TableCell component="th" id={labelId} scope="row" padding="none">
-                        {row.category}
-                      </TableCell>
-                      <TableCell align="right">{row.label}</TableCell>
-                      <TableCell align="right">{row.noitems}</TableCell>
+                      <TableCell align="right">{row.price}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -409,6 +403,78 @@ export default function MenuItems() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Paper>
+      </Box>
+
+      <Box sx={{ 
+        width: "35%", 
+        borderRadius: 3, 
+        boxShadow: 2,  
+        p: 2,  
+        borderWidth: 4,
+        borderColor:"#FB7F3B"
+    
+      }}>
+        {selected.length > 0 ? (
+          (() => {
+            const selectedRow = rows.find(row => row.id === selected[0]);
+
+            return (
+            <div className='p-2 '>
+
+                <img src={selectedRow?.image}
+                  style={{
+                    backgroundColor: "#d6d5d2",
+                    borderRadius: 3,
+                    height: 200
+                }}/>
+
+                <div className='flex flex-row gap-20 w-full mt-5'>
+                  <div>
+                    <div>
+                      <p className='font-bold'>Category:</p>
+                      <p>{selectedRow?.category}</p>
+                    </div>
+                    <div>
+                      <p className='font-bold'>Sub-Category:</p>
+                      <p>{selectedRow?.subLabel}</p>
+                    </div>
+                    <div>
+                        <p className='font-bold'>Price:</p>
+                        <p>{selectedRow?.price}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div>
+                        <p className='font-bold'>Label:</p>
+                        <p> {selectedRow?.itemLabel}</p>
+                      </div>
+                      <div>
+                          <p className='font-bold'>Full Label:</p>
+                          <p>{selectedRow?.itemFullLabel}</p>
+                      </div>
+                      <div>
+                        <p className='font-bold'>Time:</p>
+                        <p> {selectedRow?.time}</p>
+                      </div>
+  
+                    </div>
+                  </div>
+                 
+                  <div>
+                      <p className='font-bold'>Description:</p>
+                      <p> {selectedRow?.description}</p>
+                  </div>
+
+                  <div className="flex justify-between mt-5 w-full">
+                    <button className="text px-6 py-1 rounded-md focus:outline-none" style={{borderColor: "#2C2C2C", borderWidth: 3}}>EDIT</button>
+                    <button className="text text-white  px-6 py-1 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
+                      <p>DELETE</p>
+                    </button>
+                  </div>
+              </div>
+            );
+          })()) : <div className="w-full h-full flex justify-center items-center text-center"><p className='text text-gray-800'>Click a row to see the details.</p></div>}
       </Box>
     </div>
   );

@@ -90,7 +90,7 @@ function AddSubCategoryModal() {
             <button
                 onClick={handleClose}
                 className="text w-full"
-                style={{ borderWidth:3, borderColor: "#2C2C2C", color: "#2C2C2C", borderRadius: "4px",  padding: "5px 20px"}}
+                style={{ borderWidth:3, borderColor: "#2C2C2C", color: "#2C2C2C", borderRadius: "4px",  padding: "2px 20px"}}
             >
                 CLOSE
             </button>
