@@ -17,6 +17,7 @@ import menu from '../../data/menu.json';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import AddSubCategoryModal from '../orders/addSubcategoryModal';
 
 // Data Types
 interface Data {
@@ -203,13 +204,9 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </Select>
         </FormControl>
 
-        <button
-          className="text text-white"
-          style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: 10, paddingRight: 20 }}
-        >
-          <AddRoundedIcon sx={{ color: "white", marginRight: 1 }} />
-          ADD
-        </button>
+
+
+        <AddSubCategoryModal />
 
         {selectedSubCategories.size > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
@@ -410,6 +407,7 @@ export default function SubCategory() {
           />
         </Paper>
       </Box>
+    
     </div>
   );
 }
