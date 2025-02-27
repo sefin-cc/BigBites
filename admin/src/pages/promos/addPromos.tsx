@@ -1,13 +1,25 @@
 import React, { useState } from 'react';
-import { Modal, Box, Button, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent } from '@mui/material';
+import { Modal, Box, Button, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, styled } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
-function AddSubCategoryModal() {
+const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+});
+
+function AddPromoModal() {
   // State to control the opening and closing of the modal
   const [open, setOpen] = useState(false);
   // State for form values
-  const [category, setCategory] = useState('');
-  const [subcategory, setSubcategory] = useState('');
+  const [label, setLabel] = useState('');
 
   // Function to handle opening the modal
   const handleOpen = () => setOpen(true);
@@ -16,14 +28,11 @@ function AddSubCategoryModal() {
   const handleClose = () => setOpen(false);
 
   // Function to handle category change (typed event as SelectChangeEvent)
-  const handleCategoryChange = (event: SelectChangeEvent) => {
-    setCategory(event.target.value);
+  const handleLabelChange = (event: SelectChangeEvent) => {
+    setLabel(event.target.value);
   };
 
-  // Function to handle subcategory change (typed event as React.ChangeEvent<HTMLInputElement>)
-  const handleSubcategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSubcategory(event.target.value);
-  };
+
 
   return (
     <div>
@@ -57,35 +66,32 @@ function AddSubCategoryModal() {
           }}
         >
           <Typography variant="h6" id="simple-modal-title" sx={{ marginBottom: 3, fontWeight: "bold", fontFamily: "Madimi One" }}>
-            ADD NEW SUB-CATEGORY 
+            ADD PROMO
           </Typography>
 
-          {/* Dropdown for Category */}
-          <FormControl size="small" fullWidth sx={{ mt: 2 }}>
-            <InputLabel id="category-select-label">Category</InputLabel>
-            <Select
-              labelId="category-select-label"
-              value={category}
-              onChange={handleCategoryChange}
-              label="Category"
-            >
-              <MenuItem value="BURGERS">BURGERS</MenuItem>
-              <MenuItem value="BARKADAS">BARKADAS</MenuItem>
-              <MenuItem value="SIDES">SIDES</MenuItem>
-              <MenuItem value="DRINKS">DRINKS</MenuItem>
-              <MenuItem value="DESSERTS">DESSERTS</MenuItem>
-            </Select>
-          </FormControl>
-
-          {/* Text Field for Subcategory */}
           <TextField
-            label="Sub-Category Name"
-            value={subcategory}
-            onChange={handleSubcategoryChange}
+            label="Promos Label"
+            value={label}
+            onChange={() =>handleLabelChange}
             fullWidth
             sx={{ mt: 2 }}
             size="small"
           />
+
+        <Button
+            component="label"
+            role={undefined}
+            variant="contained"
+            tabIndex={-1}
+            startIcon={<CloudUploadIcon />}
+            sx={{ mt: 2, backgroundColor: "#2C2C2C" }}
+          > Upload Image
+            <VisuallyHiddenInput
+              type="file"
+              onChange={(event: any) => console.log(event.target.files)}
+              multiple
+            />
+          </Button>
 
         <div style={{ display: "flex", flexDirection: "row", gap: 20 , marginTop: 20}}>
             <button
@@ -99,8 +105,7 @@ function AddSubCategoryModal() {
             <button
             onClick={() => {
                 // Handle your form submission logic here
-                console.log("Category:", category);
-                console.log("Subcategory:", subcategory);
+                console.log("LAbel:", label);
                 handleClose();
             }}
                 className="text text-white w-full"
@@ -118,4 +123,4 @@ function AddSubCategoryModal() {
   );
 }
 
-export default AddSubCategoryModal;
+export default AddPromoModal;
