@@ -198,12 +198,12 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         MENU ITEMS
       </Typography>
 
-      <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
+      <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 1}}>
         <TextField
           label="Search"
           variant="outlined"
           size="small"
-          sx={{ flex: 1 }}
+          sx={{ flex: 1 , minWidth: 200 }}
           onChange={onSearchChange}
           placeholder="Search..."
         />
@@ -216,7 +216,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             onChange={handleCategoryChange}
             label="Categories"
             size="small"
-            sx={{ width: 250 }}
+            sx={{ width: 200 }}
           >
             {
               // Extract unique categories from rows
@@ -237,7 +237,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             onChange={onFilterChange}
             label="Sub-Categories"
             size="small"
-            sx={{ width: 250 }}
+            sx={{ width: 200 }}
             disabled={!categoryType}  // Disable subcategory dropdown until a category is selected
           >
             {
@@ -252,7 +252,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </Select>
         </FormControl>
 
-        <AddMenuItemsModal />
+        <AddMenuItemsModal rows={rows} />
 
         {selectedSubCategories.size > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
@@ -342,7 +342,7 @@ export default function MenuItems() {
 
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
-      <Box sx={{ width: '70%' }}>
+      <Box sx={{ width: '75%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
             numSelected={selectedSubCategories.size}
