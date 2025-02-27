@@ -17,7 +17,8 @@ import menu from '../../data/menu.json';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import AddMenuItemsModal from '../orders/addMenuItemsModal';
+import AddMenuItemsModal from './addMenuItemsModal';
+import EditMenuItemsModal from './editMenuItemsModal';
 
 // Data Types
 interface Data {
@@ -467,7 +468,7 @@ export default function MenuItems() {
                   </div>
 
                   <div className="flex justify-between mt-5 w-full">
-                    <button className="text px-6 py-1 rounded-md focus:outline-none" style={{borderColor: "#2C2C2C", borderWidth: 3}}>EDIT</button>
+                    <EditMenuItemsModal rows={rows}/>
                     <button className="text text-white  px-6 py-1 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
                       <p>DELETE</p>
                     </button>
