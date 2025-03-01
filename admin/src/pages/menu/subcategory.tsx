@@ -17,7 +17,8 @@ import menu from '../../data/menu.json';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import AddSubCategoryModal from '../orders/addSubcategoryModal';
+import AddSubCategoryModal from './addSubcategoryModal';
+import EditSubCategoryModal from './editSubcategoryModal';
 
 // Data Types
 interface Data {
@@ -218,9 +219,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
         {selectedSubCategories.size === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
-              <ModeEditRoundedIcon sx={{ color: "gray" }} />
-            </button>
+            <EditSubCategoryModal />
           </div>
         ) : null}
       </Box>
