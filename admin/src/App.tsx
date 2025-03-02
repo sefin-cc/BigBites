@@ -11,6 +11,7 @@ import Branches from './pages/branches/branches'
 import ManageAdmin from './pages/admin/manageAdmin'
 import UserSettings from './pages/userSettings/userSettings'
 import Pending from './pages/orders/pending'
+import Login from './pages/auth/login'
 
 function App() {
 
@@ -27,16 +28,8 @@ function App() {
         <Route path="/branches" element={<Branches/>}  />
         <Route path="/admin" element={<ManageAdmin/>}  />
         <Route path="/usersettings" element={<UserSettings/>}  />
-        
-
-        {/* <Route path="/register" element={user? <Home /> : <Register />} />
-        <Route path="/login" element={user ? <Home /> : <Login/>}  />
-        <Route path="/create" element={user ? <Create /> : <Login/>}  />
-
-        <Route path="/posts/:id" element={<Show />} />
-        <Route path="/posts/update/:id" element={user ? <Update /> : <Login/>}  /> */}
       </Route>
-      
+      <Route path="/login" element={<Login/>}  />
     </Routes>
 </BrowserRouter>
   )
