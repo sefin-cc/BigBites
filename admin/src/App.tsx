@@ -8,8 +8,8 @@ import Orders from './pages/orders/orders'
 import Menu from './pages/menu/menu'
 import Promos from './pages/promos/promos'
 import Branches from './pages/branches/branches'
-import ManageAdmin from './pages/manageAdmin'
-import UserSettings from './pages/userSettings'
+import ManageAdmin from './pages/admin/manageAdmin'
+import UserSettings from './pages/userSettings/userSettings'
 import Pending from './pages/orders/pending'
 
 function App() {

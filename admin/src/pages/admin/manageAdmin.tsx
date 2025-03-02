@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,67 +12,66 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, Checkbox, TextField } from '@mui/material';
-
 import DeleteIcon from '@mui/icons-material/Delete';
-import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import location from "../../data/location.json"
-import AddBranches from './addBranches';
-import EditBranches from './editBranch';
-// import AddPromoModal from './addPromos';
-// import EditPromoModal from './editPromos';
+import AddUserModal from './addUserModal';
+import EditUserModal from './editUserModal';
+
+
 
 // Data Types
 interface Data {
     id: string;
-    branchName: string;
-    province: string;
-    city: string;
-    fullAddress: string;
-    openingTime: string;
-    closingTime: string;
-    acceptAdvancedOrder: boolean;
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    branch: string;
+    role: string;
 }
 
 // Data Row Creation
 function createData(
     id: string,
-    branchName: string,
-    province: string,
-    city: string,
-    fullAddress: string,
-    openingTime: string,
-    closingTime: string,
-    acceptAdvancedOrder: boolean
+    name: string,
+    email: string,
+    phone: string,
+    address: string,
+    branch: string,
+    role: string,
 
 ): Data {
   return {
     id,
-    branchName,
-    province,
-    city,
-    fullAddress,
-    openingTime,
-    closingTime,
-    acceptAdvancedOrder
+    name,
+    email,
+    phone,
+    address,
+    branch,
+    role,
   };
 }
-const branches: Data[] = [
+
+const branches = [
     { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false  },
     { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
     { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
     { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
   ];
 
-  const rows = branches.map(branch => createData(
-    branch.id,
-    branch.branchName,
-    branch.province,
-    branch.city,
-    branch.fullAddress,
-    branch.openingTime,
-    branch.closingTime,
-    branch.acceptAdvancedOrder
+
+const users: Data[] = [
+    { id: "1", name: "Rogena Tibegar", email: "rogenasefin6@gmail.com", phone: "09500321222", address: "Mangaldan, Pangasinan",  branch: "SM DAGUPAN CITY", role: "Admin" },
+  
+  ];
+
+  const rows = users.map(users => createData(
+    users.id,
+    users.name,
+    users.email,
+    users.phone,
+    users.address,
+    users.branch,
+    users.role,
 ));
 
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T): number {
@@ -121,12 +119,12 @@ interface HeadCell {
 
 // Head Cells
 const headCells: readonly HeadCell[] = [
-  { id: 'branchName', numeric: false, disablePadding: true, label: 'Name' },
-  { id: 'province', numeric: false, disablePadding: false, label: 'Province' },
-  { id: 'city', numeric: false, disablePadding: false, label: 'City' },
-  { id: 'fullAddress', numeric: false, disablePadding: false, label: 'Full Address' },
-  { id: 'openingTime', numeric: false, disablePadding: false, label: 'Open Time' },
-  { id: 'closingTime', numeric: false, disablePadding: false, label: 'Closing Time' },
+  { id: 'name', numeric: false, disablePadding: true, label: 'Name' },
+  { id: 'email', numeric: false, disablePadding: false, label: 'Email' },
+  { id: 'phone', numeric: false, disablePadding: false, label: 'Phone' },
+  { id: 'address', numeric: false, disablePadding: false, label: 'Address' },
+  { id: 'branch', numeric: false, disablePadding: false, label: 'Branch' },
+  { id: 'role', numeric: false, disablePadding: false, label: 'Role' },
 
 ];
 
@@ -181,22 +179,22 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface EnhancedTableToolbarProps {
-  province: string;
-  cities: string;
-  handleCitiesChange:  (event: SelectChangeEvent<string>) => void;
-  handleProvinceChange:  (event: SelectChangeEvent<string>) => void;
+  branch: string;
+  handleBranchChange:  (event: SelectChangeEvent<string>) => void;
+  role: string;
+  handleRoleChange:  (event: SelectChangeEvent<string>) => void;
   numSelected: number;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { onSearchChange, numSelected, province, cities, handleCitiesChange, handleProvinceChange  } = props;
+  const { onSearchChange, numSelected, role, handleRoleChange, branch, handleBranchChange } = props;
 
 
   return (
     <Toolbar sx={{ flex: 1, flexDirection: "column" }}>
       <Typography variant="h6" component="div" sx={{ margin: 2, fontWeight: "bold", fontFamily: "Madimi One" }}>
-        BRANCH
+        MANAGE USERS
       </Typography>
       <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
         <TextField
@@ -208,13 +206,13 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           placeholder="Search..."
         />
 
-      <FormControl>
-        <InputLabel id="type-filter-label">Province</InputLabel>
+    <FormControl>
+        <InputLabel id="type-filter-label">Branch</InputLabel>
         <Select
           labelId="type-filter-label"
-          value={province}
-          onChange={handleProvinceChange}
-          label="Province"
+          value={branch}
+          onChange={handleBranchChange}
+          label="Branch"
           size="small"
           sx={{ width: 200 }}
           MenuProps={{
@@ -227,24 +225,23 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           }}
         >
            <MenuItem value="">All</MenuItem>
-          {location.Luzon.provinces.map((province, key) => (
-            <MenuItem key={key} value={province.name}>
-              {province.name}
+           {branches.map((branch, key) => (
+            <MenuItem key={key} value={branch.branchName}>
+              {branch.branchName}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
 
       <FormControl>
-        <InputLabel id="city-filter-label">Cities</InputLabel>
+        <InputLabel id="type-filter-label">Role</InputLabel>
         <Select
-          labelId="city-filter-label"
-          value={cities}
-          onChange={handleCitiesChange}
-          label="Cities"
+          labelId="type-filter-label"
+          value={role}
+          onChange={handleRoleChange}
+          label="Role"
           size="small"
           sx={{ width: 200 }}
-          disabled={!province}  // Disable the Cities dropdown if no Province is selected
           MenuProps={{
             PaperProps: {
               style: {
@@ -254,20 +251,15 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             }
           }}
         >
-          <MenuItem value="">All</MenuItem>
-          {province && (
-            location.Luzon.provinces
-              .find((p) => p.name === province)
-              ?.cities.map((city, key) => (
-                <MenuItem key={key} value={city}>
-                  {city}
-                </MenuItem>
-              ))
-          )}
+           <MenuItem value="">All</MenuItem>
+           <MenuItem value="Admin">Admin</MenuItem>
+           <MenuItem value="Employee">Employee</MenuItem>
         </Select>
       </FormControl>
 
-      <AddBranches location={location} />
+    
+
+      <AddUserModal branches={branches} />
 
         {/* <AddPromoModal /> */}
         {numSelected > 0 ? (
@@ -279,7 +271,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         ) : null}
         {numSelected === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <EditBranches location={location} />
+            <EditUserModal  branches={branches} />
           </div>
         ) : null}
       </Box>
@@ -287,15 +279,16 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   );
 }
 
-export default function Branches() {
+export default function ManageAdmin() {
   const [menuCategory, setMenuCategory] = React.useState<menuCategory>('asc');
-  const [sortBy, setSortBy] = React.useState<keyof Data>('branchName');
+  const [sortBy, setSortBy] = React.useState<keyof Data>('name');
   const [selected, setSelected] = React.useState<Set<string>>(new Set()); // Tracks selected categories
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [searchTerm, setSearchTerm] = React.useState<string>('');
-  const [cities, setCities] = React.useState<string>('');
-  const [province, setProvince] = React.useState<string>('');
+  const [role, setRoles] = React.useState<string>('');
+  const [branch, setBranch] = React.useState<string>('');
+
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
@@ -315,8 +308,6 @@ export default function Branches() {
   const handleSubCategorySelect = (event: React.ChangeEvent<HTMLInputElement>, id: string) => {
     const newSelected: Set<string> = new Set(selected); // Explicitly type the Set
 
-  
-
     if (event.target.checked) {
       newSelected.add(id);
     } else {
@@ -333,30 +324,31 @@ export default function Branches() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-
-
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleCitiesChange = (event: SelectChangeEvent<string>) => {
-    setCities(event.target.value);
+  const handleRoleChange = (event: SelectChangeEvent<string>) => {
+    setRoles(event.target.value);
   };
 
-  const handleProvinceChange = (event: SelectChangeEvent<string>) => {
-    setProvince(event.target.value);
+  const handleBranchChange = (event: SelectChangeEvent<string>) => {
+    setBranch(event.target.value);
   };
+
+
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const filteredRows = rows
-    .filter(row => cities ? row.city === cities : true)
-    .filter(row => province ? row.province === province : true)  
-    .filter(row => row.branchName.toLowerCase().includes(searchTerm.toLowerCase())||
-      row.province.toLowerCase().includes(searchTerm.toLowerCase())||
-      row.city.toLowerCase().includes(searchTerm.toLowerCase())||
-      row.fullAddress.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(row => role ? row.role === role : true)
+    .filter(row => branch ? row.branch === branch : true)
+    .filter(row => row.role.toLowerCase().includes(searchTerm.toLowerCase())||
+      row.name.toLowerCase().includes(searchTerm.toLowerCase())||
+      row.branch.toLowerCase().includes(searchTerm.toLowerCase())||
+      row.email.toLowerCase().includes(searchTerm.toLowerCase())||
+      row.phone.toLowerCase().includes(searchTerm.toLowerCase())
   ); // Apply search
 
   const visibleRows = React.useMemo(
@@ -375,10 +367,10 @@ export default function Branches() {
       <Box sx={{ width: '100%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
-            cities={cities}  
-            province={province}
-            handleCitiesChange={handleCitiesChange}
-            handleProvinceChange={handleProvinceChange}
+            branch={branch}
+            handleBranchChange={handleBranchChange}
+            role={role}  
+            handleRoleChange={handleRoleChange}
             onSearchChange={handleSearchChange}
             numSelected={selected.size}
           />
@@ -407,13 +399,13 @@ export default function Branches() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row" padding="none">
-                        {row.branchName}
+                        {row.name}
                       </TableCell>
-                      <TableCell align="right">{row.province}</TableCell>
-                      <TableCell align="right">{row.city}</TableCell>
-                      <TableCell align="right">{row.fullAddress}</TableCell>
-                      <TableCell align="right">{row.openingTime}</TableCell>
-                      <TableCell align="right">{row.closingTime}</TableCell>
+                      <TableCell align="right">{row.email}</TableCell>
+                      <TableCell align="right">{row.phone}</TableCell>
+                      <TableCell align="right">{row.address}</TableCell>
+                      <TableCell align="right">{row.branch}</TableCell>
+                      <TableCell align="right">{row.role}</TableCell>
                     </TableRow>
                   );
                 })}
