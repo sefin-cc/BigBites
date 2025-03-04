@@ -32,6 +32,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
+
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -83,7 +85,12 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function Navigation() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
+  const navigate = useNavigate();
+  const context = useContext(AppContext);
+  if (!context) {
+      // Handle the case where the context is undefined
+      return <div>Loading...</div>;
+  }
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -92,13 +99,8 @@ export default function Navigation() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-    const navigate = useNavigate();
-    const context = useContext(AppContext);
-    if (!context) {
-        // Handle the case where the context is undefined
-        return <div>Loading...</div>;
-    }
-    const { token, setToken, user, setUser } = context;
+
+    // const { token, setToken, user, setUser } = context;
 
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -106,22 +108,23 @@ export default function Navigation() {
   const handleLogout = async () =>{
 
 
-    const res = await fetch('/api/logout', {
-        method: 'post',
-        headers:{
-            Authorization: `Bearer ${token}`,
-        }
-    });
+    // const res = await fetch('/api/logout', {
+    //     method: 'post',
+    //     headers:{
+    //         Authorization: `Bearer ${token}`,
+    //     }
+    // });
 
-    const data = await res.json();
-    console.log(data);
+    // const data = await res.json();
+    // console.log(data);
 
-    if(res.ok){
-        setUser(null);
-        setToken(null);
-        localStorage.removeItem("token");
-        navigate('/');
-    }
+    // if(res.ok){
+    //     setUser(null);
+    //     setToken(null);
+    //     localStorage.removeItem("token");
+    //     navigate('/');
+    // }
+    navigate('/login'); 
 }
 
   const handleDrawerOpen = () => {
@@ -192,8 +195,8 @@ export default function Navigation() {
               onClose={handleCloseUserMenu}
             >
   
-              <MenuItem onClick={handleCloseUserMenu}>
-              <LogoutRoundedIcon sx={{ color: 'lightgrey' }} />
+              <MenuItem onClick={ () => {handleCloseUserMenu(); handleLogout();}}>
+                <LogoutRoundedIcon sx={{ color: 'lightgrey' }} />
                 <Typography sx={{ marginLeft :1, textAlign: 'center' }}>Logout</Typography>
               </MenuItem>
 
@@ -292,16 +295,28 @@ export default function Navigation() {
 
         <List>
 
-        <Link to= "/admin">
+        <Link to= "/users">
         <ListItem disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   <AdminPanelSettingsRoundedIcon />
                 </ListItemIcon>
-                <ListItemText primary={"Manage Admin"} />
+                <ListItemText primary={"Manage Users"} />
               </ListItemButton>
             </ListItem>
         </Link>
+
+        <Link to= "/reports">
+        <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <DescriptionRoundedIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Reports"} />
+              </ListItemButton>
+            </ListItem>
+        </Link>
+
            
         <Link to= "/usersettings">
         <ListItem disablePadding>

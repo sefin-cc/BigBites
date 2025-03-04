@@ -12,6 +12,7 @@ import ManageAdmin from './pages/admin/manageAdmin'
 import UserSettings from './pages/userSettings/userSettings'
 import Pending from './pages/orders/pending'
 import Login from './pages/auth/login'
+import Reports from './pages/reports/reports'
 
 function App() {
 
@@ -26,7 +27,8 @@ function App() {
         <Route path="/menu" element={<Menu/>}  />
         <Route path="/promos" element={<Promos/>}  />
         <Route path="/branches" element={<Branches/>}  />
-        <Route path="/admin" element={<ManageAdmin/>}  />
+        <Route path="/users" element={<ManageAdmin/>}  />
+        <Route path="/reports" element={<Reports/>}  />
         <Route path="/usersettings" element={<UserSettings/>}  />
       </Route>
       <Route path="/login" element={<Login/>}  />
