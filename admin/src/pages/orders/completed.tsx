@@ -20,8 +20,8 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent } from '@mui/material';
 
-// Data Types
 interface Data {
+
   id: number;
   datatime: string;
   name: string;
@@ -33,6 +33,7 @@ interface Data {
   type: string;
   pickUpType: string;
   order: Array<any>;
+  status: string;
 }
 
 // Data Row Creation
@@ -47,7 +48,8 @@ function createData(
   grandTotal: number,
   type: string,
   pickUpType: string,
-  order: Array<any>
+  order: Array<any>,
+  status: string
 ): Data {
   return {
     id,
@@ -61,6 +63,7 @@ function createData(
     type,
     pickUpType,
     order,
+    status,
   };
 }
 
@@ -77,7 +80,8 @@ const rows = orders.map((order, index) =>
     order.fees.grandTotal,
     order.type,
     order.pickUpType || '',
-    order.order
+    order.order,
+    order.status
   )
 );
 
@@ -183,8 +187,8 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
   return (
     <Toolbar>
-      <Typography sx={{ flex: '1 1 100%' }} variant="h6" component="div">
-        Completed Orders
+      <Typography sx={{ flex: '1 1 100%', fontFamily:"Madimi One"}} variant="h6" component="div">
+        COMPLETED ORDERS
       </Typography>
 
       <FormControl>
@@ -259,9 +263,10 @@ export default function Completed() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  const filteredRows = rows.filter(row =>
-    filterType ? row.type === filterType : true
-  );
+    const filteredRows = rows.filter(row => 
+      (filterType ? row.type === filterType : true) && row.status === 'completed'
+    );
+    
 
   const visibleRows = React.useMemo(
     () =>
