@@ -48,8 +48,9 @@ function OverviewModal() {
     // Proceed with form submission logic here
     const filteredOrders = orders.filter(order => {
       const orderDate = dayjs(order.timestamp); // Convert the order timestamp to Dayjs
-      const isDateInRange = orderDate.isBetween(startDate, endDate, null, '[]'); // Check if order is within the date range
-      return isDateInRange ; 
+      const isDateInRange = orderDate.isBetween(startDate, endDate, null, '[]'); 
+      const isStatusCompleted = order.status === 'completed'; 
+      return isDateInRange && isStatusCompleted; 
 });
     generatePDF(filteredOrders, branches);
     handleClose();

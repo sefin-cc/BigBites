@@ -66,20 +66,23 @@ function BranchEarningModal() {
     console.log('dates:', { startDate, endDate, selectedBranch });
     
    // Filter orders within the date range and branch name
-    const filteredOrders = orders.filter(order => {
-        const orderDate = dayjs(order.timestamp); // Convert the order timestamp to Dayjs
-        const isDateInRange = orderDate.isBetween(startDate, endDate, null, '[]'); // Check if order is within the date range
-    
-        // If no branch is selected, include all orders in the selected date range
-        if (!selectedBranch) {
-        return isDateInRange;
-        }
-    
-        // Otherwise, check if the selected branch is in the branch array
-        const isBranchMatch = order.branch.some(b => b.branchName === selectedBranch);
-    
-        return isDateInRange && isBranchMatch; // Both conditions must be true
-  });
+   const filteredOrders = orders.filter(order => {
+    const orderDate = dayjs(order.timestamp); // Convert the order timestamp to Dayjs
+    const isDateInRange = orderDate.isBetween(startDate, endDate, null, '[]'); // Check if order is within the date range
+
+    // Check if order status is 'completed'
+    const isStatusCompleted = order.status === 'completed'; // Make sure to match the exact status value
+
+    // If no branch is selected, include all orders in the selected date range that are completed
+    if (!selectedBranch) {
+        return isDateInRange && isStatusCompleted;
+    }
+
+    // Otherwise, check if the selected branch matches and the order status is 'completed'
+    const isBranchMatch = order.branch.some(b => b.branchName === selectedBranch);
+
+    return isDateInRange && isBranchMatch && isStatusCompleted; // All conditions must be true
+});
 
     generatePDF(filteredOrders);
     handleClose();
