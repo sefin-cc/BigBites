@@ -73,6 +73,7 @@
     ],
     "basePrice": 423,
     "timestamp": "2025-02-23 20:18:56",
+    "status": "completed",
     "discountCardDetails": {
       "name": "",
       "discountCard": ""
@@ -152,6 +153,7 @@
     ],
     "basePrice": 425,
     "timestamp": "2025-02-23 20:32:15",
+    "status": "completed",
     "discountCardDetails": {
       "name": "Rogena Sefin Tibegar",
       "discountCard": "54545464644"
@@ -237,6 +239,7 @@
     ],
     "basePrice": 423,
     "timestamp": "2025-02-23 20:18:56",
+    "status": "completed",
     "discountCardDetails": {
       "name": "",
       "discountCard": ""
@@ -316,6 +319,7 @@
     ],
     "basePrice": 425,
     "timestamp": "2025-02-23 20:32:15",
+    "status": "completed",
     "discountCardDetails": {
       "name": "Rogena Sefin Tibegar",
       "discountCard": "54545464644"
@@ -401,6 +405,7 @@
     ],
     "basePrice": 423,
     "timestamp": "2025-02-23 20:18:56",
+    "status": "completed",
     "discountCardDetails": {
       "name": "",
       "discountCard": ""
@@ -480,6 +485,7 @@
     ],
     "basePrice": 425,
     "timestamp": "2025-02-23 20:32:15",
+    "status": "completed",
     "discountCardDetails": {
       "name": "Rogena Sefin Tibegar",
       "discountCard": "54545464644"
@@ -565,6 +571,7 @@
     ],
     "basePrice": 423,
     "timestamp": "2025-02-23 20:18:56",
+    "status": "completed",
     "discountCardDetails": {
       "name": "",
       "discountCard": ""
@@ -644,6 +651,7 @@
     ],
     "basePrice": 425,
     "timestamp": "2025-02-23 20:32:15",
+    "status": "pending",
     "discountCardDetails": {
       "name": "Rogena Sefin Tibegar",
       "discountCard": "54545464644"
@@ -729,6 +737,7 @@
     ],
     "basePrice": 423,
     "timestamp": "2025-02-23 20:18:56",
+    "status": "completed",
     "discountCardDetails": {
       "name": "",
       "discountCard": ""
@@ -808,6 +817,7 @@
     ],
     "basePrice": 425,
     "timestamp": "2025-02-23 20:32:15",
+    "status": "completed",
     "discountCardDetails": {
       "name": "Rogena Sefin Tibegar",
       "discountCard": "54545464644"
@@ -893,6 +903,7 @@
     ],
     "basePrice": 423,
     "timestamp": "2025-02-23 20:18:56",
+    "status": "completed",
     "discountCardDetails": {
       "name": "",
       "discountCard": ""
@@ -972,6 +983,7 @@
     ],
     "basePrice": 425,
     "timestamp": "2025-02-23 20:32:15",
+    "status": "completed",
     "discountCardDetails": {
       "name": "Rogena Sefin Tibegar",
       "discountCard": "54545464644"
@@ -1057,6 +1069,7 @@
     ],
     "basePrice": 423,
     "timestamp": "2025-02-23 20:18:56",
+    "status": "completed",
     "discountCardDetails": {
       "name": "",
       "discountCard": ""
@@ -1136,6 +1149,7 @@
     ],
     "basePrice": 425,
     "timestamp": "2025-02-23 20:32:15",
+    "status": "pending",
     "discountCardDetails": {
       "name": "Rogena Sefin Tibegar",
       "discountCard": "54545464644"
@@ -1220,7 +1234,8 @@
       }
     ],
     "basePrice": 423,
-    "timestamp": "2025-02-23 20:18:56",
+    "timestamp": "2025-03-05 20:18:56",
+    "status": "pending",
     "discountCardDetails": {
       "name": "",
       "discountCard": ""
@@ -1243,7 +1258,7 @@
     "branch": [
       {
         "id": "4",
-        "branchName": "ROBINSONS PLACE LA UNION",
+        "branchName": "SM CITY URDANETA",
         "province": "La Union",
         "city": "San Fernando",
         "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
@@ -1299,7 +1314,8 @@
       }
     ],
     "basePrice": 425,
-    "timestamp": "2025-02-23 20:32:15",
+    "timestamp": "2024-12-23 20:32:15",
+    "status": "completed",
     "discountCardDetails": {
       "name": "Rogena Sefin Tibegar",
       "discountCard": "54545464644"
@@ -1384,7 +1400,8 @@
       }
     ],
     "basePrice": 423,
-    "timestamp": "2025-02-23 20:18:56",
+    "timestamp": "2025-03-5 20:18:56",
+    "status": "pending",
     "discountCardDetails": {
       "name": "",
       "discountCard": ""
@@ -1407,7 +1424,7 @@
     "branch": [
       {
         "id": "4",
-        "branchName": "ROBINSONS PLACE LA UNION",
+        "branchName": "SM DAGUPAN CITY",
         "province": "La Union",
         "city": "San Fernando",
         "fullAddress": "Brgy, MacArthur Hwy, San Fernando, La Union",
@@ -1464,6 +1481,7 @@
     ],
     "basePrice": 425,
     "timestamp": "2025-02-23 20:32:15",
+    "status": "pending",
     "discountCardDetails": {
       "name": "Rogena Sefin Tibegar",
       "discountCard": "54545464644"

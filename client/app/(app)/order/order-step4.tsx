@@ -6,6 +6,9 @@ import DropDownPicker from "react-native-dropdown-picker";
 import location from "../../../data/location.json"
 import { AppContext } from "@/app/context/AppContext";
 
+//removes the tags and you should base on the opening time and closing time
+//add accepting future orders
+
 interface Branch {
   id: string;
   branchName: string;
