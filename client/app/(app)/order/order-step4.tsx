@@ -5,9 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import location from "../../../data/location.json"
 import { AppContext } from "@/app/context/AppContext";
-
-//removes the tags and you should base on the opening time and closing time
-//add accepting future orders
+import { Snackbar } from "react-native-paper";
 
 interface Branch {
   id: string;
@@ -15,16 +13,35 @@ interface Branch {
   province: string;
   city: string;
   fullAddress: string;
-  tags: Array<string | null>; 
+  openingTime: string;
+  closingTime: string;
+  acceptAdvancedOrder: boolean;
 }
+
+// Function to check if current time is within opening hours
+const isBranchOpen = (openingTime: string, closingTime: string) => {
+  const currentTime = new Date();
+  const currentHour = currentTime.getHours();
+  const currentMinute = currentTime.getMinutes();
+  const currentTimeInMinutes = currentHour * 60 + currentMinute;
+
+  const [openHour, openMinute] = openingTime.split(':').map(Number);
+  const [closeHour, closeMinute] = closingTime.split(':').map(Number);
+  
+  const openingTimeInMinutes = openHour * 60 + openMinute;
+  const closingTimeInMinutes = closeHour * 60 + closeMinute;
+
+  // Check if current time is within opening and closing time
+  return currentTimeInMinutes >= openingTimeInMinutes && currentTimeInMinutes <= closingTimeInMinutes;
+};
 
 export default function BranchesStep3() {
   //This is temporary data
   const branches: Branch[] = [
-    { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan", tags: ["CURRENTLY CLOSED", "ADVANCE ORDER"] },
-    { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", tags: ["ADVANCE ORDER"] },
-    { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan", tags: ["ADVANCE ORDER"] },
-    { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union", tags: ["CURRENTLY CLOSED"] },
+    { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false  },
+    { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
+    { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
+    { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
   ];
 
   const context = useContext(AppContext);
@@ -36,7 +53,7 @@ export default function BranchesStep3() {
   const [provinceOpen, setProvinceOpen] = useState<boolean>(false);
   const [province, setProvince] = useState<string | null>(null);
   const [provinceItems, setProvinceItems] = useState<{ label: string; value: string }[]>([]);
-
+  const [visible, setVisible] = useState<boolean>(false);
   const [cityOpen, setCityOpen] = useState<boolean>(false);
   const [city, setCity] = useState<string | null>(null);
   const [cityItems, setCityItems] = useState<{ label: string; value: string }[]>([]);
@@ -73,17 +90,34 @@ export default function BranchesStep3() {
     });
   
     const handleSelectedBranch = (item: Branch ) => {
-      setOrder(prev => ({
-        ...prev,
-        branch: [item],
-      }));
-      router.push("/(app)/menu/menu-categories");
+      if (isBranchOpen(item.openingTime, item.closingTime)  || item.acceptAdvancedOrder){
+        setOrder(prev => ({
+          ...prev,
+          branch: [item],
+        }));
+        router.push("/(app)/menu/menu-categories");
+      }else{
+        setVisible(true);
+      }
+
     }
 
     useEffect(() => {
       console.log(order);
     },[handleSelectedBranch]);
+   // Function to hide the snackbar
+   const hideSnackbar = () => setVisible(false);
 
+   useEffect(() => {
+     if (visible) {
+       const timer = setTimeout(() => {
+         hideSnackbar(); // Hide snackbar after 3 seconds
+       }, 3000);
+ 
+       // Cleanup timer on component unmount or when visible changes
+       return () => clearTimeout(timer);
+     }
+   }, [visible]); 
   return (
     <View style={[globalStyle.container, { paddingHorizontal: "5%" }]}>
       <View style={dropdownStyles.dropdownMainContainer}>
@@ -134,17 +168,19 @@ export default function BranchesStep3() {
             <Text style={styles.branchName}>{item.branchName}</Text>
             <Text style={styles.address}>{item.fullAddress}</Text>
             <View style={styles.tagContainer}>
-              {item.tags.map((tag, index) => (
-                <Text 
-                  key={index} 
-                  style={[
-                    styles.tag, 
-                    { backgroundColor: tag === "CURRENTLY CLOSED" ? "#C1272D" : "#FB7F3B" }
-                  ]}
-                >
-                  {tag}
+                {
+                  !isBranchOpen(item.openingTime, item.closingTime) &&
+                  <Text style={[ styles.tag, { backgroundColor:"#C1272D" } ]}>
+                    CURRENTLY CLOSED
+                  </Text>
+                }
+
+                {
+                  item.acceptAdvancedOrder &&
+                  <Text style={[ styles.tag, { backgroundColor:"#FB7F3B" } ]}>
+                    ADVANCE ORDER
                 </Text>
-              ))}
+                }
             </View>
           </View>
           </TouchableOpacity>
@@ -155,6 +191,22 @@ export default function BranchesStep3() {
           </View>
         }
       />
+
+    <View style={{width: "100%", backgroundColor:"black", justifyContent: "center", marginBottom: 20}}>
+      <Snackbar
+          visible={visible}
+          onDismiss={hideSnackbar}
+          duration={Snackbar.DURATION_LONG} 
+          style={{                     
+            backgroundColor: '#2C2C2C', 
+            borderRadius: 10,     
+            zIndex: 10000,          
+          }}
+        >
+          <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}>CURRENTLY CLOSED!</Text>
+        </Snackbar>
+    </View>
+   
     </View>
   );
 }

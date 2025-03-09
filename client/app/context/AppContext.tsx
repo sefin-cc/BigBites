@@ -14,7 +14,9 @@ interface Branch {
   province: string;
   city: string;
   fullAddress: string;
-  tags: Array<string | null>; 
+  openingTime: string;
+  closingTime: string;
+  acceptAdvancedOrder: boolean;
 }
 
 interface Order {
@@ -25,7 +27,8 @@ interface Order {
   branch: Array<Branch> | null;
   order: any[]; // Adjust type as needed
   basePrice: number,
-  timestamp: string | null
+  timestamp: string | null;
+  status: string;
 
 }
 
@@ -60,6 +63,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     order: [],
     basePrice: 0,
     timestamp: null,
+    status: 'pending'
   });
 
   // Load token from AsyncStorage
