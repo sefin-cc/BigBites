@@ -2,7 +2,6 @@ import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "r
 import globalStyle from "../../../assets/styles/globalStyle";
 import MapView, { Marker } from 'react-native-maps';
 import { useContext, useEffect, useState } from "react";
-import { OPENCAGE_API_KEY } from '@env'; 
 import { geocode } from 'opencage-api-client'; 
 import { AppContext } from "@/app/context/AppContext";
 import { router } from "expo-router";
@@ -10,9 +9,12 @@ import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import Loading from "@/components/loading";
 
+import Constants from 'expo-constants';
+
 
 
 export default function MapLocationStep3() {
+  const OPENCAGE_API_KEY = Constants.expoConfig?.extra?.OPENCAGE_API_KEY;
   const context = useContext(AppContext);
   if (!context) {
     return <Text>Error: AppContext is not available</Text>;
