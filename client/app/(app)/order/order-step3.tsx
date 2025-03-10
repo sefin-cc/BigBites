@@ -2,7 +2,6 @@ import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "r
 import globalStyle from "../../../assets/styles/globalStyle";
 import MapView, { Marker } from 'react-native-maps';
 import { useContext, useEffect, useState } from "react";
-import { OPENCAGE_API_KEY } from '@env'; 
 import { geocode } from 'opencage-api-client'; 
 import { AppContext } from "@/app/context/AppContext";
 import { router } from "expo-router";
@@ -10,9 +9,29 @@ import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import Loading from "@/components/loading";
 
+import Constants from 'expo-constants';
+import { Snackbar } from "react-native-paper";
 
+interface Branch {
+  id: string;
+  branchName: string;
+  province: string;
+  city: string;
+  fullAddress: string;
+  openingTime: string;
+  closingTime: string;
+  acceptAdvancedOrder: boolean;
+}
+
+const branches: Branch[] = [
+  { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false  },
+  { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
+  { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
+  { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
+];
 
 export default function MapLocationStep3() {
+  const OPENCAGE_API_KEY = Constants.expoConfig?.extra?.OPENCAGE_API_KEY;
   const context = useContext(AppContext);
   if (!context) {
     return <Text>Error: AppContext is not available</Text>;
@@ -26,7 +45,9 @@ export default function MapLocationStep3() {
   const [savedLocation, setSavedLocation] = useState<{ description: string, latitude: number, longitude: number } | null>(null); 
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [townCity, setTownCity] = useState({city: "", town: ""});
+  const [visible, setVisible] = useState<boolean>(false);
+  
   const reverseGeocode = async (query: string) =>{
     setIsLoading(true);
     try {
@@ -34,12 +55,12 @@ export default function MapLocationStep3() {
 
       if (response.status.code === 200 && response.results.length > 0) {
         const result = response.results[0];
-
+        setTownCity({ city: result.components.city , town: result.components.town});
         // Set location suggestions
         setSavedLocation({
           description: result.formatted,
           latitude: result.geometry.lat,
-          longitude: result.geometry.lng,
+          longitude: result.geometry.lng
         });  
       } else {
      //   setError('Something went wrong.');
@@ -76,7 +97,7 @@ export default function MapLocationStep3() {
       const { latitude, longitude } = coords;
       const query = latitude+", "+longitude;
       setLocation('');
-      setCoordinates({ latitude, longitude });
+      setCoordinates({ latitude, longitude });                  
       setRegion({
         latitude: latitude,
         longitude: longitude,
@@ -109,11 +130,13 @@ export default function MapLocationStep3() {
       const response = await geocode({ q: query, key: OPENCAGE_API_KEY });
 
       if (response.status.code === 200 && response.results.length > 0) {
+  
         // Map OpenCage results to suggestions
         const formattedSuggestions = response.results.map((result: any) => ({
           description: result.formatted,
           lat: result.geometry.lat,
           lng: result.geometry.lng,
+          result: { city: result.components.city, town: result.components.town}
         }));
         // Set location suggestions
         setSuggestions(formattedSuggestions);  
@@ -142,6 +165,7 @@ export default function MapLocationStep3() {
       latitude: place.lat,
       longitude: place.lng,
     }); 
+    setTownCity(place.result);
   };
 
   const handlePinLocation = (newRegion: any) => {
@@ -163,18 +187,39 @@ export default function MapLocationStep3() {
   };
   }
  
-
   const handleConfirm = () => {
-    setOrder(prev => ({
+    // Find a branch with a matching city or town from the selected location
+    const isLocationAvailable = branches.find(
+      (branch) => branch.city === townCity.city || branch.city === townCity.town
+    );
+
+    if (isLocationAvailable) {
+      // If a branch is found, save the location and navigate
+      setOrder((prev) => ({
         ...prev,
         location: savedLocation,
-    }));
-    router.push("/(app)/menu/menu-categories");
-  }
+        branch: [isLocationAvailable],
+      }));
+      router.push("/(app)/menu/menu-categories");
+    } else {
+      setVisible(true);
+    }
+  };
   
+     // Function to hide the snackbar
+     const hideSnackbar = () => setVisible(false);
 
-  
-  
+     useEffect(() => {
+       if (visible) {
+         const timer = setTimeout(() => {
+           hideSnackbar(); // Hide snackbar after 3 seconds
+         }, 3000);
+   
+         // Cleanup timer on component unmount or when visible changes
+         return () => clearTimeout(timer);
+       }
+     }, [visible]); 
+ 
   return (
     <View style={{ flex: 1, position: "relative" }}>
       <Loading isLoading={isLoading} />
@@ -292,7 +337,20 @@ export default function MapLocationStep3() {
             <Text style={globalStyle.buttonText}>CONFIRM</Text>
           </TouchableOpacity>
         </View>
-       
+        <View style={{bottom: 100}}>
+          <Snackbar
+            visible={visible}
+            onDismiss={hideSnackbar}
+            duration={Snackbar.DURATION_LONG} 
+            style={{  
+              backgroundColor:"#2C2C2C",
+              borderRadius: 10,    
+              zIndex: 10000,     
+            }}
+          >
+            <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> SORRY YOUR LOCATION IS NOT AVAILABLE!</Text>
+          </Snackbar>
+        </View>
     </View>
   );
 };

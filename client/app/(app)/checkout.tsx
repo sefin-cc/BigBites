@@ -88,12 +88,13 @@ export default function Checkout() {
 
   function handlePlaceOrder() {
     if (validateForm()) {
-      const grandTotal = order.basePrice - discountDeduction;
+      const deliveryFee = (order.type === "Delivery" ? 50 : 0);
+      const grandTotal = order.basePrice - discountDeduction + deliveryFee;
 
       setOrder(prev => ({
         ...prev,
         discountCardDetails: {name: name, discountCard: discountCard},
-        fees: {subTotal: order.basePrice, discountDeduction: discountDeduction, grandTotal: grandTotal},
+        fees: {subTotal: order.basePrice, discountDeduction: discountDeduction, deliveryFee: deliveryFee, grandTotal: grandTotal},
         timestamp: currentTimestamp
       }));
    
@@ -162,19 +163,50 @@ export default function Checkout() {
               <Text style={styles.text}>LOCATION:</Text>
             </View>
             <View style={{flex: 1}}>
-              {order.branch && (
+              { (order.type !== "Delivery" && order.branch ) && (
                 <View>
                   <Text style={styles.collapsibleText}>{order.branch[0].branchName}</Text>
                   <Text style={styles.collapsibleText}>{order.branch[0].fullAddress}</Text>
                 </View>
               )}
               {order.location && (
-                <Text style={styles.collapsibleText}>
-                  {order.location && order.location?.description}
-                </Text>
+                <View>
+                  <Text style={styles.collapsibleText}>
+                    {order.location && order.location?.description}
+                  </Text>
+                </View>
               )}
             </View>
           </View>
+
+          <View style={{flexDirection: "row", marginBottom: 10}}>
+            <View style={{flex: 1}}>
+              <Text style={styles.text}>ORDER TYPE:</Text>
+            </View>
+            <View style={{flex: 1}}>
+                <View>
+                  <Text style={styles.collapsibleText}>{order.type} {order.pickUpType}</Text>
+                </View>
+            </View>
+          </View>
+            
+          {
+            (order.dateTimePickUp && order.pickUpType === "TakeOut") &&
+            <View style={{flexDirection: "row", marginBottom: 10}}>
+              <View style={{flex: 1}}>
+                <Text style={styles.text}>DATE AND TIME OF PICKUP:</Text>
+              </View>
+              <View style={{flex: 1}}>
+                  <View>
+                    <Text style={styles.collapsibleText}>{order.dateTimePickUp}</Text>
+                  </View>
+              </View>
+            </View>
+          }
+
+
+          
+
 
           <View style={{flexDirection: "row", marginBottom: 10}}>
             <View style={{flex: 1}}>
@@ -222,7 +254,7 @@ export default function Checkout() {
             (
               <View>
                 <View style={{borderTopWidth: 2, borderColor: "#7d7d7d", marginTop: 10, marginBottom: 17}}></View>
-                <Text style={styles.discountText}>ENTER YOUR PWD OR SENIOR CITIZEN CARD</Text>
+                <Text style={styles.discountText}>Present the card upon receiving the order. Discount is invalid if the card is invalid.</Text>
                 <TextInput
                   label="FULL NAME"
                   mode="outlined"
@@ -326,9 +358,14 @@ export default function Checkout() {
             <View style={styles.subTotalCard}>
               <Text style={[styles.totalText, {fontSize: 20}]}>SUBTOTAL:    <Text style={{fontSize: 16}}>PHP {order.basePrice}</Text></Text>
               <Text style={[styles.totalText, {fontSize: 20}]}>DISCOUNT:    <Text style={{fontSize: 16}}>PHP {discountDeduction >0 && <Text>-</Text>}{discountDeduction}</Text></Text>
+              {
+                order.type === "Delivery" &&
+                <Text style={[styles.totalText, {fontSize: 20}]}>DELIVERY:    <Text style={{fontSize: 16}}>PHP 50</Text></Text>
+              }
+              
             </View>
             <View style={styles.grandTotalCard}>
-              <Text style={[styles.totalText, {fontSize: 20, color: "white"}]}>GRAND TOTAL:    <Text style={{fontSize: 24}}>PHP {(order.basePrice - discountDeduction)}</Text></Text>
+              <Text style={[styles.totalText, {fontSize: 20, color: "white"}]}>GRAND TOTAL:    <Text style={{fontSize: 24}}> PHP {order.basePrice - discountDeduction + (order.type === "Delivery" ? 50 : 0)}</Text></Text>
             </View>
           </View>
           
@@ -410,8 +447,8 @@ const styles = StyleSheet.create({
     fontFamily: "MadimiOne",  
   },
   discountText: {
-    fontSize: 16,
-    color: "#2C2C2C",
+    fontSize: 14,
+    color: "#747474",
     fontFamily: 'MadimiOne', 
     marginBottom: 10,
     alignSelf: "center"
