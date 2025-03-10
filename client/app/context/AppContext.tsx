@@ -29,7 +29,7 @@ interface Order {
   basePrice: number,
   timestamp: string | null;
   status: string;
-
+  dateTimePickUp: any | null;
 }
 
 // Define the context type
@@ -63,7 +63,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     order: [],
     basePrice: 0,
     timestamp: null,
-    status: 'pending'
+    status: 'pending',
+    dateTimePickUp: null
   });
 
   // Load token from AsyncStorage

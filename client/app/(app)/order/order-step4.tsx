@@ -90,21 +90,38 @@ export default function BranchesStep3() {
     });
   
     const handleSelectedBranch = (item: Branch ) => {
-      if (isBranchOpen(item.openingTime, item.closingTime)  || item.acceptAdvancedOrder){
-        setOrder(prev => ({
-          ...prev,
-          branch: [item],
-        }));
-        router.push("/(app)/menu/menu-categories");
+      if(order.pickUpType !== "DineIn"){
+        if (isBranchOpen(item.openingTime, item.closingTime)  || item.acceptAdvancedOrder){
+          setOrder(prev => ({
+            ...prev,
+            branch: [item],
+          }));
+          if(item.acceptAdvancedOrder){
+            router.push("/(app)/order/order-step5");
+          }else{
+            router.push("/(app)/menu/menu-categories");
+          }
+        
+        }else{
+          setVisible(true);
+        }
       }else{
-        setVisible(true);
+        if (isBranchOpen(item.openingTime, item.closingTime)){
+          setOrder(prev => ({
+            ...prev,
+            branch: [item],
+          }));
+          router.push("/(app)/menu/menu-categories");
+        }else{
+          setVisible(true);
+        }
       }
-
     }
 
     useEffect(() => {
       console.log(order);
     },[handleSelectedBranch]);
+    
    // Function to hide the snackbar
    const hideSnackbar = () => setVisible(false);
 
@@ -176,10 +193,10 @@ export default function BranchesStep3() {
                 }
 
                 {
-                  item.acceptAdvancedOrder &&
+                  (item.acceptAdvancedOrder && (order.pickUpType !== "DineIn")) &&
                   <Text style={[ styles.tag, { backgroundColor:"#FB7F3B" } ]}>
                     ADVANCE ORDER
-                </Text>
+                  </Text>
                 }
             </View>
           </View>
