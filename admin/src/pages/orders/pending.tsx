@@ -18,7 +18,7 @@ import orders from "../../data/orders.json";
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent } from '@mui/material';
+import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
 
 // Data Types
 interface Data {
@@ -29,12 +29,14 @@ interface Data {
   address: string;
   phone: string;
   discountDeduction: number;
+  deliveryFee: number;
   subTotal: number;
   grandTotal: number;
   type: string;
   pickUpType: string;
   order: Array<any>;
   status: string;
+  dateTimePickUp: any | null;
 }
 
 // Data Row Creation
@@ -45,12 +47,14 @@ function createData(
   address: string,
   phone: string,
   discountDeduction: number,
+  deliveryFee: number,
   subTotal: number,
   grandTotal: number,
   type: string,
   pickUpType: string,
   order: Array<any>,
-  status: string
+  status: string,
+  dateTimePickUp: any | null,
 ): Data {
   return {
     id,
@@ -59,12 +63,14 @@ function createData(
     address,
     phone,
     discountDeduction,
+    deliveryFee,
     subTotal,
     grandTotal,
     type,
     pickUpType,
     order,
     status,
+    dateTimePickUp
   };
 }
 
@@ -77,12 +83,14 @@ const rows = orders.map((order, index) =>
     order.location?.description || order.branch[0].branchName +', '+ order.branch[0].fullAddress,
     order.costumer || '0978787877',
     order.fees.discountDeduction,
+    order.fees.deliveryFee,
     order.fees.subTotal,
     order.fees.grandTotal,
     order.type,
     order.pickUpType || '',
     order.order,
-    order.status
+    order.status,
+    order.dateTimePickUp
   )
 );
 
@@ -181,32 +189,42 @@ interface EnhancedTableToolbarProps {
   numSelected: number;
   onFilterChange: (event: SelectChangeEvent<string>) => void;
   filterValue: string;
+  onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, onFilterChange, filterValue } = props;
+  const { onSearchChange, onFilterChange, filterValue } = props;
 
   return (
     <Toolbar>
-      <Typography sx={{ flex: '1 1 100%', fontFamily:"Madimi One"}} variant="h6" component="div">
+      <Typography sx={{ marginRight: 2, fontFamily:"Madimi One"}} variant="h6" component="div">
         PENDING ORDERS
       </Typography>
-
-      <FormControl>
-        <InputLabel id="type-filter-label">Type</InputLabel>
-        <Select
-          labelId="type-filter-label"
-          value={filterValue}
-          onChange={onFilterChange}
-          label="Type"
-          size="small"
-          sx={{ width: 110 }}
-        >
-          <MenuItem value="">All</MenuItem>
-          <MenuItem value="PickUp">PickUp</MenuItem>
-          <MenuItem value="Delivery">Delivery</MenuItem>
-        </Select>
-      </FormControl>
+      <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
+        <TextField
+            label="Search"
+            variant="outlined"
+            size="small"
+            sx={{ flex: 1 }}
+            onChange={onSearchChange}
+            placeholder="Search..."
+        />
+        <FormControl>
+          <InputLabel id="type-filter-label">Type</InputLabel>
+          <Select
+            labelId="type-filter-label"
+            value={filterValue}
+            onChange={onFilterChange}
+            label="Type"
+            size="small"
+            sx={{ width: 110 }}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="PickUp">PickUp</MenuItem>
+            <MenuItem value="Delivery">Delivery</MenuItem>
+          </Select>
+        </FormControl>
+        </Box>
     </Toolbar>
   );
 }
@@ -219,6 +237,7 @@ export default function Pending() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [filterType, setFilterType] = React.useState<string>('');
+   const [searchTerm, setSearchTerm] = React.useState<string>('');
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -260,14 +279,27 @@ export default function Pending() {
     setFilterType(event.target.value);
   };
   
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-    const filteredRows = rows.filter(row => 
-      (filterType ? row.type === filterType : true) && row.status === 'pending'
-    );
-    
+    const filteredRows = rows
+    .filter(row => !filterType || row.type === filterType)  // Apply filter for type
+    .filter(row => row.status === 'pending')  // Apply filter for 'pending' status
+    .filter(row => !row.dateTimePickUp)  // Apply filter for no dateTimePickUp
+    .filter(row => {
+      const searchTermLower = searchTerm.toLowerCase();
+      // Apply search term across multiple fields (name, phone, datatime)
+      return (
+        row.name.toLowerCase().includes(searchTermLower) ||
+        row.phone.toLowerCase().includes(searchTermLower) ||
+        row.datatime.toLowerCase().includes(searchTermLower)
+      );
+    });
+  
 
   const visibleRows = React.useMemo(
     () =>
@@ -281,7 +313,12 @@ export default function Pending() {
     <div style={{ display: 'flex', flexDirection: "row", gap: 20}}>
        <Box sx={{ width: '70%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} onFilterChange={handleFilterChange} filterValue={filterType} />
+        <EnhancedTableToolbar 
+          numSelected={selected.length} 
+          onFilterChange={handleFilterChange} 
+          filterValue={filterType} 
+          onSearchChange={handleSearchChange}
+        />
           <TableContainer sx={{ width: '100%' }}>
             <Table
               aria-labelledby="tableTitle"
@@ -379,6 +416,7 @@ export default function Pending() {
                       <p className='font-bold'>Phone:</p>
                       <p>{selectedRow?.phone}</p>
                     </div>
+                    
                   </div>
 
                   <div>
@@ -420,6 +458,7 @@ export default function Pending() {
                       <div className=' bg-white border-t-4 border-dashed flex flex-col text-end pr-3 p-2' style={{borderColor:"#FB7F3B"}}>
                           <p className='font-bold'>SubTotal: PHP {selectedRow?.subTotal}</p>
                           <p className='font-bold'>Discount: PHP {selectedRow?.discountDeduction}</p>
+                          <p className='font-bold'>Delivery Fee: PHP {selectedRow?.deliveryFee}</p>
                       </div>
                       <div className='text-white flex flex-row  justify-end items-center gap-3 pr-3 rounded-b-sm' style={{backgroundColor:"#FB7F3B"}}>
                         <p className=' font-bold text-lg'>Grand Total:  </p>

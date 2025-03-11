@@ -111,7 +111,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
           <TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
+            padding={'normal'}
             sortDirection={sortBy === headCell.id ? menuCategory : false}
           >
             <TableSortLabel
@@ -283,7 +283,7 @@ export default function Promos() {
                           onChange={(e) => handleSubCategorySelect(e, `${row.id}`)}
                         />
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
+                      <TableCell component="th" scope="row" padding="normal">
                         {row.label}
                       </TableCell>
                       <TableCell align="right">{row.image}</TableCell>

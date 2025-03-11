@@ -57,8 +57,9 @@ export default function Login() {
                     objectFit: 'contain' 
                 }} 
             />
-            <div className="p-4 rounded-lg bg-white text-center" style={{width: '40%'}}>
-                <p className=" text-3xl mb-3" style={{fontFamily: 'Madimi One', color: "#2C2C2C"}}>LOGIN</p>
+            <p className=" text-3xl mb-3" style={{fontFamily: 'Madimi One', color: "white"}}>LOGIN</p>
+            <div className="p-7 rounded-lg bg-white text-center" style={{width: '40%'}}>
+
                 <div className="text-left">
                     <TextField
                         label="Email"
