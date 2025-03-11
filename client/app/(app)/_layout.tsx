@@ -72,15 +72,18 @@ export default function AppLayout() {
             }}/>
             
         <Stack.Screen name="order/order-step5"  options={{
+          headerShown: false,
+            }}/>
+
+          <Stack.Screen name="order/order-step6"  options={{
           headerShown: true,
-          headerTitle: "SELECT DATE AND TIME",
+          headerTitle: "ADVANCE ORDER",
           headerStyle: globalStyle.headerStyle,
           headerTitleStyle: globalStyle.headerTitleStyle,
           headerLeft: () => (
             <BackButton />
           ),
             }}/>
-        
         {/* Menu Screens */}
         <Stack.Screen name="menu/menu-categories" options={{
           headerShown: true,
