@@ -12,23 +12,18 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import orders from "../../data/orders.json";
-import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 
+// Data Types
 interface Data {
-
   id: number;
   datatime: string;
   name: string;
   address: string;
   phone: string;
   discountDeduction: number;
-  deliveryFee: number;
   subTotal: number;
   grandTotal: number;
   type: string;
@@ -46,7 +41,6 @@ function createData(
   address: string,
   phone: string,
   discountDeduction: number,
-  deliveryFee: number,
   subTotal: number,
   grandTotal: number,
   type: string,
@@ -62,7 +56,6 @@ function createData(
     address,
     phone,
     discountDeduction,
-    deliveryFee,
     subTotal,
     grandTotal,
     type,
@@ -82,7 +75,6 @@ const rows = orders.map((order, index) =>
     order.location?.description || order.branch[0].branchName +', '+ order.branch[0].fullAddress,
     order.costumer || '0978787877',
     order.fees.discountDeduction,
-    order.fees.deliveryFee,
     order.fees.subTotal,
     order.fees.grandTotal,
     order.type,
@@ -130,25 +122,24 @@ interface HeadCell {
 
 // Head Cells
 const headCells: readonly HeadCell[] = [
-  { id: 'datatime', numeric: false, disablePadding: true, label: 'Date and Time' },
-  { id: 'name', numeric: true, disablePadding: false, label: 'Name' },
-  { id: 'address', numeric: true, disablePadding: false, label: 'Address' },
-  { id: 'phone', numeric: true, disablePadding: false, label: 'Phone' },
-  { id: 'grandTotal', numeric: true, disablePadding: false, label: 'Total Price' },
+    { id: 'dateTimePickUp', numeric: false, disablePadding: true, label: 'Expected Date and Time' },
+    { id: 'datatime', numeric: false, disablePadding: true, label: 'Timestamp' },
+    { id: 'name', numeric: true, disablePadding: false, label: 'Name' },
+    { id: 'address', numeric: true, disablePadding: false, label: 'Address' },
+    { id: 'phone', numeric: true, disablePadding: false, label: 'Phone' },
+    { id: 'grandTotal', numeric: true, disablePadding: false, label: 'Total Price' },
 ];
 
 // Table Header Component
 interface EnhancedTableProps {
-  numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
-  rowCount: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const {  order, orderBy, onRequestSort } = props;
   const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -183,79 +174,39 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   );
 }
 
-// Toolbar Component with Filter
 interface EnhancedTableToolbarProps {
-  numSelected: number;
-  onFilterChange: (event: SelectChangeEvent<string>) => void;
-  filterValue: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleFilterOrderChange: (event: SelectChangeEvent<string>) => void;
-  filterOrder: string;
 }
+
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { onSearchChange, onFilterChange, filterValue, filterOrder,handleFilterOrderChange} = props;
-
-  return (
-    <Toolbar>
-      <Typography sx={{ marginRight:2, fontFamily:"Madimi One"}} variant="h6" component="div">
-        COMPLETED ORDERS
-      </Typography>
-
-       <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
-          <TextField
-              label="Search"
-              variant="outlined"
-              size="small"
-              sx={{ flex: 1 }}
-              onChange={onSearchChange}
-              placeholder="Search..."
-          />
-          <FormControl>
-            <InputLabel id="type-filter-label">Type</InputLabel>
-            <Select
-              labelId="type-filter-label"
-              value={filterValue}
-              onChange={onFilterChange}
-              label="Type"
-              size="small"
-              sx={{ width: 110 }}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="PickUp">PickUp</MenuItem>
-              <MenuItem value="Delivery">Delivery</MenuItem>
-            </Select>
-        </FormControl>
-        <FormControl>
-            <InputLabel id="type-filter-label">Order Type</InputLabel>
-            <Select
-              labelId="type-filter-label"
-              value={filterOrder}
-              onChange={handleFilterOrderChange}
-              label="Type"
-              size="small"
-              sx={{ width: 110 }}
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="Advance Order">Advance Order</MenuItem>
-              <MenuItem value="Normal Order">Normal Order</MenuItem>
-            </Select>
-        </FormControl>
-      </Box>
-      
-    </Toolbar>
-  );
+    const { onSearchChange } = props;
+    return (
+        <Toolbar>
+            <Typography sx={{ marginRight:2, fontFamily:"Madimi One"}} variant="h6" component="div">
+                PENDING ADVANCE ORDERS
+            </Typography>
+            <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
+                <TextField
+                    label="Search"
+                    variant="outlined"
+                    size="small"
+                    sx={{ flex: 1 }}
+                    onChange={onSearchChange}
+                    placeholder="Search..."
+                />
+            </Box>
+        </Toolbar>
+    );
 }
 
-
-export default function Completed() {
+// Main Pending Orders Component
+export default function AdvanceOrders() {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('datatime');
+  const [orderBy, setOrderBy] = React.useState<keyof Data>('dateTimePickUp');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [filterType, setFilterType] = React.useState<string>('');
-  const [filterOrder, setFilterOrder] = React.useState<string>('');
  const [searchTerm, setSearchTerm] = React.useState<string>('');
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
@@ -294,32 +245,17 @@ export default function Completed() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  const handleFilterChange = (event: SelectChangeEvent<string>) => {
-    setFilterType(event.target.value);
-  };
-  const handleFilterOrderChange = (event: SelectChangeEvent<string>) => {
-    setFilterOrder(event.target.value);
-  };
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
+
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
     const filteredRows = rows
-    .filter(row => !filterType || row.type === filterType)  
-    .filter(row => row.status === 'completed')  
-    .filter(row => {
-      // Apply the filter based on filterOrder
-      if (filterOrder === 'All') {
-        return true; // Show all rows
-      } else if (filterOrder === 'Advance Order') {
-        return row.dateTimePickUp; // Show rows with a dateTimePickUp
-      } else if (filterOrder === 'Normal Order') {
-        return !row.dateTimePickUp; // Show rows without a dateTimePickUp
-      }
-      return true; // Default case to show all rows if no filterOrder is set
-    })
+    .filter(row => row.status === 'pending')  // Apply filter for 'completed' status
+    .filter(row => row.dateTimePickUp)  
     .filter(row => {
       const searchTermLower = searchTerm.toLowerCase();
       // Apply search term across multiple fields (name, phone, datatime)
@@ -330,9 +266,7 @@ export default function Completed() {
       );
     });
   
-
-    
-  
+     
 
   const visibleRows = React.useMemo(
     () =>
@@ -347,13 +281,8 @@ export default function Completed() {
        <Box sx={{ width: '70%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar 
-          numSelected={selected.length} 
-          onFilterChange={handleFilterChange} 
-          filterValue={filterType} 
-          onSearchChange={handleSearchChange}
-          handleFilterOrderChange={handleFilterOrderChange}
-          filterOrder={filterOrder}
-          />
+            onSearchChange={handleSearchChange}
+        />
           <TableContainer sx={{ width: '100%' }}>
             <Table
               aria-labelledby="tableTitle"
@@ -361,12 +290,10 @@ export default function Completed() {
               sx={{ width: '100%' }}
             >
               <EnhancedTableHead
-                numSelected={selected.length}
                 order={order}
                 orderBy={orderBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={filteredRows.length}
               />
               <TableBody>
                 {visibleRows.map((row, index) => {
@@ -393,8 +320,9 @@ export default function Completed() {
                         scope="row"
                         padding="none"
                       >
-                        {row.datatime}
+                        {row.dateTimePickUp}
                       </TableCell>
+                      <TableCell align="right">{row.datatime}</TableCell>
                       <TableCell align="right">{row.name}</TableCell>
                       <TableCell align="right">{row.address}</TableCell>
                       <TableCell align="right">{row.phone}</TableCell>
@@ -441,7 +369,7 @@ export default function Completed() {
 
             return (
             <div className='p-2 '>
-            
+      
                 <div className='flex flex-row gap-20 w-full'>
                   <div>
                     <div>
@@ -452,6 +380,7 @@ export default function Completed() {
                       <p className='font-bold'>Phone:</p>
                       <p>{selectedRow?.phone}</p>
                     </div>
+                    
                   </div>
 
                   <div>
@@ -465,12 +394,8 @@ export default function Completed() {
                   </div>
                   </div>
 
-              </div>
-
-              {
-                selectedRow?.dateTimePickUp ?
-
-                <div>
+                  </div>
+                  <div>
                   <div>
                     <p className='font-bold'>Advance Order:</p>
                     <p>Yes</p>
@@ -479,14 +404,7 @@ export default function Completed() {
                     <p className='font-bold'>Expected Date and Time:</p>
                     <p>{selectedRow?.dateTimePickUp}</p>
                   </div>
-                </div> :
-
-                <div>
-                  <p className='font-bold'>Advance Order:</p>
-                  <p>No</p>
                 </div>
-
-              }
                   <p className='font-bold'>Order List:</p>
                   <div className=' rounded-2xl mt-1 border-4 ' style={{borderColor:"#FB7F3B"}}>
                   <div className='pr-4 pl-4 pt-2 rounded-2xl' style={{backgroundColor: "#FFEEE5"}}>
@@ -514,7 +432,6 @@ export default function Completed() {
                       <div className=' bg-white border-t-4 border-dashed flex flex-col text-end pr-3 p-2' style={{borderColor:"#FB7F3B"}}>
                           <p className='font-bold'>SubTotal: PHP {selectedRow?.subTotal}</p>
                           <p className='font-bold'>Discount: PHP {selectedRow?.discountDeduction}</p>
-                          <p className='font-bold'>Delivery Fee: PHP {selectedRow?.deliveryFee}</p>
                       </div>
                       <div className='text-white flex flex-row  justify-end items-center gap-3 pr-3 rounded-b-sm' style={{backgroundColor:"#FB7F3B"}}>
                         <p className=' font-bold text-lg'>Grand Total:  </p>
@@ -522,7 +439,12 @@ export default function Completed() {
                       </div>
                   </div>
                     
-      
+                  <div className="flex justify-between mt-4 w-full">
+                    <button className="text text-white  px-4 py-2 rounded-md focus:outline-none" style={{backgroundColor: "#2C2C2C"}}>COMPLETED</button>
+                    <button className="text text-white  px-4 py-2 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
+                      <p>CANCEL ORDER</p>
+                    </button>
+                  </div>
               </div>
             );
           })()) : <div className="w-full h-full flex justify-center items-center text-center"><p className='text text-gray-800'>Click a row to see the details.</p></div>}

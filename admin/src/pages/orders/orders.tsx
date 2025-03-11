@@ -4,6 +4,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Pending from './pending';
 import Completed from './completed';
+import AdvanceOrders from './advanceOrder';
 
 export default function Order() {
   const [value, setValue] = React.useState(0);
@@ -22,6 +23,7 @@ export default function Order() {
       >
         {/* Simply use Tab without href and onClick */}
         <Tab label="Pending Orders" />
+        <Tab label="Pending Advanced Orders" />
         <Tab label="Completed Orders" />
       </Tabs>
 
@@ -33,6 +35,11 @@ export default function Order() {
           </Box>
         )}
         {value === 1 && (
+          <Box>
+            <AdvanceOrders />
+          </Box>
+        )}
+         {value === 2 && (
           <Box>
             <Completed />
           </Box>

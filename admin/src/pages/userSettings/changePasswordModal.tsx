@@ -94,7 +94,7 @@ function ChangePasswordModal() {
           }}
         >
           <Typography variant="h6" id="simple-modal-title" sx={{ marginBottom: 3, fontWeight: 'bold', fontFamily: 'Madimi One' }}>
-            RESET YOUR PASSWORD
+            CHANGE YOUR PASSWORD
           </Typography>
 
           <TextField
