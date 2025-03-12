@@ -15,4 +15,12 @@ Route::post('admin/login', [AdminController::class, 'login']);
 Route::post('admin/register', [AdminController::class, 'register']);
 Route::post('admin/logout', [AdminController::class, 'logout'])->middleware('auth:sanctum');
 
+
+//Admin User Routes
+Route::get('/client', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
 Route::post('client/login', [ClientController::class, 'login']);
+Route::post('client/register', [ClientController::class, 'register']);
+Route::post('client/logout', [ClientController::class, 'logout'])->middleware('auth:sanctum');
