@@ -4,16 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;  
 
 class BranchController extends Controller
 {
+    public function __construct()
+    {
+        // Apply permission middleware to all actions except 'index' and 'show'
+        $this->middleware('permission:view-branch|create-branch|edit-branch|delete-branch', ['except' => ['index', 'show']]);
+        $this->middleware('permission:create-branch', ['only' => ['create', 'store']]);
+        $this->middleware('permission:edit-branch', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:delete-branch', ['only' => ['destroy']]);
+    }
+
     // View all branches
     public function index()
     {
         // Fetch all branches from the database
         $branches = Branch::all();
-
-        // Return branches as a JSON response
         return response()->json($branches);
     }
 
@@ -43,8 +51,6 @@ class BranchController extends Controller
     {
         // Find the branch by ID
         $branch = Branch::find($id);
-
-        // If branch not found, return error
         if (!$branch) {
             return response()->json(['error' => 'Branch not found'], 404);
         }
@@ -58,8 +64,6 @@ class BranchController extends Controller
     {
         // Find the branch by ID
         $branch = Branch::find($id);
-
-        // If branch not found, return error
         if (!$branch) {
             return response()->json(['error' => 'Branch not found'], 404);
         }
@@ -87,8 +91,6 @@ class BranchController extends Controller
     {
         // Find the branch by ID
         $branch = Branch::find($id);
-
-        // If branch not found, return error
         if (!$branch) {
             return response()->json(['error' => 'Branch not found'], 404);
         }

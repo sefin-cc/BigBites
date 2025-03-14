@@ -6,10 +6,13 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class Client extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles;
+
+    protected $guard_name = 'client'; 
 
     /**
      * The attributes that are mass assignable.
@@ -22,7 +25,7 @@ class Client extends Authenticatable
         'password',
         'phone',
         'address',
-        'favourites',
+        'favourites'
     ];
 
     /**

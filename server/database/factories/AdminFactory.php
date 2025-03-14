@@ -22,8 +22,8 @@ class AdminFactory extends Factory
             'phone' => $this->faker->phoneNumber,
             'address' => $this->faker->address,
             'branch' => $this->faker->word, 
-            'role' => $this->faker->word,  
             'password' => Hash::make('password')
+
         ];
     }
 }
