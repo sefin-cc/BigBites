@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\PromoController;
 
 //Admin User Routes
 // Admin User Routes
@@ -50,5 +51,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::resource('branches', BranchController::class);
+        Route::resource('promos', PromoController::class);
         Route::resource('role', RolesController::class);
     });
