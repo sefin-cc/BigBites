@@ -8,36 +8,44 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\RolesController;
 
 //Admin User Routes
-Route::get('/admin', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
+// Admin User Routes
 Route::post('admin/login', [AdminController::class, 'login']);
-Route::post('admin/register', [AdminController::class, 'register']);
-Route::post('admin/logout', [AdminController::class, 'logout'])->middleware('auth:sanctum');
 
 
-//Admin User Routes
-Route::get('/client', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Protect these routes with authentication middleware
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/admin', function (Request $request) {
+        return $request->user();
+    });
+    Route::post('admin/register', [AdminController::class, 'register']);
+    Route::post('admin/logout', [AdminController::class, 'logout']);
+    Route::get('admin/index', [AdminController::class, 'index']);
+    Route::get('admin/show/{id}', [AdminController::class, 'show']);
+    Route::put('admin/update/{id}', [AdminController::class, 'update']);
+    Route::delete('admin/destroy/{id}', [AdminController::class, 'destroy']);
+});
 
+
+
+//Client User Routes
 Route::post('client/login', [ClientController::class, 'login']);
 Route::post('client/register', [ClientController::class, 'register']);
-Route::post('client/logout', [ClientController::class, 'logout'])->middleware('auth:sanctum');
 
-// Route::prefix('branches')->group(function () {
-//     // Admin routes for managing branches
-//     Route::middleware(['auth:sanctum'])->group(function () {
-//         Route::post('/', [BranchController::class, 'store']); // Create a new branch
-//         Route::put('{id}', [BranchController::class, 'update']); // Update a specific branch
-//         Route::delete('{id}', [BranchController::class, 'destroy']); // Delete a specific branch
-//     });
+// Protect client routes that require authentication
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/client', function (Request $request) {
+        return $request->user();
+    });
 
-//     // Common routes for both Admins and Clients (view all branches, view specific branch)
-//     Route::get('/', [BranchController::class, 'index']); // View all branches
-//     Route::get('{id}', [BranchController::class, 'show']); // View a specific branch
-// });
+    Route::post('client/logout', [ClientController::class, 'logout']);  // Logout route
+
+    // CRUD operations for clients
+    Route::get('client/index', [ClientController::class, 'index']);
+    Route::get('client/show/{id}', [ClientController::class, 'show']);
+    Route::put('client/update/{id}', [ClientController::class, 'update']);
+    Route::delete('client/destroy/{id}', [ClientController::class, 'destroy']);
+});
+
 
 
     Route::middleware(['auth:sanctum'])->group(function () {
