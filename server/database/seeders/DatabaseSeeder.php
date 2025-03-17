@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             ClientSeeder::class,
             BranchSeeder::class,
-            PromoSeeder::class
+            PromoSeeder::class,
+            MenuSeeder::class
         ]);
     }
 }

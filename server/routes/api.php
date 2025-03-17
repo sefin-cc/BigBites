@@ -7,9 +7,14 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubCategoryController;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\AddOnController;
+
 
 //Admin User Routes
-// Admin User Routes
 Route::post('admin/login', [AdminController::class, 'login']);
 
 
@@ -50,7 +55,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::resource('branches', BranchController::class);
-        Route::resource('promos', PromoController::class);
-        Route::resource('role', RolesController::class);
+        Route::apiResource('branches', BranchController::class);
+        Route::apiResource('promos', PromoController::class);
+        Route::apiResource('role', RolesController::class);
+        Route::get('menu', [MenuController::class, 'index']);
+        Route::apiResource('categories', CategoryController::class);
+        Route::apiResource('subcategories', SubCategoryController::class);
+        Route::apiResource('items', ItemController::class);
+        Route::apiResource('addons', AddOnController::class);
+
     });
