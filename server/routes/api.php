@@ -12,7 +12,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\AddOnController;
-
+use App\Http\Controllers\OrderController;
 
 //Admin User Routes
 Route::post('admin/login', [AdminController::class, 'login']);
@@ -30,8 +30,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('admin/update/{id}', [AdminController::class, 'update']);
     Route::delete('admin/destroy/{id}', [AdminController::class, 'destroy']);
 });
-
-
 
 //Client User Routes
 Route::post('client/login', [ClientController::class, 'login']);
@@ -52,8 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('client/destroy/{id}', [ClientController::class, 'destroy']);
 });
 
-
-
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('branches', BranchController::class);
         Route::apiResource('promos', PromoController::class);
@@ -63,5 +59,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('subcategories', SubCategoryController::class);
         Route::apiResource('items', ItemController::class);
         Route::apiResource('addons', AddOnController::class);
-
+        Route::apiResource('orders', OrderController::class);
     });
