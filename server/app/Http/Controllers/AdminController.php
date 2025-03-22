@@ -58,49 +58,63 @@ class AdminController extends Controller
         }
     }
     
-    public function login(Request $request)
-    {
-        // Validate the input fields
-        try {
-            $request->validate([
-                'email' => 'required|email|exists:admins',
-                'password' => 'required|min:6',
-            ]);
-        } catch (ValidationException $e) {
-            // If validation fails, return a JSON response with errors
-            return response()->json([
-                'errors' => $e->errors(),
-            ], 422); 
+public function login(Request $request)
+{
+        // Validate request data
+        $validatedData = $request->validate([
+            'email' => 'required|email|exists:admins,email',
+            'password' => 'required|min:6',
+        ]);
+
+       
+        if (!Auth::guard('admin')->attempt([
+            'email' => $validatedData['email'],
+            'password' => $validatedData['password']
+        ])) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
-        // Find the admin by email
-        $admin = Admin::where('email', $request->email)->first();
+      
+        $request->session()->regenerate();
 
-        // Check if the admin exists and the password is correct
-        if (!$admin || !Hash::check($request->password, $admin->password)) {
-            return response()->json([
-                'error' => 'The provided credentials are incorrect.',
-            ], 401);
+      
+        $admin = Auth::guard('admin')->user();
+
+      
+        if (!$admin) {
+            return response()->json(['error' => 'Authentication failed'], 401);
         }
 
-        // Create a token for the admin
-        $token = $admin->createToken('AdminApp')->plainTextToken;
-
-        // Return the token and admin details as a JSON response
         return response()->json([
-            'token' => $token,
-            'admin' => $admin,
-        ], 200); 
-    }
+            'message' => 'Login successful',
+            'admin' => $admin
+        ]);
+
+}
+    
+    
 
     public function logout(Request $request)
     {
-        // Delete all tokens for the admin upon logout
-        $request->user()->tokens()->delete();
+        // Check if the user is authenticated before trying to logout
+        if (Auth::guard('admin')->user()) {
+            // Delete all tokens (only needed for API token auth)
+            $request->user()->tokens()->delete();
 
-        return response()->json([
-            'message' => 'You have been logged out successfully.',
-        ]);
+            // Logout from the admin guard
+            Auth::guard('admin')->logout();
+
+            // Invalidate session and regenerate CSRF token
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            // Forget cookies to remove authentication state
+            return response()->json(['message' => 'Logged out successfully'])
+                ->withCookie(cookie()->forget('XSRF-TOKEN'))
+                ->withCookie(cookie()->forget('laravel_session'));
+        }
+
+        return response()->json(['message' => 'User not authenticated'], 401);
     }
 
     // Show all admins

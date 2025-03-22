@@ -15,11 +15,11 @@ use App\Http\Controllers\AddOnController;
 use App\Http\Controllers\OrderController;
 
 //Admin User Routes
-Route::post('admin/login', [AdminController::class, 'login']);
+Route::post('admin/login', [AdminController::class, 'login'])->middleware(['web']);
 
 
 // Protect these routes with authentication middleware
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin', function (Request $request) {
         return $request->user();
     });

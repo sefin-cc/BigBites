@@ -21,13 +21,15 @@ class BranchController extends Controller
     // View all branches
     public function index()
     {
-        try {
-            // Fetch all branches from the database
-            $branches = Branch::all();
-            return response()->json($branches);
-        } catch (Exception $e) {
-            return response()->json(['error' => 'Failed to retrieve branches.', 'message' => $e->getMessage()], 500);
-        }
+        $branches = Branch::all();
+        return response()->json($branches);
+        // try {
+        //     // Fetch all branches from the database
+        //     $branches = Branch::all();
+        //     return response()->json($branches);
+        // } catch (Exception $e) {
+        //     return response()->json(['error' => 'Failed to retrieve branches.', 'message' => $e->getMessage()], 500);
+        // }
     }
 
     // Create a new branch

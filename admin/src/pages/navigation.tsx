@@ -33,7 +33,10 @@ import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
-
+import { useLogoutMutation } from '../features/auth/authApi';
+import Cookies from 'js-cookie';
+// import { resetAuth } from '../store/authSlice'; 
+// import { useDispatch } from 'react-redux';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -87,6 +90,9 @@ export default function Navigation() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const context = useContext(AppContext);
+  const [logout, { isLoading }] = useLogoutMutation();
+  // const dispatch = useDispatch();
+
   if (!context) {
       // Handle the case where the context is undefined
       return <div>Loading...</div>;
@@ -106,25 +112,17 @@ export default function Navigation() {
   const [open, setOpen] = React.useState(false);
 
   const handleLogout = async () =>{
+    try {
+        await logout().unwrap();
+        Cookies.remove('XSRF-TOKEN');
+        Cookies.remove('laravel_session');
+          
+        // dispatch(resetAuth());
+        navigate('/login'); 
+    } catch (err) {
+        console.error("Logout failed:", err);
+    }
 
-
-    // const res = await fetch('/api/logout', {
-    //     method: 'post',
-    //     headers:{
-    //         Authorization: `Bearer ${token}`,
-    //     }
-    // });
-
-    // const data = await res.json();
-    // console.log(data);
-
-    // if(res.ok){
-    //     setUser(null);
-    //     setToken(null);
-    //     localStorage.removeItem("token");
-    //     navigate('/');
-    // }
-    navigate('/login'); 
 }
 
   const handleDrawerOpen = () => {

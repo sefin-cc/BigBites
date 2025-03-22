@@ -20,8 +20,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import location from "../../data/location.json"
 import AddBranches from './addBranches';
 import EditBranches from './editBranch';
-// import AddPromoModal from './addPromos';
-// import EditPromoModal from './editPromos';
+import { useGetBranchesQuery } from '../../features/api/apiSlice';
 
 // Data Types
 interface Data {
@@ -58,23 +57,7 @@ function createData(
     acceptAdvancedOrder
   };
 }
-const branches: Data[] = [
-    { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false  },
-    { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-  ];
 
-  const rows = branches.map(branch => createData(
-    branch.id,
-    branch.branchName,
-    branch.province,
-    branch.city,
-    branch.fullAddress,
-    branch.openingTime,
-    branch.closingTime,
-    branch.acceptAdvancedOrder
-));
 
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T): number {
   const valueA = a[sortBy];
@@ -297,6 +280,24 @@ export default function Branches() {
   const [cities, setCities] = React.useState<string>('');
   const [province, setProvince] = React.useState<string>('');
 
+  const { data: branches, error, isLoading } = useGetBranchesQuery();
+const [rows, setRows] = React.useState<any[]>([]);  // Initialize with an empty array
+
+React.useEffect(() => {
+  if (branches) {
+    setRows(branches.map(branch => createData(
+      branch.id,
+      branch.branchName,
+      branch.province,
+      branch.city,
+      branch.fullAddress,
+      branch.openingTime,
+      branch.closingTime,
+      branch.acceptAdvancedOrder
+    )));
+  }
+}, [branches]);  
+
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
     setMenuCategory(isAsc ? 'desc' : 'asc');
@@ -369,6 +370,8 @@ export default function Branches() {
 
   const isAllSelected =
     visibleRows.length > 0 && visibleRows.every((row) => selected.has(`${row.id}`));
+
+
 
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
