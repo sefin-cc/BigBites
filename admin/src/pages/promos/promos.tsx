@@ -19,6 +19,7 @@ import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddPromoModal from './addPromos';
 import EditPromoModal from './editPromos';
+import { useGetPromosQuery } from '../../features/api/promoApi';
 
 // Data Types
 interface Data {
@@ -36,12 +37,7 @@ function createData(id: number, label: string, image: string): Data {
   };
 }
 
-// Mapping orders to rows
-const rows = [
-  createData(1, "Promo 1", ""),
-  createData(2, "Promo 2", ""),
-  createData(3, "Promo 3", ""),
-];
+
 
 // Sorting Functions
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
@@ -186,6 +182,18 @@ export default function Promos() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [filterType, setFilterType] = React.useState<string>('');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const { data: promos, error, isLoading } = useGetPromosQuery();
+  const [rows, setRows] = React.useState<any[]>([]); 
+    
+  React.useEffect(() => {
+    if (promos) {
+      setRows(promos.map(promo => createData(
+        promo.id,
+        promo.label,
+        promo.image,
+      )));
+    }
+  }, [promos]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';

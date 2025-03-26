@@ -15,12 +15,12 @@ import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, Checkbox,
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddUserModal from './addUserModal';
 import EditUserModal from './editUserModal';
-
-
+import { useGetAdminsQuery } from '../../features/api/adminUsersApi';
+import { useGetBranchesQuery } from '../../features/api/branchApi';
 
 // Data Types
 interface Data {
-    id: string;
+    id: number;
     name: string;
     email: string;
     phone: string;
@@ -31,7 +31,7 @@ interface Data {
 
 // Data Row Creation
 function createData(
-    id: string,
+    id: number,
     name: string,
     email: string,
     phone: string,
@@ -51,28 +51,18 @@ function createData(
   };
 }
 
-const branches = [
-    { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false  },
-    { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-  ];
+interface Branch {
+  id: string;
+  branchName: string;
+  province: string;
+  city: string;
+  fullAddress: string;
+  openingTime: string;
+  closingTime: string;
+  acceptAdvancedOrder: boolean;
+}
 
 
-const users: Data[] = [
-    { id: "1", name: "Rogena Tibegar", email: "rogenasefin6@gmail.com", phone: "09500321222", address: "Mangaldan, Pangasinan",  branch: "SM DAGUPAN CITY", role: "Admin" },
-  
-  ];
-
-  const rows = users.map(users => createData(
-    users.id,
-    users.name,
-    users.email,
-    users.phone,
-    users.address,
-    users.branch,
-    users.role,
-));
 
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T): number {
   const valueA = a[sortBy];
@@ -185,10 +175,11 @@ interface EnhancedTableToolbarProps {
   handleRoleChange:  (event: SelectChangeEvent<string>) => void;
   numSelected: number;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  branchesList: Branch[];
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { onSearchChange, numSelected, role, handleRoleChange, branch, handleBranchChange } = props;
+  const { branchesList, onSearchChange, numSelected, role, handleRoleChange, branch, handleBranchChange } = props;
 
 
   return (
@@ -225,7 +216,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           }}
         >
            <MenuItem value="">All</MenuItem>
-           {branches.map((branch, key) => (
+           {branchesList.map((branch, key) => (
             <MenuItem key={key} value={branch.branchName}>
               {branch.branchName}
             </MenuItem>
@@ -252,14 +243,15 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           }}
         >
            <MenuItem value="">All</MenuItem>
-           <MenuItem value="Admin">Admin</MenuItem>
-           <MenuItem value="Employee">Employee</MenuItem>
+           <MenuItem value="Administrator">Administrator</MenuItem>
+           <MenuItem value="Manager">Manager</MenuItem>
+           <MenuItem value="Staff">Staff</MenuItem>
         </Select>
       </FormControl>
 
     
 
-      <AddUserModal branches={branches} />
+      <AddUserModal branches={branchesList} />
 
         {/* <AddPromoModal /> */}
         {numSelected > 0 ? (
@@ -271,7 +263,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         ) : null}
         {numSelected === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <EditUserModal  branches={branches} />
+            <EditUserModal  branches={branchesList} />
           </div>
         ) : null}
       </Box>
@@ -288,7 +280,24 @@ export default function ManageAdmin() {
   const [searchTerm, setSearchTerm] = React.useState<string>('');
   const [role, setRoles] = React.useState<string>('');
   const [branch, setBranch] = React.useState<string>('');
+  const { data: branchesList } = useGetBranchesQuery();
+  const { data: users, error, isLoading } = useGetAdminsQuery();
+  const [rows, setRows] = React.useState<any[]>([]); 
+  
+  React.useEffect(() => {
+ if (users) {
+        setRows(users.map(user => createData(
+            user.id,
+            user.name,
+            user.email,
+            user.phone,
+            user.address,
+            user.branch,
+            user.roles.length > 0 ? user.roles[0].name : 'No Role' // Handling multiple roles
+        )));
+    }
 
+  }, [users]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
@@ -368,6 +377,7 @@ export default function ManageAdmin() {
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
             branch={branch}
+            branchesList={branchesList || []}
             handleBranchChange={handleBranchChange}
             role={role}  
             handleRoleChange={handleRoleChange}

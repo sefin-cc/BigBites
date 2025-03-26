@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';
+import { setAdmin, clearAdmin } from './authSlice';
 
 // Define the types
 interface LoginRequest {
@@ -7,7 +8,7 @@ interface LoginRequest {
   password: string;
 }
 
-interface Admin {
+export interface Admin {
   id: number;
   name: string;
   email: string;
@@ -22,19 +23,23 @@ interface LoginResponse {
   admin: Admin;
 }
 
-// ✅ Function to fetch CSRF token
-const fetchCsrfToken = async () => {
+interface LogoutResponse {
+  message: string;
+}
+
+// Function to fetch CSRF token
+export const fetchCsrfToken = async () => {
   await fetch(`${import.meta.env.VITE_BACKEND_URL}csrf-cookie`, {
     method: 'GET',
     credentials: 'include',
   });
 };
 
-// ✅ Function to add XSRF-TOKEN to headers
+// Function to add XSRF-TOKEN to headers
 const withXSRFToken = (headers: Headers) => {
   const xsrfToken = Cookies.get('XSRF-TOKEN');
   
-  headers.set('Accept', 'application/json'); // ✅ Ensure JSON response format
+  headers.set('Accept', 'application/json'); //  Ensure JSON response format
 
   if (xsrfToken) {
     headers.set('X-XSRF-TOKEN', xsrfToken);
@@ -45,7 +50,7 @@ const withXSRFToken = (headers: Headers) => {
   return headers;
 };
 
-// ✅ Base Query with CSRF Protection
+// Base Query with CSRF Protection
 const baseQueryWithCsrf = async (args: any, api: any, extraOptions: any) => {
   if (args.method && args.method !== 'GET' && args.url !== 'admin/logout') {
     await fetchCsrfToken(); // Ensure CSRF token is fetched first
@@ -54,32 +59,68 @@ const baseQueryWithCsrf = async (args: any, api: any, extraOptions: any) => {
   const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BACKEND_URL,
     credentials: 'include',
-    prepareHeaders: (headers) => withXSRFToken(headers), // ✅ Apply XSRF Token
+    prepareHeaders: (headers) => withXSRFToken(headers), // Apply XSRF Token
   });
 
   return baseQuery(args, api, extraOptions);
 };
 
-// ✅ Create the API slice
+//  Create the API slice
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: baseQueryWithCsrf,
   endpoints: (builder) => ({
-    login: builder.mutation<LoginResponse, LoginRequest>({
+    login: builder.mutation({
       query: (credentials) => ({
         url: 'admin/login',
         method: 'POST',
         body: credentials,
       }),
+      async onQueryStarted(credentials, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setAdmin(data.admin)); // Store user session
+        } catch (error) {
+          console.error('Login failed:', error);
+        }
+      },
     }),
-    logout: builder.mutation<{ message: string }, void>({
+
+    logout: builder.mutation({
       query: () => ({
         url: 'admin/logout',
         method: 'POST',
-        credentials: 'include',
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(clearAdmin()); // Clear session on logout
+        } catch (error) {
+          console.error('Logout failed:', error);
+        }
+      },
+    }),
+
+    getLoggedInAdmin: builder.query<Admin, void>({
+      query: () => ({
+        url: 'admin',
+        method: 'GET',
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setAdmin(data)); // Store user session
+        } catch (error) {
+          dispatch(clearAdmin()); 
+        }
+      },
     }),
   }),
 });
 
-export const { useLoginMutation, useLogoutMutation } = authApi;
+// Export hooks for usage in components
+export const { 
+  useLoginMutation, 
+  useLogoutMutation, 
+  useGetLoggedInAdminQuery  
+} = authApi;

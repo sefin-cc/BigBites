@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Modal, Box, Typography, FormHelperText, InputLabel, FormControl, Select, MenuItem } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -8,17 +8,10 @@ import PaymentsRoundedIcon from '@mui/icons-material/PaymentsRounded';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { logo } from '../../assets/logo64';
-import orders from "../../data/orders.json";
+
 import isBetween from 'dayjs/plugin/isBetween';
-
-
-
-const branches = [
-    { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-  ];
+import { useGetBranchesQuery } from '../../features/api/branchApi';
+import { useGetOrdersQuery } from '../../features/api/orderApi';
 
 function BranchEarningModal() {
   // State to control the opening and closing of the modal
@@ -29,8 +22,19 @@ function BranchEarningModal() {
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null); // State for the selected branch
   const [error, setError] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ branch?: string }>({}); // State for field-specific errors
+  const { data: branches, isLoading: branchesLoading } = useGetBranchesQuery();
+  const { data: orders, isLoading: ordersLoading } = useGetOrdersQuery();
+  const [isReady, setIsReady] = useState(false);
 
 
+  useEffect(() => {
+    if (!branchesLoading && !ordersLoading && branches && orders) {
+      setIsReady(true);
+    } else {
+      setIsReady(false);
+    }
+  }, [branchesLoading, ordersLoading, branches, orders]);
+  
   // Function to handle opening the modal
   const handleOpen = () => setOpen(true);
 
@@ -39,6 +43,10 @@ function BranchEarningModal() {
 
    // Validation function
    const handleGenerate = () => {
+
+    if (!isReady) return; 
+    if (!orders) return;
+
     let validationErrors: { branch?: string } = {};
 
     if (!startDate || !endDate) {
@@ -64,25 +72,26 @@ function BranchEarningModal() {
     setErrors({}); // Clear any field-specific errors
     // Proceed with form submission logic here
     console.log('dates:', { startDate, endDate, selectedBranch });
-    
-   // Filter orders within the date range and branch name
-   const filteredOrders = orders.filter(order => {
-    const orderDate = dayjs(order.timestamp); // Convert the order timestamp to Dayjs
-    const isDateInRange = orderDate.isBetween(startDate, endDate, null, '[]'); // Check if order is within the date range
+    console.log('orders:' + orders);
 
-    // Check if order status is 'completed'
-    const isStatusCompleted = order.status === 'completed'; // Make sure to match the exact status value
-
-    // If no branch is selected, include all orders in the selected date range that are completed
-    if (!selectedBranch) {
-        return isDateInRange && isStatusCompleted;
-    }
-
-    // Otherwise, check if the selected branch matches and the order status is 'completed'
-    const isBranchMatch = order.branch.some(b => b.branchName === selectedBranch);
-
-    return isDateInRange && isBranchMatch && isStatusCompleted; // All conditions must be true
-});
+    const filteredOrders = orders.filter(order => {
+      const orderDate = dayjs(order.timestamp); // Convert the order timestamp to Dayjs
+      const isDateInRange = orderDate.isBetween(startDate, endDate, null, '[]'); // Check if order is within the date range
+  
+      // Check if order status is 'completed'
+      const isStatusCompleted = order.status === 'completed'; 
+  
+      // If no branch is selected, include all orders in the selected date range that are completed
+      if (!selectedBranch) {
+          return isDateInRange && isStatusCompleted;
+      }
+  
+      // Otherwise, check if the selected branch matches and the order status is 'completed'
+      const isBranchMatch = order.branch?.branchName === selectedBranch;
+  
+      return isDateInRange && isBranchMatch && isStatusCompleted;
+  });
+  
 
     generatePDF(filteredOrders);
     handleClose();
@@ -90,8 +99,10 @@ function BranchEarningModal() {
 
    const generatePDF = (filteredOrders : any[]) => {
 
+
     const grossEarnings = filteredOrders.reduce((acc, filteredOrders) => acc + filteredOrders.fees.subTotal, 0);
     const totalDiscounts = filteredOrders.reduce((acc, filteredOrders) => acc + filteredOrders.fees.discountDeduction, 0);
+    const totalDeliveryFee= filteredOrders.reduce((acc, filteredOrders) => acc + filteredOrders.fees.deliveryFee, 0);
     const totalEarnings = filteredOrders.reduce((acc, filteredOrders) => acc + filteredOrders.fees.grandTotal, 0);
 
      const doc = new jsPDF();
@@ -133,9 +144,9 @@ function BranchEarningModal() {
      doc.text(`${startDate?.format('DD-MM-YYYY')} to ${endDate?.format('DD-MM-YYYY')}`, 15, 75);
 
      // Table headers
-     const headers = ['Completed Orders','Gross Earning', 'Total of Given Discounts', 'Total Earnings'];
+     const headers = ['Completed Orders','Gross Earning', 'Given Discounts', 'Given Delivery Fees' ,'Total Earnings'];
      const rows = [
-        [filteredOrders.length, `PHP ${grossEarnings.toFixed(2)}`, `PHP ${totalDiscounts.toFixed(2)}`, `PHP ${totalEarnings.toFixed(2)}`]
+        [filteredOrders.length, `PHP ${grossEarnings.toFixed(2)}`, `PHP ${totalDiscounts.toFixed(2)}`, `PHP ${totalDeliveryFee.toFixed(2)}`,`PHP ${totalEarnings.toFixed(2)}`]
      ];
    
      // Generate the table using autoTable
@@ -233,7 +244,7 @@ function BranchEarningModal() {
                   }
                 }}
               >
-                {branches.map((branch, key: number) => (
+                {branches?.map((branch, key: number) => (
                   <MenuItem key={key} value={branch.branchName}>
                     {branch.branchName}
                   </MenuItem>

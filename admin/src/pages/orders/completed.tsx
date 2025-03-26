@@ -19,6 +19,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
+import { useGetOrdersQuery } from '../../features/api/orderApi';
+
 
 interface Data {
 
@@ -73,25 +75,6 @@ function createData(
   };
 }
 
-// Mapping orders to rows
-const rows = orders.map((order, index) =>
-  createData(
-    index + 1,
-    order.timestamp,
-    order.costumer || 'Unknown',
-    order.location?.description || order.branch[0].branchName +', '+ order.branch[0].fullAddress,
-    order.costumer || '0978787877',
-    order.fees.discountDeduction,
-    order.fees.deliveryFee,
-    order.fees.subTotal,
-    order.fees.grandTotal,
-    order.type,
-    order.pickUpType || '',
-    order.order,
-    order.status,
-    order.dateTimePickUp
-  )
-);
 
 // Sorting Functions
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -256,7 +239,34 @@ export default function Completed() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [filterType, setFilterType] = React.useState<string>('');
   const [filterOrder, setFilterOrder] = React.useState<string>('');
- const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const { data: orders, error, isLoading } = useGetOrdersQuery();
+  const [rows, setRows] = React.useState<any[]>([]); 
+     
+   React.useEffect(() => {
+     if (orders) {
+ 
+       setRows(orders.map((order, index) =>
+         createData(
+           index + 1,
+           order.timestamp,
+           order.user.name,
+           order.location?.description || order.branch.branchName +', '+ order.branch.fullAddress,
+           order.user.email,
+           order.fees.discountDeduction,
+           order.fees.deliveryFee,
+           order.fees.subTotal,
+           order.fees.grandTotal,
+           order.type,
+           order.pick_up_type || '',
+           order.order_items,
+           order.status,
+           order.date_time_pickup
+         )
+       ));
+    
+     }
+   }, [orders]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -491,7 +501,7 @@ export default function Completed() {
                   <div className=' rounded-2xl mt-1 border-4 ' style={{borderColor:"#FB7F3B"}}>
                   <div className='pr-4 pl-4 pt-2 rounded-2xl' style={{backgroundColor: "#FFEEE5"}}>
                       {
-                        selectedRow?.order.map((item, index) => (
+                        selectedRow?.order.map((item: { label: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; price: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; addOns: any[]; }, index: React.Key | null | undefined) => (
                           <div key={index}>
                             <div className="flex justify-between text-end ">
                               <p className="font-bold w-full">{item.label}</p>

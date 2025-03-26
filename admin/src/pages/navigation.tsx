@@ -34,9 +34,9 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
 import { useLogoutMutation } from '../features/auth/authApi';
-import Cookies from 'js-cookie';
-// import { resetAuth } from '../store/authSlice'; 
-// import { useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { clearAdmin  } from '../features/auth/authSlice';
+
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -90,6 +90,7 @@ export default function Navigation() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const context = useContext(AppContext);
+  const dispatch = useDispatch();
   const [logout, { isLoading }] = useLogoutMutation();
   // const dispatch = useDispatch();
 
@@ -114,10 +115,7 @@ export default function Navigation() {
   const handleLogout = async () =>{
     try {
         await logout().unwrap();
-        Cookies.remove('XSRF-TOKEN');
-        Cookies.remove('laravel_session');
-          
-        // dispatch(resetAuth());
+        dispatch(clearAdmin()); 
         navigate('/login'); 
     } catch (err) {
         console.error("Logout failed:", err);

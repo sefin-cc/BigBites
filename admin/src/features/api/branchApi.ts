@@ -12,11 +12,12 @@ interface Branch {
     acceptAdvancedOrder: boolean;
 }
 
+
 export const branchApi = createApi({
   reducerPath: 'branchApi',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BACKEND_URL,
-    credentials: 'include', // ✅ Ensures cookies are sent
+    credentials: 'include', 
   }),
   endpoints: (builder) => ({
     getBranches: builder.query<Branch[], void>({

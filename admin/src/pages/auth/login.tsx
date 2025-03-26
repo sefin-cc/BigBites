@@ -12,6 +12,8 @@ import { useState } from "react";
 import logo from '../../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../../features/auth/authApi';
+import { useDispatch } from 'react-redux';
+import { setAdmin } from '../../features/auth/authSlice';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -19,6 +21,8 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    
     const [login, { isLoading }] = useLoginMutation();
 
     // Toggle Password Visibility
@@ -45,7 +49,8 @@ export default function Login() {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                await login({ email, password }).unwrap(); 
+                const response = await login({ email, password }).unwrap(); 
+                dispatch(setAdmin(response.admin));
                 navigate('/'); // Redirect after successful login
 
             } catch (err: any) {

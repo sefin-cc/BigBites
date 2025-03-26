@@ -54,10 +54,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('branches', BranchController::class);
         Route::apiResource('promos', PromoController::class);
         Route::apiResource('role', RolesController::class);
-        Route::get('menu', [MenuController::class, 'index']);
+ 
         Route::apiResource('categories', CategoryController::class);
-        Route::apiResource('subcategories', SubCategoryController::class);
+  
         Route::apiResource('items', ItemController::class);
         Route::apiResource('addons', AddOnController::class);
         Route::apiResource('orders', OrderController::class);
+        Route::get('menu', [MenuController::class, 'index']);
+        Route::apiResource('subcategories', SubCategoryController::class);
     });

@@ -19,45 +19,32 @@ import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddSubCategoryModal from './addSubcategoryModal';
 import EditSubCategoryModal from './editSubcategoryModal';
-
+import { useGetMenuQuery } from '../../features/api/menu/menu';
 // Data Types
 interface Data {
-  id: number;
+  category_id: number;
   category: string;
-  subId: number;
+  sub_id: number;
   label: string;
-  noitems: number;
+  no_items: number;
 }
 
 // Data Row Creation
 function createData(
-  id: number,
+  category_id: number,
   category: string,
-  subId: number,
+  sub_id: number,
   label: string,
-  noitems: number,
+  no_items: number,
 ): Data {
   return {
-    id,
+    category_id,
     category,
-    subId,
+    sub_id,
     label,
-    noitems,
+    no_items,
   };
 }
-
-// Mapping orders to rows
-const rows = menu.flatMap((category) =>
-  category.subCategories.map((subCategories) =>
-    createData(
-      parseInt(category.id, 10),
-      category.category,
-      parseInt(subCategories.subId, 10),
-      subCategories.label,
-      subCategories.items.length
-    )
-  )
-);
 
 // Sorting Functions
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
@@ -98,7 +85,7 @@ interface HeadCell {
 const headCells: readonly HeadCell[] = [
   { id: 'category', numeric: false, disablePadding: true, label: 'Category' },
   { id: 'label', numeric: true, disablePadding: false, label: 'Sub-Category' },
-  { id: 'noitems', numeric: true, disablePadding: false, label: 'No. Items' },
+  { id: 'no_items', numeric: true, disablePadding: false, label: 'No. Items' },
 ];
 
 // Table Header Component
@@ -155,6 +142,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface EnhancedTableToolbarProps {
+  rows: Data[];
   numSelected: number;
   onFilterChange: (event: SelectChangeEvent<string>) => void;
   filterValue: string;
@@ -164,7 +152,7 @@ interface EnhancedTableToolbarProps {
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, onFilterChange, filterValue, onSearchChange, selectedSubCategories, setSelectedSubCategories } = props;
+  const { rows, numSelected, onFilterChange, filterValue, onSearchChange, selectedSubCategories, setSelectedSubCategories } = props;
 
   // You can add any logic you need to manage or modify selectedSubCategories here if necessary
 
@@ -183,7 +171,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           onChange={onSearchChange}
           placeholder="Search..."
         />
-
+          
         <FormControl>
           <InputLabel id="type-filter-label">Categories</InputLabel>
           <Select
@@ -204,8 +192,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             }
           </Select>
         </FormControl>
-
-
 
         <AddSubCategoryModal />
 
@@ -237,6 +223,28 @@ export default function SubCategory() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [filterType, setFilterType] = React.useState<string>('');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const { data: menu, error, isLoading } = useGetMenuQuery();
+  const [rows, setRows] = React.useState<any[]>([]); 
+    
+  React.useEffect(() => {
+    if (menu) {
+
+      setRows(menu.flatMap((category) =>
+          category.sub_categories.map((subCategories) =>
+            createData(
+              category.id,
+              category.category,
+              subCategories.id, 
+              subCategories.label,
+              subCategories.items.length
+            )
+          )));
+   
+    }
+  }, [menu]);  
+
+
+  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
@@ -337,6 +345,7 @@ export default function SubCategory() {
             onSearchChange={handleSearchChange}
             selectedSubCategories={selectedSubCategories}
             setSelectedSubCategories={setSelectedSubCategories}
+            rows={rows}
           />
           <TableContainer sx={{ width: '100%' }}>
             <Table
@@ -352,6 +361,7 @@ export default function SubCategory() {
                 onRequestSort={handleRequestSort}
                 rowCount={filteredRows.length}
                 isAllSelected={isAllSelected}
+                
               />
               <TableBody>
                 {visibleRows.map((row, index) => {
@@ -383,7 +393,7 @@ export default function SubCategory() {
                         {row.category}
                       </TableCell>
                       <TableCell align="right">{row.label}</TableCell>
-                      <TableCell align="right">{row.noitems}</TableCell>
+                      <TableCell align="right">{row.no_items}</TableCell>
                     </TableRow>
                   );
                 })}

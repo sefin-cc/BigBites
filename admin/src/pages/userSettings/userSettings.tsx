@@ -1,6 +1,9 @@
 import ChangePasswordModal from "./changePasswordModal";
+import { useGetLoggedInAdminQuery } from '../../features/auth/authApi';
 
 export default function UserSettings() {
+    const { data: user, error, isLoading } = useGetLoggedInAdminQuery();
+
     return(
         <div>
             <p className=" text-2xl mb-3" style={{fontFamily: 'Madimi One', color: "#2C2C2C"}}>YOUR ACCOUNT INFORMATION: </p>
@@ -27,12 +30,11 @@ export default function UserSettings() {
                     </div>
                 </div>
                 <div className=" w-full p-4 ">
-                    <p className="text-gray-500">Name: </p>
-                    <p className="text-gray-500">Email: </p>
-                    <p className="text-gray-500">Phone: </p>
-                    <p className="text-gray-500">Address: </p>
-                    <p className="text-gray-500">Branch: </p>
-                    <p className="text-gray-500">Role: </p>
+                    <p className="text-gray-500"><b>Name:</b> {user?.name}</p>
+                    <p className="text-gray-500"><b>Email:</b> {user?.email}</p>
+                    <p className="text-gray-500"><b>Phone:</b> {user?.phone}</p>
+                    <p className="text-gray-500"><b>Address:</b> {user?.address}</p>
+                    <p className="text-gray-500"><b>Branch: </b>{user?.branch}</p>
                 </div>
             </div>
 

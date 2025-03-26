@@ -19,6 +19,7 @@ import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddMenuItemsModal from './addMenuItemsModal';
 import EditMenuItemsModal from './editMenuItemsModal';
+import { useGetMenuQuery } from '../../features/api/menu/menu';
 
 // Data Types
 interface Data {
@@ -66,27 +67,6 @@ function createData(
     addOns
   };
 }
-
-const rows = menu.flatMap((category) =>
-  category.subCategories.flatMap((subCategory) =>
-    subCategory.items.map((item) => 
-      createData(
-        parseInt(category.id, 10),             // Parse category id to integer
-        category.category,                     // Category name
-        parseInt(subCategory.subId, 10),       // Parse subcategory id to integer
-        subCategory.label,                     // Subcategory label
-        parseInt(item.itemId, 10),             // Parse item id to integer
-        item.label,                            // Item label
-        item.fullLabel,                        // Full item label
-        item.description,                      // Item description
-        item.price,                            // Item price
-        item.time,                             // Time estimate for item
-        item.image,                            // Image associated with the item
-        item.addOns                            // Additional add-ons for the item
-      )
-    )
-  )
-);
 
 // Sorting Functions
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
@@ -177,6 +157,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface EnhancedTableToolbarProps {
+  rows: Data[];
   numSelected: number;
   onFilterChange: (event: SelectChangeEvent<string>) => void;
   filterValue: string;
@@ -186,7 +167,7 @@ interface EnhancedTableToolbarProps {
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, onFilterChange, filterValue, onSearchChange, selectedSubCategories, setSelectedSubCategories } = props;
+  const { rows, numSelected, onFilterChange, filterValue, onSearchChange, selectedSubCategories, setSelectedSubCategories } = props;
   const [categoryType, setCategoryType] = React.useState<string>('BURGERS');
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
@@ -285,7 +266,39 @@ export default function MenuItems() {
   const [filterType, setFilterType] = React.useState<string>('JR BURGERS');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
+  const { data: menu, error, isLoading } = useGetMenuQuery();
+  const [rows, setRows] = React.useState<any[]>([]); 
+    
+  React.useEffect(() => {
+    if (menu) {
 
+      setRows(menu.flatMap((category) =>
+        category.sub_categories.flatMap((subCategory) =>
+          subCategory.items.map((item) => 
+            createData(
+              category.id,        
+              category.category,                  
+              subCategory.id, 
+              subCategory.label,                     
+              item.id, 
+              item.label,                         
+              item.full_label,                       
+              item.description,                    
+              item.price,                            
+              item.time,                           
+              item.image,                            
+              item.add_ons                           
+            )
+          )
+        )));
+    
+    }
+
+  }, [menu]);
+
+
+
+  console.log("rows: "+ rows);
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
     setMenuCategory(isAsc ? 'desc' : 'asc');
@@ -346,6 +359,7 @@ export default function MenuItems() {
       <Box sx={{ width: '75%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
+            rows={rows}
             numSelected={selectedSubCategories.size}
             onFilterChange={handleFilterChange}
             filterValue={filterType}

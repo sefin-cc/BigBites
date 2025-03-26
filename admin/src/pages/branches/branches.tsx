@@ -20,7 +20,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import location from "../../data/location.json"
 import AddBranches from './addBranches';
 import EditBranches from './editBranch';
-import { useGetBranchesQuery } from '../../features/api/apiSlice';
+import { useGetBranchesQuery } from '../../features/api/branchApi';
 
 // Data Types
 interface Data {
@@ -281,7 +281,7 @@ export default function Branches() {
   const [province, setProvince] = React.useState<string>('');
 
   const { data: branches, error, isLoading } = useGetBranchesQuery();
-const [rows, setRows] = React.useState<any[]>([]);  // Initialize with an empty array
+  const [rows, setRows] = React.useState<any[]>([]);  // Initialize with an empty array
 
 React.useEffect(() => {
   if (branches) {
