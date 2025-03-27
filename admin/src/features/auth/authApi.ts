@@ -51,7 +51,7 @@ const withXSRFToken = (headers: Headers) => {
 };
 
 // Base Query with CSRF Protection
-const baseQueryWithCsrf = async (args: any, api: any, extraOptions: any) => {
+export const baseQueryWithCsrf = async (args: any, api: any, extraOptions: any) => {
   if (args.method && args.method !== 'GET' && args.url !== 'admin/logout') {
     await fetchCsrfToken(); // Ensure CSRF token is fetched first
   }

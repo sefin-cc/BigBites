@@ -28,6 +28,7 @@
     "react-loading": "^2.0.3",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5",
+    "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",
     "tailwindcss": "^4.0.8"
   },

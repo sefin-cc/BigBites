@@ -5,7 +5,9 @@ import { inputBaseClasses } from '@mui/material/InputBase';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
-
+import { useAddBranchMutation } from '../../features/api/branchApi';
+import ReactLoading from 'react-loading';
+import { Slide, ToastContainer, toast } from 'react-toastify';
 
 interface Province {
   name: string;
@@ -32,25 +34,23 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 function AddBranches({ location }: { location: Location }) {
-  // State to control the opening and closing of the modal
   const [open, setOpen] = useState(false);
-  // State for form values
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [province, setProvince] = useState('');
   const [city, setCity] = useState('');
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [selectedOpeningTime, setSelectedOpeningTime] = useState<string>('');
-  const [selectedClosingTime, setSelectedClosingTime] = useState<string>('');
+  const [selectedOpeningTime, setSelectedOpeningTime] = useState('');
+  const [selectedClosingTime, setSelectedClosingTime] = useState('');
   const [checked, setChecked] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  
+  const [addBranch, {isLoading}] = useAddBranchMutation();
 
-
-
-  // Function to generate time options in 15-minute intervals
+  // Generate time options in 15-minute intervals
   const generateTimeOptions = () => {
     const times: string[] = [];
     const hours = 24;
-    const minutes = [0, 15, 30, 45]; // 15-minute intervals
+    const minutes = [0, 15, 30, 45]; 
 
     for (let h = 0; h < hours; h++) {
       minutes.forEach((m) => {
@@ -59,7 +59,6 @@ function AddBranches({ location }: { location: Location }) {
         times.push(`${hour}:${minute}`);
       });
     }
-
     return times;
   };
 
@@ -67,12 +66,8 @@ function AddBranches({ location }: { location: Location }) {
     setChecked(event.target.checked);
   };
 
-  // Function to handle opening the modal
   const handleOpen = () => setOpen(true);
-
-  // Function to handle closing the modal
   const handleClose = () => setOpen(false);
-
 
   const handleProvinceChange = (event: SelectChangeEvent) => {
     setProvince(event.target.value);
@@ -90,47 +85,79 @@ function AddBranches({ location }: { location: Location }) {
     setSelectedClosingTime(event.target.value);
   };
 
-
-  // Function to handle text input change dynamically
   const handleTextFieldChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     switch (field) {
       case 'name':
         setName(event.target.value);
         break;
       case 'address':
-        setAddress(event.target.value)
-     
+        setAddress(event.target.value);
         break;
       default:
         break;
     }
   };
 
-  const handleSubmit = () => {
-    // Validate the required fields
+  const handleSubmit = async () => {
     const newErrors: { [key: string]: string } = {};
-
+    
     if (!name) newErrors.name = 'Branch name is required';
     if (!province) newErrors.province = 'Province is required';
     if (!city) newErrors.city = 'City is required';
     if (!address) newErrors.address = 'Full address is required';
     if (!selectedOpeningTime) newErrors.openingTime = 'Opening time is required';
     if (!selectedClosingTime) newErrors.closingTime = 'Closing time is required';
-   
 
     setErrors(newErrors);
 
-    // If there are no errors, proceed with form submission
     if (Object.keys(newErrors).length === 0) {
-      // Handle your form submission logic here
-      console.log("Form data submitted successfully!");
-      console.log("Branch Name:", name);
-      console.log("City:", city);
-      console.log("Address:", address);
-      console.log("Opening Time:", selectedOpeningTime);
-      console.log("Closing Time:", selectedClosingTime);
-      console.log("Advance Order?:", checked);
-      handleClose();
+      try {
+        await addBranch({
+          branchName: name,
+          province,
+          city,
+          fullAddress: address,
+          openingTime: selectedOpeningTime,
+          closingTime: selectedClosingTime,
+          acceptAdvancedOrder: checked,
+        }).unwrap(); // Ensure errors are handled correctly
+
+        toast.success('Branch added successfully!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Slide,
+        });
+        handleClose(); // Close modal after successful submission
+        
+        // Reset form fields
+        setName('');
+        setProvince('');
+        setCity('');
+        setAddress('');
+        setSelectedOpeningTime('');
+        setSelectedClosingTime('');
+        setChecked(false);
+        setErrors({});
+      } catch (err) {
+        console.error('Failed to add branch:', err);
+         toast.error('Something went wrong!', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Slide,
+            });
+      }
     }
   };
 
@@ -356,13 +383,18 @@ function AddBranches({ location }: { location: Location }) {
             <button
               onClick={handleSubmit}
               className="text text-white w-full"
-              style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: "5px 20px" }}
+              style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: "5px 20px",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'}}
+              disabled={isLoading} 
             >
-              SAVE
+              {isLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "ADD BRANCH"}
             </button>
           </div>
         </Box>
       </Modal>
+      <ToastContainer/>
     </div>
   );
 }

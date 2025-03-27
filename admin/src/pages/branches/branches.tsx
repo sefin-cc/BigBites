@@ -20,8 +20,12 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import location from "../../data/location.json"
 import AddBranches from './addBranches';
 import EditBranches from './editBranch';
-import { useGetBranchesQuery } from '../../features/api/branchApi';
+import { useGetBranchesQuery, useDeleteBranchMutation } from '../../features/api/branchApi';
 import ReactLoading from 'react-loading';
+import { Slide, ToastContainer, toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
 
 // Data Types
 interface Data {
@@ -171,10 +175,12 @@ interface EnhancedTableToolbarProps {
   handleProvinceChange:  (event: SelectChangeEvent<string>) => void;
   numSelected: number;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  selected: Set<string>;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { onSearchChange, numSelected, province, cities, handleCitiesChange, handleProvinceChange  } = props;
+  const { selected, handleDelete,  onSearchChange, numSelected, province, cities, handleCitiesChange, handleProvinceChange  } = props;
 
 
   return (
@@ -253,17 +259,16 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
       <AddBranches location={location} />
 
-        {/* <AddPromoModal /> */}
         {numSelected > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
+            <button onClick={handleDelete}  className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
               <DeleteIcon sx={{ color: "gray" }} />
             </button>
           </div>
         ) : null}
         {numSelected === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <EditBranches location={location} />
+            <EditBranches location={location}  id={selected}/>
           </div>
         ) : null}
       </Box>
@@ -280,8 +285,9 @@ export default function Branches() {
   const [searchTerm, setSearchTerm] = React.useState<string>('');
   const [cities, setCities] = React.useState<string>('');
   const [province, setProvince] = React.useState<string>('');
-
+  const dispatch = useDispatch();
   const { data: branches, error, isLoading } = useGetBranchesQuery();
+  const [deleteBranch, { isLoading: deleteLoading}] = useDeleteBranchMutation();
   const [rows, setRows] = React.useState<any[]>([]);  // Initialize with an empty array
 
 React.useEffect(() => {
@@ -296,6 +302,19 @@ React.useEffect(() => {
       branch.closingTime,
       branch.acceptAdvancedOrder
     )));
+  }
+  if(error){
+    toast.error('Something went wrong!', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Slide,
+    });
   }
 }, [branches]);  
 
@@ -316,9 +335,6 @@ React.useEffect(() => {
   
   const handleSubCategorySelect = (event: React.ChangeEvent<HTMLInputElement>, id: string) => {
     const newSelected: Set<string> = new Set(selected); // Explicitly type the Set
-
-  
-
     if (event.target.checked) {
       newSelected.add(id);
     } else {
@@ -372,13 +388,56 @@ React.useEffect(() => {
   const isAllSelected =
     visibleRows.length > 0 && visibleRows.every((row) => selected.has(`${row.id}`));
 
-
+    const handleDelete = async () => {
+      if (selected.size === 0) {
+        toast.warning('No branches selected for deletion.', {
+          position: "top-right",
+          autoClose: 3000,
+          theme: "light",
+          transition: Slide,
+        });
+        return;
+      }
+    
+      if (!confirm(`Are you sure you want to delete ${selected.size > 1 ? 'these branches?' : 'this branch?'}`)) {
+        return;
+      }
+    
+      try {
+        await Promise.all(Array.from(selected).map((id) => deleteBranch(id).unwrap()));
+    
+        toast.success(`${selected.size > 1 ? 'Branches' : 'Branch'} deleted successfully!`, {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Slide,
+        });
+    
+        setSelected(new Set()); // Clear selection after successful deletion
+      } catch (err) {
+        console.error('Failed to delete branch:', err);
+    
+        toast.error('Something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Slide,
+        });
+      }
+    };
+    
+    
+      useEffect(() => {
+        dispatch(setLoading(deleteLoading));
+      }, [deleteLoading]);
 
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
       <Box sx={{ width: '100%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
+            selected={selected}
+            handleDelete={handleDelete}
             cities={cities}  
             province={province}
             handleCitiesChange={handleCitiesChange}
@@ -465,6 +524,7 @@ React.useEffect(() => {
           />
         </Paper>
       </Box>
+      <ToastContainer/>
     </div>
   );
 }

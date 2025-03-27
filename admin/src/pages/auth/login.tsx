@@ -137,7 +137,7 @@ export default function Login() {
                         alignItems: 'center',
                         justifyContent: 'center',
                     }}
-                    disabled={isLoading} // ✅ Disable button while logging in
+                    disabled={isLoading} 
                 >
                     {isLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} />: "LOGIN"}
                 </button>
