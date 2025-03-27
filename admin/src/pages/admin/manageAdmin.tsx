@@ -17,6 +17,7 @@ import AddUserModal from './addUserModal';
 import EditUserModal from './editUserModal';
 import { useGetAdminsQuery } from '../../features/api/adminUsersApi';
 import { useGetBranchesQuery } from '../../features/api/branchApi';
+import ReactLoading from 'react-loading';
 
 // Data Types
 interface Data {
@@ -385,32 +386,42 @@ export default function ManageAdmin() {
             numSelected={selected.size}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
-            >
-              <EnhancedTableHead
+          <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%', minHeight: 100 }}>
+            <EnhancedTableHead
                 menuCategory={menuCategory}
                 sortBy={sortBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={filteredRows.length}
-                isAllSelected={isAllSelected} numSelected={0}              />
-              <TableBody>
-                {visibleRows.map((row, index) => {
+                isAllSelected={isAllSelected} numSelected={0} 
+                />
+            <TableBody>
+              {isLoading ? (
+                // Show loading indicator when fetching data
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                      <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : visibleRows.length === 0 ? (
+                //  Show "No Data Available" when no rows exist
+                <TableRow>
+                  <TableCell colSpan={7} align="center" sx={{ color: "gray", fontStyle: "italic", py: 2 }}>
+                    No Data Available
+                  </TableCell>
+                </TableRow>
+              ) : (
+                //  Render table rows when data is available
+                visibleRows.map((row) => {
                   const isSubCategorySelected = selected.has(`${row.id}`);
                   return (
-                    <TableRow hover key={`${row.id}`}>
+                    <TableRow hover key={row.id}>
                       <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isSubCategorySelected}
-                          onChange={(e) => handleSubCategorySelect(e, `${row.id}`)}
-                        />
+                        <Checkbox checked={isSubCategorySelected} onChange={(e) => handleSubCategorySelect(e, `${row.id}`)} />
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
-                        {row.name}
-                      </TableCell>
+                      <TableCell component="th" scope="row" padding="none">{row.name}</TableCell>
                       <TableCell align="right">{row.email}</TableCell>
                       <TableCell align="right">{row.phone}</TableCell>
                       <TableCell align="right">{row.address}</TableCell>
@@ -418,14 +429,18 @@ export default function ManageAdmin() {
                       <TableCell align="right">{row.role}</TableCell>
                     </TableRow>
                   );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                })
+              )}
+
+              {/* 🔹 Preserve table height when empty but not loading */}
+              {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+                <TableRow sx={{ height: 33 }}>
+                  <TableCell colSpan={7} />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}

@@ -20,6 +20,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddSubCategoryModal from './addSubcategoryModal';
 import EditSubCategoryModal from './editSubcategoryModal';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
+import ReactLoading from 'react-loading';
 // Data Types
 interface Data {
   category_id: number;
@@ -348,62 +349,75 @@ export default function SubCategory() {
             rows={rows}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
-            >
-              <EnhancedTableHead
-                numSelected={selectedSubCategories.size}
-                menuCategory={menuCategory}
-                sortBy={sortBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={filteredRows.length}
-                isAllSelected={isAllSelected}
-                
-              />
-              <TableBody>
-                {visibleRows.map((row, index) => {
-                  const isCategorySelected = selectedCategories.has(row.id);
-                  const isSubCategorySelected = selectedSubCategories.has(`${row.id}-${row.subId}`);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+          <Table
+            aria-labelledby="tableTitle"
+            size="small"
+            sx={{ width: '100%', minHeight: 100 }}
+          >
+            <EnhancedTableHead
+              numSelected={selectedSubCategories.size}
+              menuCategory={menuCategory}
+              sortBy={sortBy}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              rowCount={filteredRows.length}
+              isAllSelected={isAllSelected}
+          />
 
-                  return (
-                    <TableRow
-                      hover
-                      key={`${row.id}-${row.subId}`}
-                    >
-                      <TableCell padding="checkbox">
-                        {row.subId === 0 ? (
-                          // Category checkbox
-                          <Checkbox
-                            checked={isCategorySelected}
-                            onChange={(e) => handleCategorySelect(e, row.id)}
-                          />
-                        ) : (
-                          // Sub-category checkbox
-                          <Checkbox
-                            checked={isSubCategorySelected}
-                            onChange={(e) => handleSubCategorySelect(e, `${row.id}-${row.subId}`)}
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell component="th" id={labelId} scope="row" padding="none">
-                        {row.category}
-                      </TableCell>
-                      <TableCell align="right">{row.label}</TableCell>
-                      <TableCell align="right">{row.no_items}</TableCell>
-                    </TableRow>
-                  );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
+          <TableBody>
+            {isLoading ? (
+               <TableRow>
+                  <TableCell colSpan={7}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                      <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+            ) : visibleRows.length > 0 ? (
+              visibleRows.map((row, index) => {
+                const isCategorySelected = selectedCategories.has(row.id);
+                const isSubCategorySelected = selectedSubCategories.has(`${row.id}-${row.subId}`);
+                const labelId = `enhanced-table-checkbox-${index}`;
+
+                return (
+                  <TableRow hover key={`${row.id}-${row.subId}`}>
+                    <TableCell padding="checkbox">
+                      {row.subId === 0 ? (
+                        <Checkbox
+                          checked={isCategorySelected}
+                          onChange={(e) => handleCategorySelect(e, row.id)}
+                        />
+                      ) : (
+                        <Checkbox
+                          checked={isSubCategorySelected}
+                          onChange={(e) => handleSubCategorySelect(e, `${row.id}-${row.subId}`)}
+                        />
+                      )}
+                    </TableCell>
+                    <TableCell component="th" id={labelId} scope="row" padding="none">
+                      {row.category}
+                    </TableCell>
+                    <TableCell align="right">{row.label}</TableCell>
+                    <TableCell align="right">{row.no_items}</TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} align="center" sx={{ color: "gray", fontStyle: "italic", py: 4 }}>
+                  No Data Available
+                </TableCell>
+              </TableRow>
+            )}
+
+            {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+              <TableRow style={{ height: 33 }}>
+                <TableCell colSpan={4} />
+              </TableRow>
+            )}
+          </TableBody>
+          </Table>
+
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}

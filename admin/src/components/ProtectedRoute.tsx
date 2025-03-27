@@ -7,19 +7,23 @@ import { RootState } from '../store';
 
 const ProtectedRoutes = () => {
   const dispatch = useDispatch();
-  const { admin } = useSelector((state: RootState) => state.auth);
+  const { admin, isLoggingOut } = useSelector((state: RootState) => state.auth);
+
+  // Skip fetching when logging out or when admin is already set
   const { data, isError } = useGetLoggedInAdminQuery(undefined, {
-    skip: !!admin, // Skip fetching if admin is already set
+    skip: isLoggingOut || !!admin,
   });
 
   useEffect(() => {
-    if (data) {
-      dispatch(setAdmin(data)); // Restore session on refresh
+    if (!admin && !isLoggingOut) {
+      if (data) {
+        dispatch(setAdmin(data)); // Restore session on refresh
+      }
+      if (isError) {
+        dispatch(clearAdmin()); // Clear session on error
+      }
     }
-    if (isError) {
-      dispatch(clearAdmin()); // Clear session on error
-    }
-  }, [data, isError, dispatch]);
+  }, [data, isError, dispatch, isLoggingOut]);
 
   if (admin) return <Outlet />; // Allow access
 

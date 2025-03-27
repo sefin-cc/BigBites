@@ -7,6 +7,8 @@ import { menuApi } from './features/api/menu/menu';
 import { orderApi } from './features/api/orderApi';
 import { adminUserApi } from './features/api/adminUsersApi';
 import authReducer from './features/auth/authSlice';
+import loadingReducer from './features/loadingSlice';
+
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +20,7 @@ export const store = configureStore({
     [orderApi.reducerPath]: orderApi.reducer,
     [adminUserApi.reducerPath]: adminUserApi.reducer,
     auth: authReducer,
+    loading: loadingReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

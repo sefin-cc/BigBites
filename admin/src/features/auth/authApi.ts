@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';
-import { setAdmin, clearAdmin } from './authSlice';
+import { setAdmin, clearAdmin, logoutRequest } from './authSlice';
 
 // Define the types
 interface LoginRequest {
@@ -94,6 +94,7 @@ export const authApi = createApi({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
+          dispatch(logoutRequest()); 
           dispatch(clearAdmin()); // Clear session on logout
         } catch (error) {
           console.error('Logout failed:', error);

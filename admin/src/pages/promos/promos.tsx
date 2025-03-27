@@ -20,6 +20,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddPromoModal from './addPromos';
 import EditPromoModal from './editPromos';
 import { useGetPromosQuery } from '../../features/api/promoApi';
+import ReactLoading from 'react-loading';
 
 // Data Types
 interface Data {
@@ -268,10 +269,10 @@ export default function Promos() {
             numSelected={selected.size}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
+          <Table
               aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
+              size="small"
+              sx={{ width: '100%', minHeight: 100 }} 
             >
               <EnhancedTableHead
                 menuCategory={menuCategory}
@@ -279,9 +280,23 @@ export default function Promos() {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={filteredRows.length}
-                isAllSelected={isAllSelected} numSelected={0}              />
-              <TableBody>
-                {visibleRows.map((row, index) => {
+                isAllSelected={isAllSelected}
+                numSelected={0}
+            />
+
+            <TableBody>
+              {isLoading ? (
+                // Show loading indicator first
+                <TableRow>
+                    <TableCell colSpan={7}>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                        <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+              ) : visibleRows.length > 0 ? (
+                // Show data if available
+                visibleRows.map((row) => {
                   const isSubCategorySelected = selected.has(`${row.id}`);
                   return (
                     <TableRow hover key={`${row.id}`}>
@@ -294,17 +309,36 @@ export default function Promos() {
                       <TableCell component="th" scope="row" padding="normal">
                         {row.label}
                       </TableCell>
-                      <TableCell align="right">{row.image}</TableCell>
+                      <TableCell align="right">
+                        <a href={row.image} target="_blank" >
+                          <img 
+                            src={row.image} 
+                            alt={row.label} 
+                            style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 5 }}
+                          />
+                        </a>
+                      </TableCell>
                     </TableRow>
                   );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
+                })
+              ) : (
+                // Show "No Data Available" only if not loading and empty
+                <TableRow>
+                  <TableCell colSpan={3} align="center" sx={{ color: "gray", fontStyle: "italic", py: 4 }}>
+                    No Data Available
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {/*  Preserve table structure when empty but not loading */}
+              {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+                <TableRow style={{ height: 33 }}>
+                  <TableCell colSpan={3} />
+                </TableRow>
+              )}
+            </TableBody>
             </Table>
+
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}

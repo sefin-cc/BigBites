@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../../features/auth/authApi';
 import { useDispatch } from 'react-redux';
 import { setAdmin } from '../../features/auth/authSlice';
+import ReactLoading from "react-loading";
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -138,7 +139,7 @@ export default function Login() {
                     }}
                     disabled={isLoading} // ✅ Disable button while logging in
                 >
-                    {isLoading ? <CircularProgress size={24} color="inherit" /> : "LOGIN"}
+                    {isLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} />: "LOGIN"}
                 </button>
             </div>
         </div>

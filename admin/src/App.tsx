@@ -16,6 +16,7 @@ import Reports from './pages/reports/reports'
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute'
 
+
 function App() {
 
   return (
@@ -43,6 +44,7 @@ function App() {
         </Route>
 
       </Routes>
+  
     </BrowserRouter>
   )
 }

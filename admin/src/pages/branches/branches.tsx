@@ -21,6 +21,7 @@ import location from "../../data/location.json"
 import AddBranches from './addBranches';
 import EditBranches from './editBranch';
 import { useGetBranchesQuery } from '../../features/api/branchApi';
+import ReactLoading from 'react-loading';
 
 // Data Types
 interface Data {
@@ -386,47 +387,72 @@ React.useEffect(() => {
             numSelected={selected.size}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
+          <Table
               aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
+              size="small"
+              sx={{ width: '100%', minHeight: 100 }} // Ensures table has a minimum height
             >
-              <EnhancedTableHead
-                menuCategory={menuCategory}
-                sortBy={sortBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={filteredRows.length}
-                isAllSelected={isAllSelected} numSelected={0}              />
+          <EnhancedTableHead
+            menuCategory={menuCategory}
+            sortBy={sortBy}
+            onSelectAllClick={handleSelectAllClick}
+            onRequestSort={handleRequestSort}
+            rowCount={filteredRows.length}
+            isAllSelected={isAllSelected}
+            numSelected={0}
+          />
+
               <TableBody>
-                {visibleRows.map((row, index) => {
-                  const isSubCategorySelected = selected.has(`${row.id}`);
-                  return (
-                    <TableRow hover key={`${row.id}`}>
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isSubCategorySelected}
-                          onChange={(e) => handleSubCategorySelect(e, `${row.id}`)}
-                        />
-                      </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
-                        {row.branchName}
-                      </TableCell>
-                      <TableCell align="right">{row.province}</TableCell>
-                      <TableCell align="right">{row.city}</TableCell>
-                      <TableCell align="right">{row.fullAddress}</TableCell>
-                      <TableCell align="right">{row.openingTime}</TableCell>
-                      <TableCell align="right">{row.closingTime}</TableCell>
-                    </TableRow>
-                  );
-                })}
-                {emptyRows > 0 && (
+                {isLoading ? (
+                  // Centered loading indicator
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                        <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ) : visibleRows.length === 0 ? (
+                  // "No Data Available" message
+                  <TableRow>
+                    <TableCell colSpan={7} align="center" sx={{ color: "gray", fontStyle: "italic", py: 4 }}>
+                      No Data Available
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  // Display rows when data is available
+                  visibleRows.map((row) => {
+                    const isSubCategorySelected = selected.has(`${row.id}`);
+                    return (
+                      <TableRow hover key={`${row.id}`}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={isSubCategorySelected}
+                            onChange={(e) => handleSubCategorySelect(e, `${row.id}`)}
+                          />
+                        </TableCell>
+                        <TableCell component="th" scope="row" padding="none">
+                          {row.branchName}
+                        </TableCell>
+                        <TableCell align="right">{row.province}</TableCell>
+                        <TableCell align="right">{row.city}</TableCell>
+                        <TableCell align="right">{row.fullAddress}</TableCell>
+                        <TableCell align="right">{row.openingTime}</TableCell>
+                        <TableCell align="right">{row.closingTime}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+
+                {/* 🔹 Preserve table structure when empty but not loading */}
+                {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
                   <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
+                    <TableCell colSpan={7} />
                   </TableRow>
                 )}
               </TableBody>
             </Table>
+
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}

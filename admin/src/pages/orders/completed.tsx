@@ -20,6 +20,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
 import { useGetOrdersQuery } from '../../features/api/orderApi';
+import ReactLoading from 'react-loading';
 
 
 interface Data {
@@ -365,11 +366,7 @@ export default function Completed() {
           filterOrder={filterOrder}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
-            >
+            <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%' }}>
               <EnhancedTableHead
                 numSelected={selected.length}
                 order={order}
@@ -379,51 +376,58 @@ export default function Completed() {
                 rowCount={filteredRows.length}
               />
               <TableBody>
-                {visibleRows.map((row, index) => {
-                  const isItemSelected = selected.includes(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6}>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                        <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ) : visibleRows.length > 0 ? (
+                  visibleRows.map((row, index) => {
+                    const isItemSelected = selected.includes(row.id);
+                    const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      <TableCell padding="checkbox">
-                      
-                      </TableCell>
-                      <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
+                    return (
+                      <TableRow
+                        hover
+                        onClick={(event) => handleClick(event, row.id)}
+                        role="checkbox"
+                        aria-checked={isItemSelected}
+                        tabIndex={-1}
+                        key={row.id}
+                        selected={isItemSelected}
+                        sx={{ cursor: 'pointer' }}
                       >
-                        {row.datatime}
-                      </TableCell>
-                      <TableCell align="right">{row.name}</TableCell>
-                      <TableCell align="right">{row.address}</TableCell>
-                      <TableCell align="right">{row.phone}</TableCell>
-                      <TableCell align="right">{row.grandTotal}</TableCell>
-                    </TableRow>
-                  );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow
-                    style={{
-                      height: 33,
-                    }}
-                  >
+                        <TableCell padding="checkbox"></TableCell>
+                        <TableCell component="th" id={labelId} scope="row" padding="none">
+                          {row.datatime}
+                        </TableCell>
+                        <TableCell align="right">{row.name}</TableCell>
+                        <TableCell align="right">{row.address}</TableCell>
+                        <TableCell align="right">{row.phone}</TableCell>
+                        <TableCell align="right">{row.grandTotal}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ color: 'gray', fontStyle: 'italic', py: 4 }}>
+                      No Data Available
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+                  <TableRow style={{ height: 33 }}>
                     <TableCell colSpan={6} />
                   </TableRow>
                 )}
               </TableBody>
             </Table>
           </TableContainer>
+
           <TablePagination
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
             component="div"

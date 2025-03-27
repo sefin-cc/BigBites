@@ -1,9 +1,19 @@
 import ChangePasswordModal from "./changePasswordModal";
 import { useGetLoggedInAdminQuery } from '../../features/auth/authApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
+import { useEffect } from "react";
+
+
 
 export default function UserSettings() {
-    const { data: user, error, isLoading } = useGetLoggedInAdminQuery();
+    const dispatch = useDispatch();
+    const { data: user, isLoading: userLoading } = useGetLoggedInAdminQuery();
 
+    useEffect(() => {
+        dispatch(setLoading(userLoading));
+    }, [userLoading]);
+    
     return(
         <div>
             <p className=" text-2xl mb-3" style={{fontFamily: 'Madimi One', color: "#2C2C2C"}}>YOUR ACCOUNT INFORMATION: </p>

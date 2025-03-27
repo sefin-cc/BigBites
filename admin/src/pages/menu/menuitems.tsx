@@ -20,6 +20,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddMenuItemsModal from './addMenuItemsModal';
 import EditMenuItemsModal from './editMenuItemsModal';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
+import ReactLoading from 'react-loading';
 
 // Data Types
 interface Data {
@@ -368,45 +369,53 @@ export default function MenuItems() {
             setSelectedSubCategories={setSelectedSubCategories}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
-            >
-              <EnhancedTableHead
-                numSelected={selectedSubCategories.size}
-                menuCategory={menuCategory}
-                sortBy={sortBy}
-                onRequestSort={handleRequestSort}
-                rowCount={filteredRows.length}
+          <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%', minHeight: 100 }}>
+            <EnhancedTableHead
+              numSelected={selectedSubCategories.size}
+              menuCategory={menuCategory}
+              sortBy={sortBy}
+              onRequestSort={handleRequestSort}
+              rowCount={filteredRows.length}
+            />
 
-              />
-              <TableBody>
-                {visibleRows.map((row, index) => {
-          
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={2}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                      <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : visibleRows.length > 0 ? (
+                visibleRows.map((row, index) => {
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
-                    <TableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      key={`${row.id}-${row.subId}-${row.itemId}`}
-                    >
-
+                    <TableRow hover onClick={(event) => handleClick(event, row.id)} key={`${row.id}-${row.subId}-${row.itemId}`}>
                       <TableCell component="th" id={labelId} scope="row">
                         {row.itemLabel}
                       </TableCell>
                       <TableCell align="right">{row.price}</TableCell>
                     </TableRow>
                   );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={2} align="center" sx={{ color: 'gray', fontStyle: 'italic', py: 4 }}>
+                    No Data Available
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+                <TableRow style={{ height: 33 }}>
+                  <TableCell colSpan={2} />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}

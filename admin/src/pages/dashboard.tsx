@@ -1,18 +1,21 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import dayjs, { Dayjs } from 'dayjs';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { useGetOrdersQuery, Order} from '../features/api/orderApi';
 import { useEffect, useMemo, useState } from 'react';
-
+import { setLoading } from '../features/loadingSlice';
 
 
 export default function Dashboard() {
   const now: Dayjs = dayjs();
   const today = now.format('DD-MM-YYYY');
   const admin = useSelector((state: RootState) => state.auth.admin);
+  const dispatch = useDispatch();
   const { data: ordersData, isLoading: ordersLoading } = useGetOrdersQuery();
   const [orders, setOrders] = useState<Order[]>([]);
+
+
 
   // Get month and year
   const getMonthYear = (timestamp: string) => dayjs(timestamp).format('YYYY-MM');
@@ -73,6 +76,11 @@ export default function Dashboard() {
 
   // Format the grandTotal with ₱ symbol
   const formatCurrency = (value: number) => `₱${value.toFixed(2)}`;
+
+  useEffect(() => {
+    dispatch(setLoading(ordersLoading));
+  }, [ordersLoading]);
+  
   return (
     <div>
       <div className="p-4">
