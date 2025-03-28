@@ -1,4 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithCsrf } from '../auth/authApi'; // Using CSRF-protected baseQuery
 
 interface OrderItem {
     itemId: string;
@@ -68,39 +69,51 @@ export interface Order {
 // Example usage with an array of orders
 type Orders = Order[];
 
-
 export const orderApi = createApi({
   reducerPath: 'orderApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BACKEND_URL,
-    credentials: 'include', // Ensures cookies are sent
-  }),
+  baseQuery: baseQueryWithCsrf, // Use the same CSRF-protected baseQuery
+  tagTypes: ['Order'], // Define tag for caching
+
   endpoints: (builder) => ({
+    // Get all orders
     getOrders: builder.query<Orders, void>({
       query: () => '/orders',
+      providesTags: ['Order'], // Provides cache tag
     }),
+
+    // Get order by ID
     getOrderById: builder.query<Order, number>({
       query: (id) => `/orders/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Order', id }],
     }),
+
+    // Add a new order
     addOrder: builder.mutation<Order, Partial<Order>>({
       query: (newOrder) => ({
         url: '/orders',
         method: 'POST',
         body: newOrder,
       }),
+      invalidatesTags: ['Order'], // Invalidate cache after adding
     }),
+
+    // Update an existing order
     updateOrder: builder.mutation<Order, { id: number; data: Partial<Order> }>({
       query: ({ id, data }) => ({
         url: `/orders/${id}`,
         method: 'PUT',
         body: data,
       }),
+      invalidatesTags: ['Order'], // Invalidate cache after updating
     }),
-    deleteOrder: builder.mutation<{ success: boolean }, number>({
+
+    // Delete an order
+    deleteOrder: builder.mutation<{ success: boolean; id: number }, number>({
       query: (id) => ({
         url: `/orders/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Order'], // Invalidate cache after deleting
     }),
   }),
 });
