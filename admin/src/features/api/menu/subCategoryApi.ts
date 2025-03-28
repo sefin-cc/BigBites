@@ -11,7 +11,7 @@ interface SubCategory {
 export const subCategoryApi = createApi({
   reducerPath: 'subCategoryApi',
   baseQuery: baseQueryWithCsrf, // Use the same CSRF-protected baseQuery
-  tagTypes: ['SubCategory'], // Define tag for caching
+  tagTypes: ['SubCategory', 'Menu'], // Define tag for caching
 
   endpoints: (builder) => ({
     // Get all subcategories
@@ -23,7 +23,7 @@ export const subCategoryApi = createApi({
     // Get subcategory by ID
     getSubCategoryById: builder.query<SubCategory, number>({
       query: (id) => `/subcategories/${id}`,
-      providesTags: (result, error, id) => [{ type: 'SubCategory', id }],
+      providesTags: ['SubCategory'],
     }),
 
     // Add a new subcategory
@@ -33,7 +33,7 @@ export const subCategoryApi = createApi({
         method: 'POST',
         body: newSubCategory,
       }),
-      invalidatesTags: ['SubCategory'], // Invalidate cache after adding
+      invalidatesTags: ['SubCategory', 'Menu'], // Invalidate cache after adding
     }),
 
     // Update an existing subcategory
@@ -43,7 +43,7 @@ export const subCategoryApi = createApi({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: ['SubCategory'], // Invalidate cache after updating
+      invalidatesTags: ['SubCategory', 'Menu'], // Invalidate cache after updating
     }),
 
     // Delete a subcategory
@@ -52,7 +52,7 @@ export const subCategoryApi = createApi({
         url: `/subcategories/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['SubCategory'], // Invalidate cache after deleting
+      invalidatesTags: ['SubCategory', 'Menu'], // Invalidate cache after deleting
     }),
   }),
 });

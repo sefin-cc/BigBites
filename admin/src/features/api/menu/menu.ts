@@ -49,9 +49,11 @@ export const menuApi = createApi({
     baseUrl: import.meta.env.VITE_BACKEND_URL,
     credentials: 'include',
   }),
+  tagTypes: ['Menu'],
   endpoints: (builder) => ({
     getMenu: builder.query<CategoryList, void>({
       query: () => '/menu',
+      providesTags: ['Menu'],
     }),
   }),
 });
