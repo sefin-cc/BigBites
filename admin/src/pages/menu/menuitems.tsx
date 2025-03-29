@@ -163,14 +163,13 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface EnhancedTableToolbarProps {
   menu: any[]| undefined;
-  numSelected: number;
   onFilterChange: (event: SelectChangeEvent<string>) => void;
   filterValue: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { menu, numSelected, onFilterChange, filterValue, onSearchChange } = props;
+  const { menu, onFilterChange, filterValue, onSearchChange } = props;
   const [categoryType, setCategoryType] = React.useState<string>('BURGERS');
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
@@ -240,21 +239,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
         <AddMenuItemsModal menu={menu} />
 
-        {numSelected > 0 ? (
-          <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
-              <DeleteIcon sx={{ color: "gray" }} />
-            </button>
-          </div>
-        ) : null}
-
-        {numSelected === 1 ? (
-          <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
-              <ModeEditRoundedIcon sx={{ color: "gray" }} />
-            </button>
-          </div>
-        ) : null}
       </Box>
     </Toolbar>
   );
@@ -417,7 +401,6 @@ export default function MenuItems() {
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
             menu={menu}
-            numSelected={selected.length}
             onFilterChange={handleFilterChange}
             filterValue={filterType}
             onSearchChange={handleSearchChange}
