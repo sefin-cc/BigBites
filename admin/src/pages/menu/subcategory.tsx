@@ -344,7 +344,7 @@ export default function SubCategory() {
           return;
         }
       
-        if (!confirm(`Are you sure you want to delete ${selectedSubCategories.size > 1 ? 'these branches?' : 'this branch?'}`)) {
+        if (!confirm(`Are you sure you want to delete ${selectedSubCategories.size > 1 ? 'these sub categories?' : 'this sub category?'}`)) {
           return;
         }
       

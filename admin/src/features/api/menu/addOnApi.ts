@@ -16,58 +16,46 @@ type AddOns = AddOn[];
 
 export const addOnApi = createApi({
   reducerPath: 'addOnApi',
-  baseQuery: baseQueryWithCsrf, // Use CSRF-protected baseQuery
-  tagTypes: ['AddOn'], // Define tag for caching
+  baseQuery: baseQueryWithCsrf,
+  tagTypes: ['AddOn'],
 
   endpoints: (builder) => ({
-    // Get all add-ons
-    getAddOns: builder.query<AddOns, void>({
-      query: () => '/addons',
-      providesTags: ['AddOn'], // Provides cache tag
+    getAddOnsByItem: builder.query<AddOns, number>({
+      query: (itemId) => `/items/${itemId}/addons`,
+      providesTags: (result, error, itemId) => [{ type: 'AddOn', id: itemId }],
     }),
 
-    // Get add-on by ID
-    getAddOnById: builder.query<AddOn, number>({
-      query: (id) => `/addons/${id}`,
-      providesTags: (result, error, id) => [{ type: 'AddOn', id }],
-    }),
-
-    // Add a new add-on
-    addAddOn: builder.mutation<AddOn, Partial<AddOn>>({
+    addAddOnToItem: builder.mutation<AddOn, { item_id: number; label: string; price: number }>({
       query: (newAddOn) => ({
         url: '/addons',
         method: 'POST',
         body: newAddOn,
       }),
-      invalidatesTags: ['AddOn'], // Invalidate cache after adding
+      invalidatesTags: ['AddOn'],
     }),
 
-    // Update an existing add-on
     updateAddOn: builder.mutation<AddOn, { id: number; data: Partial<AddOn> }>({
       query: ({ id, data }) => ({
         url: `/addons/${id}`,
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: ['AddOn'], // Invalidate cache after updating
+      invalidatesTags: ['AddOn'],
     }),
 
-    // Delete an add-on
     deleteAddOn: builder.mutation<{ success: boolean }, number>({
       query: (id) => ({
         url: `/addons/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['AddOn'], // Invalidate cache after deleting
+      invalidatesTags: ['AddOn'],
     }),
   }),
 });
 
-// Export hooks for usage in components
 export const {
-  useGetAddOnsQuery,
-  useGetAddOnByIdQuery,
-  useAddAddOnMutation,
+  useGetAddOnsByItemQuery,
+  useAddAddOnToItemMutation,
   useUpdateAddOnMutation,
   useDeleteAddOnMutation,
 } = addOnApi;

@@ -21,6 +21,11 @@ import AddMenuItemsModal from './addMenuItemsModal';
 import EditMenuItemsModal from './editMenuItemsModal';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
 import ReactLoading from 'react-loading';
+import { Slide, toast, ToastContainer } from 'react-toastify';
+import { useDeleteItemMutation } from '../../features/api/menu/itemApi';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
 
 // Data Types
 interface Data {
@@ -112,16 +117,15 @@ const headCells: readonly HeadCell[] = [
 
 // Table Header Component
 interface EnhancedTableProps {
-  numSelected: number;
+
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
   menuCategory: menuCategory;
   sortBy: string;
-  rowCount: number;
 
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const {  menuCategory, sortBy, numSelected, rowCount, onRequestSort } = props;
+  const {  menuCategory, sortBy, onRequestSort } = props;
   const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -158,17 +162,15 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface EnhancedTableToolbarProps {
-  rows: Data[];
+  menu: any[]| undefined;
   numSelected: number;
   onFilterChange: (event: SelectChangeEvent<string>) => void;
   filterValue: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  selectedSubCategories: Set<string>;  // Keep track of selected sub-categories
-  setSelectedSubCategories: React.Dispatch<React.SetStateAction<Set<string>>>; // Allow setting the selected sub-categories
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { rows, numSelected, onFilterChange, filterValue, onSearchChange, selectedSubCategories, setSelectedSubCategories } = props;
+  const { menu, numSelected, onFilterChange, filterValue, onSearchChange } = props;
   const [categoryType, setCategoryType] = React.useState<string>('BURGERS');
 
   const handleCategoryChange = (event: SelectChangeEvent<string>) => {
@@ -203,7 +205,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           >
             {
               // Extract unique categories from rows
-              [...new Set(rows.map(item => item.category))].map((category, key) => (
+              [...new Set(menu?.map(item => item.category))].map((category, key) => (
                 <MenuItem key={key} value={category}>
                   {category}
                 </MenuItem>
@@ -223,21 +225,22 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             sx={{ width: 200 }}
             disabled={!categoryType}  // Disable subcategory dropdown until a category is selected
           >
-            {
-              // Filter rows based on selected categoryType and extract unique subLabels
-              [...new Set(rows.filter(item => item.category === categoryType).map(item => item.subLabel))]
-                .map((subLabel, key) => (
-                  <MenuItem key={key} value={subLabel}>
-                    {subLabel}
+          {
+              menu
+                ?.find(cat => cat.category === categoryType) 
+                ?.sub_categories 
+                ?.map((subcat:any, key:number) => (
+                  <MenuItem key={key} value={subcat.label}>
+                    {subcat.label}
                   </MenuItem>
-                ))
+                )) || [] 
             }
           </Select>
         </FormControl>
 
-        <AddMenuItemsModal rows={rows} />
+        <AddMenuItemsModal menu={menu} />
 
-        {selectedSubCategories.size > 0 ? (
+        {numSelected > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
             <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
               <DeleteIcon sx={{ color: "gray" }} />
@@ -245,7 +248,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </div>
         ) : null}
 
-        {selectedSubCategories.size === 1 ? (
+        {numSelected === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
             <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
               <ModeEditRoundedIcon sx={{ color: "gray" }} />
@@ -261,18 +264,18 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 export default function MenuItems() {
   const [menuCategory, setMenuCategory] = React.useState<menuCategory>('asc');
   const [sortBy, setSortBy] = React.useState<keyof Data>('category');
-  const [selectedSubCategories, setSelectedSubCategories] = React.useState<Set<string>>(new Set()); // Tracks selected subcategories
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [filterType, setFilterType] = React.useState<string>('JR BURGERS');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
-  const [selected, setSelected] = React.useState<readonly number[]>([]);
-  const { data: menu, error, isLoading } = useGetMenuQuery();
+  const [selected, setSelected] = React.useState<readonly string[]>([]);
+  const { data: menu, error, isLoading, refetch} = useGetMenuQuery();
   const [rows, setRows] = React.useState<any[]>([]); 
-    
+  const [deleteMenuItem, { isLoading: deleteLoading}] = useDeleteItemMutation();
+  const dispatch = useDispatch();
+
   React.useEffect(() => {
     if (menu) {
-
       setRows(menu.flatMap((category) =>
         category.sub_categories.flatMap((subCategory) =>
           subCategory.items.map((item) => 
@@ -292,35 +295,43 @@ export default function MenuItems() {
             )
           )
         )));
-    
+    }
+    if(error){
+      toast.error('Something went wrong!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
     }
 
   }, [menu]);
 
-
-
-  console.log("rows: "+ rows);
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
     setMenuCategory(isAsc ? 'desc' : 'asc');
     setSortBy(property);
   };
 
+  const handleClick = (event: React.MouseEvent<unknown>, uniqueId: string) => {
+    const selectedIndex = selected.indexOf(uniqueId);
+    let newSelected: readonly string[] = [];
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: readonly number[] = [];
-    
     if (selectedIndex === -1) {
-      // Select the clicked row
-      newSelected = [id];
+        // Select the clicked row
+        newSelected = [uniqueId];
     } else {
-      // Deselect the row if it's already selected
-      newSelected = [];
+        // Deselect if already selected
+        newSelected = [];
     }
-  
+
     setSelected(newSelected);
-  };
+};
   
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -355,27 +366,68 @@ export default function MenuItems() {
     [menuCategory, sortBy, page, rowsPerPage, filteredRows],
   );
 
+  const handleDelete = async (id: number) => {
+    
+      if (selected.length === 0) {
+        toast.warning('No Menu item selected for deletion.', {
+          position: "top-right",
+          autoClose: 3000,
+          theme: "light",
+          transition: Slide,
+        });
+        return;
+      }
+    
+      if (!confirm(`Are you sure you want to delete  this Menu Item?`)) {
+        return;
+      }
+    
+      try {
+        await deleteMenuItem(id).unwrap();
+
+        refetch();
+        
+        toast.success(`Menu Item deleted successfully!`, {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Slide,
+        });
+    
+        setSelected([]); 
+      } catch (err) {
+        console.error('Failed to delete menu item:', err);
+    
+        toast.error('Something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Slide,
+        });
+      }
+    };
+        
+    useEffect(() => {
+      dispatch(setLoading(deleteLoading));
+    }, [deleteLoading]);
+
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
       <Box sx={{ width: '75%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
-            rows={rows}
-            numSelected={selectedSubCategories.size}
+            menu={menu}
+            numSelected={selected.length}
             onFilterChange={handleFilterChange}
             filterValue={filterType}
             onSearchChange={handleSearchChange}
-            selectedSubCategories={selectedSubCategories}
-            setSelectedSubCategories={setSelectedSubCategories}
           />
           <TableContainer sx={{ width: '100%' }}>
           <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%', minHeight: 100 }}>
             <EnhancedTableHead
-              numSelected={selectedSubCategories.size}
               menuCategory={menuCategory}
               sortBy={sortBy}
               onRequestSort={handleRequestSort}
-              rowCount={filteredRows.length}
             />
 
             <TableBody>
@@ -392,7 +444,11 @@ export default function MenuItems() {
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
-                    <TableRow hover onClick={(event) => handleClick(event, row.id)} key={`${row.id}-${row.subId}-${row.itemId}`}>
+                    <TableRow 
+                        hover 
+                        onClick={(event) => handleClick(event, `${row.id}-${row.subId}-${row.itemId}`)} 
+                        key={`${row.id}-${row.subId}-${row.itemId}`}
+                      >
                       <TableCell component="th" id={labelId} scope="row">
                         {row.itemLabel}
                       </TableCell>
@@ -440,7 +496,9 @@ export default function MenuItems() {
       }}>
         {selected.length > 0 ? (
           (() => {
-            const selectedRow = rows.find(row => row.id === selected[0]);
+
+            const selectedRow = rows.find(row => `${row.id}-${row.subId}-${row.itemId}` === selected[0]);
+
 
             return (
             <div className='p-2 '>
@@ -489,17 +547,26 @@ export default function MenuItems() {
                       <p className='font-bold'>Description:</p>
                       <p> {selectedRow?.description}</p>
                   </div>
+                  <div>
+                      <p className='font-bold'>AddOns:</p>
+                      <div>
+                        {selectedRow?.addOns?.map((item: any, index: number) => (
+                          <p className='pr-2' key={index}>{item.label} - PHP{item.price}</p> 
+                        ))}
+                      </div>
+                  </div>
 
                   <div className="flex justify-between mt-5 w-full">
-                    <EditMenuItemsModal rows={rows}/>
-                    <button className="text text-white  px-6 py-1 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
-                      <p>DELETE</p>
+                    <EditMenuItemsModal menu={menu} itemId={selectedRow?.itemId} categoryId={selectedRow?.id}/>
+                    <button onClick={() =>handleDelete(selectedRow.itemId)}  className="text text-white  px-6 py-1 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}   disabled={deleteLoading} >
+                      {deleteLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "DELETE"}
                     </button>
                   </div>
               </div>
             );
           })()) : <div className="w-full h-full flex justify-center items-center text-center"><p className='text text-gray-800'>Click a row to see the details.</p></div>}
       </Box>
+      <ToastContainer/>
     </div>
   );
 }

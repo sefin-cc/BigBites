@@ -3,6 +3,8 @@ import { branchApi } from './features/api/branchApi';
 import { authApi } from './features/auth/authApi';
 import { promoApi } from './features/api/promoApi';
 import { subCategoryApi } from './features/api/menu/subCategoryApi';
+import { itemApi } from './features/api/menu/itemApi';
+import { addOnApi } from './features/api/menu/addOnApi';
 import { menuApi } from './features/api/menu/menu';
 import { orderApi } from './features/api/orderApi';
 import { adminUserApi } from './features/api/adminUsersApi';
@@ -16,6 +18,8 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer, 
     [promoApi.reducerPath]: promoApi.reducer,
     [subCategoryApi.reducerPath]: subCategoryApi.reducer,
+    [addOnApi.reducerPath]: addOnApi.reducer,
+    [itemApi.reducerPath]: itemApi.reducer,
     [menuApi.reducerPath]: menuApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
     [adminUserApi.reducerPath]: adminUserApi.reducer,
@@ -28,6 +32,8 @@ export const store = configureStore({
       authApi.middleware, 
       promoApi.middleware,
       subCategoryApi.middleware,
+      itemApi.middleware,
+      addOnApi.middleware,
       menuApi.middleware,
       orderApi.middleware,
       adminUserApi.middleware
