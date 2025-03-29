@@ -47,7 +47,7 @@ class PromoController extends Controller
             // Validate incoming request data
             $validated = $request->validate([
                 'label' => 'required|string|max:255',
-                'image' => 'required|string|max:255',
+                'image' => 'required|string',
             ]);
 
             // Create a new promo entry in the database

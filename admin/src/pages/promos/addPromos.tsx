@@ -22,6 +22,7 @@ function AddPromoModal() {
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState('');
   const [addPromo, {isLoading}] = useAddPromoMutation();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Function to handle opening the modal
   const handleOpen = () => setOpen(true);
@@ -30,60 +31,59 @@ function AddPromoModal() {
   const handleClose = () => setOpen(false);
 
   // Function to handle category change (typed event as SelectChangeEvent)
-  const handleLabelChange = (event: SelectChangeEvent) => {
+  const handleLabelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLabel(event.target.value);
   };
 
 
 
   const handleSubmit = async () => {
-    // const newErrors: { [key: string]: string } = {};
+    const newErrors: { [key: string]: string } = {};
     
-    // if (!label) newErrors.name = 'Branch name is required';
+    if (!label) newErrors.label = 'Promo name is required';
     // if (!province) newErrors.province = 'Province is required';
    
 
-    // setErrors(newErrors);
+    setErrors(newErrors);
 
-    // if (Object.keys(newErrors).length === 0) {
-    //   try {
-    //     await addPromo({
-    //       label,
-    //       province,
-    //     }).unwrap(); // Ensure errors are handled correctly
+    if (Object.keys(newErrors).length === 0) {
+      try {
+        await addPromo({
+          label: label,
+          image: "https://phmenu.net/wp-content/uploads/2024/01/promo-1024x683.webp"
+        }).unwrap(); // Ensure errors are handled correctly
 
-    //     toast.success('Promo added successfully!', {
-    //       position: "top-right",
-    //       autoClose: 5000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "light",
-    //       transition: Slide,
-    //     });
-    //     handleClose(); // Close modal after successful submission
+        toast.success('Promo added successfully!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Slide,
+        });
+        handleClose(); // Close modal after successful submission
         
-    //     // Reset form fields
-    //     setLabel('');
-    //     setProvince('');
-    //     setErrors({});
-    //   } catch (err) {
-    //     console.error('Failed to add promo:', err);
-    //      toast.error('Something went wrong!', {
-    //           position: "top-right",
-    //           autoClose: 5000,
-    //           hideProgressBar: false,
-    //           closeOnClick: true,
-    //           pauseOnHover: true,
-    //           draggable: true,
-    //           progress: undefined,
-    //           theme: "light",
-    //           transition: Slide,
-    //         });
-    //   }
-    // }
+        // Reset form fields
+        setLabel('');
+        setErrors({});
+      } catch (err) {
+        console.error('Failed to add promo:', err);
+         toast.error('Something went wrong!', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Slide,
+            });
+      }
+    }
   };
 
 
@@ -122,14 +122,20 @@ function AddPromoModal() {
             ADD PROMO
           </Typography>
 
-          <TextField
-            label="Promos Label"
-            value={label}
-            onChange={() =>handleLabelChange}
-            fullWidth
-            sx={{ mt: 2 }}
-            size="small"
-          />
+          <Box>
+            <TextField
+              label="Promos Label"
+              value={label}
+              onChange={handleLabelChange}
+              fullWidth
+              sx={{ mt: 2 }}
+              size="small"
+              required
+              error={!!errors.label}
+            />
+            {errors.label && <Typography color="error" variant="caption">{errors.label}</Typography>}
+          </Box>
+          
 
         <Button
             component="label"
@@ -173,6 +179,7 @@ function AddPromoModal() {
           
         </Box>
       </Modal>
+      <ToastContainer/>
     </div>
   );
 }

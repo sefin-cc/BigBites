@@ -19,8 +19,13 @@ import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddPromoModal from './addPromos';
 import EditPromoModal from './editPromos';
-import { useGetPromosQuery } from '../../features/api/promoApi';
+import { useGetPromosQuery, useDeletePromoMutation } from '../../features/api/promoApi';
 import ReactLoading from 'react-loading';
+import { Slide, toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
+
 
 // Data Types
 interface Data {
@@ -132,16 +137,13 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface EnhancedTableToolbarProps {
-  numSelected: number;
-  onFilterChange: (event: SelectChangeEvent<string>) => void;
-  filterValue: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  selectedSubCategories: Set<string>;
-  setSelectedSubCategories: React.Dispatch<React.SetStateAction<Set<string>>>;
+  selected: Set<string>;
+  handleDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { onSearchChange, numSelected } = props;
+  const { onSearchChange, selected, handleDelete} = props;
 
   return (
     <Toolbar sx={{ flex: 1, flexDirection: "column" }}>
@@ -158,16 +160,16 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           placeholder="Search..."
         />
         <AddPromoModal />
-        {numSelected > 0 ? (
+        {selected.size > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
+            <button onClick={handleDelete} className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
               <DeleteIcon sx={{ color: "gray" }} />
             </button>
           </div>
         ) : null}
-        {numSelected === 1 ? (
+        {selected.size === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <EditPromoModal />
+            <EditPromoModal  id={selected}/>
           </div>
         ) : null}
       </Box>
@@ -185,6 +187,8 @@ export default function Promos() {
   const [searchTerm, setSearchTerm] = React.useState<string>('');
   const { data: promos, error, isLoading } = useGetPromosQuery();
   const [rows, setRows] = React.useState<any[]>([]); 
+  const [deletePromo, { isLoading: deleteLoading}] = useDeletePromoMutation();
+  const dispatch = useDispatch();
     
   React.useEffect(() => {
     if (promos) {
@@ -193,6 +197,19 @@ export default function Promos() {
         promo.label,
         promo.image,
       )));
+    }
+    if(error){
+      toast.error('Something went wrong!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
     }
   }, [promos]);  
 
@@ -256,17 +273,56 @@ export default function Promos() {
   const isAllSelected =
     visibleRows.length > 0 && visibleRows.every((row) => selected.has(`${row.id}`));
 
+  const handleDelete = async () => {
+    if (selected.size === 0) {
+      toast.warning('No branches selected for deletion.', {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "light",
+        transition: Slide,
+      });
+      return;
+    }
+  
+    if (!confirm(`Are you sure you want to delete ${selected.size > 1 ? 'these branches?' : 'this branch?'}`)) {
+      return;
+    }
+  
+    try {
+      await Promise.all(Array.from(selected).map((id) => deletePromo(Number(id)).unwrap()));
+  
+      toast.success(`${selected.size > 1 ? 'Promos' : 'Promo'} deleted successfully!`, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+  
+      setSelected(new Set()); // Clear selection after successful deletion
+    } catch (err) {
+      console.error('Failed to delete promo:', err);
+  
+      toast.error('Something went wrong!', {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+    }
+  };
+
+      useEffect(() => {
+        dispatch(setLoading(deleteLoading));
+      }, [deleteLoading]);
+
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
       <Box sx={{ width: '100%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
-            onFilterChange={handleFilterChange}
-            filterValue={filterType}
             onSearchChange={handleSearchChange}
-            selectedSubCategories={selected}
-            setSelectedSubCategories={setSelected}
-            numSelected={selected.size}
+            selected={selected}
+            handleDelete={handleDelete}
           />
           <TableContainer sx={{ width: '100%' }}>
           <Table
