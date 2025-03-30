@@ -69,6 +69,7 @@ export const baseQueryWithCsrf = async (args: any, api: any, extraOptions: any) 
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: baseQueryWithCsrf,
+  tagTypes: ['User'],
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({
@@ -115,7 +116,20 @@ export const authApi = createApi({
           dispatch(clearAdmin()); 
         }
       },
+      providesTags: ['User'], 
     }),
+
+
+    updateAccount: builder.mutation<Admin, { id: number; data:{ name: string; email: string; phone: string; address: string; branch: string; }}>({
+      query: ({ id, data }) => ({
+        url: `/admin/update_account/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['User'], 
+    }),
+    
+
   }),
 });
 
@@ -123,5 +137,6 @@ export const authApi = createApi({
 export const { 
   useLoginMutation, 
   useLogoutMutation, 
-  useGetLoggedInAdminQuery  
+  useGetLoggedInAdminQuery,
+  useUpdateAccountMutation 
 } = authApi;

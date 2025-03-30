@@ -356,6 +356,7 @@ function EditUserModal({ branches, id }: { branches: any[], id: Set<string> }) {
           </div>
         </Box>
       </Modal>
+      <ToastContainer />
     </div>
   );
 }

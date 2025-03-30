@@ -3,6 +3,7 @@ import { useGetLoggedInAdminQuery } from '../../features/auth/authApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading } from '../../features/loadingSlice';
 import { useEffect } from "react";
+import UpdateUserModal from "./userUpdate";
 
 
 
@@ -17,7 +18,11 @@ export default function UserSettings() {
     return(
         <div>
             <p className=" text-2xl mb-3" style={{fontFamily: 'Madimi One', color: "#2C2C2C"}}>YOUR ACCOUNT INFORMATION: </p>
-            <div className="flex gap-4 ">
+            {
+                user &&
+
+                <div className="flex gap-4 ">
+
                 <div className="flex justify-center items-center p-4">
                     <div style={{ 
                         width: 130, 
@@ -39,14 +44,20 @@ export default function UserSettings() {
                         />
                     </div>
                 </div>
+
                 <div className=" w-full p-4 ">
-                    <p className="text-gray-500"><b>Name:</b> {user?.name}</p>
-                    <p className="text-gray-500"><b>Email:</b> {user?.email}</p>
-                    <p className="text-gray-500"><b>Phone:</b> {user?.phone}</p>
-                    <p className="text-gray-500"><b>Address:</b> {user?.address}</p>
-                    <p className="text-gray-500"><b>Branch: </b>{user?.branch}</p>
+                    <p className="text-gray-500"><b>Name:</b> {user.name}</p>
+                    <p className="text-gray-500"><b>Email:</b> {user.email}</p>
+                    <p className="text-gray-500"><b>Phone:</b> {user.phone}</p>
+                    <p className="text-gray-500"><b>Address:</b> {user.address}</p>
+                    <p className="text-gray-500"><b>Branch: </b>{user.branch}</p>
+                    <UpdateUserModal/>
                 </div>
-            </div>
+                
+            </div>    
+            }
+            
+
 
             <div className='border-b border-gray-300 mt-4  mb-4'></div>
 
