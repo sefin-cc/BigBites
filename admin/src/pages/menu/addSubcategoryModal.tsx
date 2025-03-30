@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { Modal, Box, Button, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import { useAddSubCategoryMutation } from '../../features/api/menu/subCategoryApi';
+import ReactLoading from 'react-loading';
+import { Slide, ToastContainer, toast } from 'react-toastify';
+import { useGetMenuQuery } from '../../features/api/menu/menu';
 
-function AddSubCategoryModal() {
-  // State to control the opening and closing of the modal
+
+
+function AddSubCategoryModal({menu} : {menu: any[]| undefined;}) {
   const [open, setOpen] = useState(false);
-  // State for form values
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState<number>(0);
   const [subcategory, setSubcategory] = useState('');
+  const [addSubCategory, {isLoading}] = useAddSubCategoryMutation();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { refetch } = useGetMenuQuery(); 
 
   // Function to handle opening the modal
   const handleOpen = () => setOpen(true);
@@ -16,14 +23,64 @@ function AddSubCategoryModal() {
   const handleClose = () => setOpen(false);
 
   // Function to handle category change (typed event as SelectChangeEvent)
-  const handleCategoryChange = (event: SelectChangeEvent) => {
-    setCategory(event.target.value);
+  const handleCategoryChange = (event: SelectChangeEvent<number>) => {
+    setCategory(Number(event.target.value)); // Convert value to a number
   };
-
   // Function to handle subcategory change (typed event as React.ChangeEvent<HTMLInputElement>)
   const handleSubcategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSubcategory(event.target.value);
   };
+
+  const handleSubmit = async () => {
+      const newErrors: { [key: string]: string } = {};
+      
+      if (!category) newErrors.category = 'Category is required';
+      if (!subcategory) newErrors.subcategory = 'Subcategory is required';
+  
+      setErrors(newErrors);
+  
+      if (Object.keys(newErrors).length === 0) {
+        try {
+          await addSubCategory({
+            category_id: category,
+            label: subcategory,
+          }).unwrap(); // Ensure errors are handled correctly
+          refetch();
+          toast.success('Sub Category added successfully!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+          });
+          handleClose(); // Close modal after successful submission
+          
+          // Reset form fields
+          setCategory(0);
+          setSubcategory('');
+        
+          setErrors({});
+        } catch (err) {
+          console.error('Failed to add subcategory:', err);
+           toast.error('Something went wrong!', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+              });
+        }
+      }
+    };
+  
 
   return (
     <div>
@@ -59,33 +116,47 @@ function AddSubCategoryModal() {
           <Typography variant="h6" id="simple-modal-title" sx={{ marginBottom: 3, fontWeight: "bold", fontFamily: "Madimi One" }}>
             ADD NEW SUB-CATEGORY 
           </Typography>
+          <Box>
+             {/* Dropdown for Category */}
+            <FormControl size="small" fullWidth sx={{ mt: 2 }}>
+              <InputLabel id="category-select-label">Category</InputLabel>
+              <Select<number> 
+                labelId="category-select-label"
+                value={category} // Ensure it's a number
+                onChange={handleCategoryChange}
+                label="Category"
+                required
+                error={!!errors.category}
+              >
+                {
+                  [...new Map(menu?.map(item => [item.id, item])).values()].map((item, index) => (
+                    <MenuItem key={index} value={item.id}>
+                      {item.category}
+                    </MenuItem>
+                  ))
+                }
 
-          {/* Dropdown for Category */}
-          <FormControl size="small" fullWidth sx={{ mt: 2 }}>
-            <InputLabel id="category-select-label">Category</InputLabel>
-            <Select
-              labelId="category-select-label"
-              value={category}
-              onChange={handleCategoryChange}
-              label="Category"
-            >
-              <MenuItem value="BURGERS">BURGERS</MenuItem>
-              <MenuItem value="BARKADAS">BARKADAS</MenuItem>
-              <MenuItem value="SIDES">SIDES</MenuItem>
-              <MenuItem value="DRINKS">DRINKS</MenuItem>
-              <MenuItem value="DESSERTS">DESSERTS</MenuItem>
-            </Select>
-          </FormControl>
+              </Select>
+            </FormControl>
 
-          {/* Text Field for Subcategory */}
-          <TextField
-            label="Sub-Category Name"
-            value={subcategory}
-            onChange={handleSubcategoryChange}
-            fullWidth
-            sx={{ mt: 2 }}
-            size="small"
-          />
+              {errors.category && <Typography color="error" variant="caption">{errors.category}</Typography>}
+          </Box>
+         
+          <Box>
+              {/* Text Field for Subcategory */}
+              <TextField
+                label="Sub-Category Name"
+                value={subcategory}
+                onChange={handleSubcategoryChange}
+                fullWidth
+                sx={{ mt: 2 }}
+                size="small"
+                required
+                error={!!errors.subcategory}
+              />
+               {errors.subcategory && <Typography color="error" variant="caption">{errors.subcategory}</Typography>}
+          </Box>
+          
 
         <div style={{ display: "flex", flexDirection: "row", gap: 20 , marginTop: 20}}>
             <button
@@ -97,16 +168,15 @@ function AddSubCategoryModal() {
             </button>
 
             <button
-            onClick={() => {
-                // Handle your form submission logic here
-                console.log("Category:", category);
-                console.log("Subcategory:", subcategory);
-                handleClose();
-            }}
-                className="text text-white w-full"
-                style={{ backgroundColor: "#2C2C2C", borderRadius: "4px",  padding: "5px 20px"}}
+              onClick={handleSubmit}
+              className="text text-white w-full"
+              style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: "5px 20px",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'}}
+              disabled={isLoading} 
             >
-                SAVE
+              {isLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "ADD SUB CATEGORY"}
             </button>
         </div>
             
@@ -114,6 +184,7 @@ function AddSubCategoryModal() {
           
         </Box>
       </Modal>
+      <ToastContainer/>
     </div>
   );
 }

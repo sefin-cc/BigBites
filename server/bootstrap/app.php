@@ -3,6 +3,11 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use App\Exceptions\AlreadyAuthenticatedException;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,6 +23,22 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class
         ]);
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
+
+        $middleware->statefulApi();
+        // $middleware->redirectUsersTo(function (Request $request) {
+        //     if ($request->expectsJson()) {
+        //         throw new AlreadyAuthenticatedException();
+        //     }
+
+        //     return '/';
+        // });
+
+        // $middleware->prepend(EncryptCookies::class);
+        // $middleware->prepend(AddQueuedCookiesToResponse::class);
+        // $middleware->prepend(StartSession::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

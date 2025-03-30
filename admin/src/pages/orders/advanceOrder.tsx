@@ -12,9 +12,13 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import orders from "../../data/orders.json";
 import { visuallyHidden } from '@mui/utils';
 import { TextField } from '@mui/material';
+import { useGetOrdersQuery, useUpdateOrderMutation } from '../../features/api/orderApi';
+import ReactLoading from 'react-loading';
+import { Slide, toast, ToastContainer } from 'react-toastify';
+import { useEffect } from 'react';
+
 
 // Data Types
 interface Data {
@@ -66,24 +70,6 @@ function createData(
   };
 }
 
-// Mapping orders to rows
-const rows = orders.map((order, index) =>
-  createData(
-    index + 1,
-    order.timestamp,
-    order.costumer || 'Unknown',
-    order.location?.description || order.branch[0].branchName +', '+ order.branch[0].fullAddress,
-    order.costumer || '0978787877',
-    order.fees.discountDeduction,
-    order.fees.subTotal,
-    order.fees.grandTotal,
-    order.type,
-    order.pickUpType || '',
-    order.order,
-    order.status,
-    order.dateTimePickUp
-  )
-);
 
 // Sorting Functions
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -207,7 +193,46 @@ export default function AdvanceOrders() {
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
- const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const { data: orders, error, isLoading, refetch} = useGetOrdersQuery();
+  const [rows, setRows] = React.useState<any[]>([]); 
+  const [updateOrder, { isLoading: orderLoading }] = useUpdateOrderMutation();
+
+  useEffect(() => {
+   if (orders) {
+     setRows(orders.map((order, index) =>
+       createData(
+         index + 1,
+         order.timestamp,
+         order.user.name,
+         order.location?.description || order.branch.branchName +', '+ order.branch.fullAddress,
+         order.user.email,
+         order.fees.discountDeduction,
+         order.fees.subTotal,
+         order.fees.grandTotal,
+         order.type,
+         order.pick_up_type || '',
+         order.order_items,
+         order.status,
+         order.date_time_pickup
+       )
+     ));
+   }
+   if(error){
+       toast.error('Something went wrong!', {
+         position: "top-right",
+         autoClose: 5000,
+         hideProgressBar: false,
+         closeOnClick: true,
+         pauseOnHover: true,
+         draggable: true,
+         progress: undefined,
+         theme: "light",
+         transition: Slide,
+       });
+     }
+ }, [orders]);  
+
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -276,6 +301,78 @@ export default function AdvanceOrders() {
     [order, orderBy, page, rowsPerPage, filteredRows],
   );
 
+  const setOrderCompleted = async (orderId: number) => {
+    if (!confirm(`Are you sure you want to set this order to "Completed"`)) {
+      return;
+    }
+    try{
+      await updateOrder({
+        id: orderId,
+        data: { 
+          status: "completed"
+        },
+        
+      }).unwrap(); 
+
+      refetch();
+      toast.success(`Order updated successfully!`, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+              
+    }catch(error){
+      console.error('Failed to set order:', error);
+        toast.error('Something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Slide,
+        });
+    }
+  }
+  const setOrderCancel = async (orderId: number) => {
+    if (!confirm(`Are you sure you want to set this order to "Canceled"`)) {
+      return;
+    }
+    try{
+      await updateOrder({
+        id: orderId,
+        data: { 
+          status: "canceled"
+        },
+        
+      }).unwrap(); 
+
+      refetch();
+      toast.success(`Order canceled successfully!`, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+              
+    }catch(error){
+      console.error('Failed to cancel order:', error);
+        toast.error('Something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Slide,
+        });
+    }
+  }
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20}}>
        <Box sx={{ width: '70%' }}>
@@ -284,11 +381,7 @@ export default function AdvanceOrders() {
             onSearchChange={handleSearchChange}
         />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
-            >
+            <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%' }}>
               <EnhancedTableHead
                 order={order}
                 orderBy={orderBy}
@@ -296,52 +389,59 @@ export default function AdvanceOrders() {
                 onRequestSort={handleRequestSort}
               />
               <TableBody>
-                {visibleRows.map((row, index) => {
-                  const isItemSelected = selected.includes(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                        <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ) : visibleRows.length > 0 ? (
+                  visibleRows.map((row, index) => {
+                    const isItemSelected = selected.includes(row.id);
+                    const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      <TableCell padding="checkbox">
-                      
-                      </TableCell>
-                      <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
+                    return (
+                      <TableRow
+                        hover
+                        onClick={(event) => handleClick(event, row.id)}
+                        role="checkbox"
+                        aria-checked={isItemSelected}
+                        tabIndex={-1}
+                        key={row.id}
+                        selected={isItemSelected}
+                        sx={{ cursor: 'pointer' }}
                       >
-                        {row.dateTimePickUp}
-                      </TableCell>
-                      <TableCell align="right">{row.datatime}</TableCell>
-                      <TableCell align="right">{row.name}</TableCell>
-                      <TableCell align="right">{row.address}</TableCell>
-                      <TableCell align="right">{row.phone}</TableCell>
-                      <TableCell align="right">{row.grandTotal}</TableCell>
-                    </TableRow>
-                  );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow
-                    style={{
-                      height: 33,
-                    }}
-                  >
-                    <TableCell colSpan={6} />
+                        <TableCell padding="checkbox"></TableCell>
+                        <TableCell component="th" id={labelId} scope="row" padding="none">
+                          {row.dateTimePickUp}
+                        </TableCell>
+                        <TableCell align="right">{row.datatime}</TableCell>
+                        <TableCell align="right">{row.name}</TableCell>
+                        <TableCell align="right">{row.address}</TableCell>
+                        <TableCell align="right">{row.phone}</TableCell>
+                        <TableCell align="right">{row.grandTotal}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} align="center" sx={{ color: 'gray', fontStyle: 'italic', py: 4 }}>
+                      No Data Available
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+                  <TableRow style={{ height: 33 }}>
+                    <TableCell colSpan={7} />
                   </TableRow>
                 )}
               </TableBody>
             </Table>
           </TableContainer>
+
           <TablePagination
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
             component="div"
@@ -409,7 +509,7 @@ export default function AdvanceOrders() {
                   <div className=' rounded-2xl mt-1 border-4 ' style={{borderColor:"#FB7F3B"}}>
                   <div className='pr-4 pl-4 pt-2 rounded-2xl' style={{backgroundColor: "#FFEEE5"}}>
                       {
-                        selectedRow?.order.map((item, index) => (
+                        selectedRow?.order.map((item: { label: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; price: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; addOns: any[]; }, index: React.Key | null | undefined) => (
                           <div key={index}>
                             <div className="flex justify-between text-end ">
                               <p className="font-bold w-full">{item.label}</p>
@@ -440,15 +540,18 @@ export default function AdvanceOrders() {
                   </div>
                     
                   <div className="flex justify-between mt-4 w-full">
-                    <button className="text text-white  px-4 py-2 rounded-md focus:outline-none" style={{backgroundColor: "#2C2C2C"}}>COMPLETED</button>
-                    <button className="text text-white  px-4 py-2 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
-                      <p>CANCEL ORDER</p>
+                    <button onClick={() => setOrderCompleted(selectedRow?.id)}  className="text text-white  px-4 py-2 rounded-md focus:outline-none" style={{backgroundColor: "#2C2C2C"}}>
+                      { orderLoading ? <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "COMPLETED" }
+                      </button>
+                    <button onClick={() => setOrderCancel(selectedRow?.id)}  className="text text-white  px-4 py-2 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
+                      { orderLoading ? <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "CANCEL ORDER" }
                     </button>
                   </div>
               </div>
             );
           })()) : <div className="w-full h-full flex justify-center items-center text-center"><p className='text text-gray-800'>Click a row to see the details.</p></div>}
       </Box>  
+      <ToastContainer/>
     </div>
   );
 }

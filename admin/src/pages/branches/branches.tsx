@@ -20,8 +20,12 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import location from "../../data/location.json"
 import AddBranches from './addBranches';
 import EditBranches from './editBranch';
-// import AddPromoModal from './addPromos';
-// import EditPromoModal from './editPromos';
+import { useGetBranchesQuery, useDeleteBranchMutation } from '../../features/api/branchApi';
+import ReactLoading from 'react-loading';
+import { Slide, ToastContainer, toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
 
 // Data Types
 interface Data {
@@ -58,23 +62,7 @@ function createData(
     acceptAdvancedOrder
   };
 }
-const branches: Data[] = [
-    { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false  },
-    { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-  ];
 
-  const rows = branches.map(branch => createData(
-    branch.id,
-    branch.branchName,
-    branch.province,
-    branch.city,
-    branch.fullAddress,
-    branch.openingTime,
-    branch.closingTime,
-    branch.acceptAdvancedOrder
-));
 
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T): number {
   const valueA = a[sortBy];
@@ -187,10 +175,12 @@ interface EnhancedTableToolbarProps {
   handleProvinceChange:  (event: SelectChangeEvent<string>) => void;
   numSelected: number;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  selected: Set<string>;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { onSearchChange, numSelected, province, cities, handleCitiesChange, handleProvinceChange  } = props;
+  const { selected, handleDelete,  onSearchChange, numSelected, province, cities, handleCitiesChange, handleProvinceChange  } = props;
 
 
   return (
@@ -269,17 +259,16 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
       <AddBranches location={location} />
 
-        {/* <AddPromoModal /> */}
         {numSelected > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
+            <button onClick={handleDelete}  className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
               <DeleteIcon sx={{ color: "gray" }} />
             </button>
           </div>
         ) : null}
         {numSelected === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <EditBranches location={location} />
+            <EditBranches location={location}  id={selected}/>
           </div>
         ) : null}
       </Box>
@@ -296,6 +285,38 @@ export default function Branches() {
   const [searchTerm, setSearchTerm] = React.useState<string>('');
   const [cities, setCities] = React.useState<string>('');
   const [province, setProvince] = React.useState<string>('');
+  const dispatch = useDispatch();
+  const { data: branches, error, isLoading } = useGetBranchesQuery();
+  const [deleteBranch, { isLoading: deleteLoading}] = useDeleteBranchMutation();
+  const [rows, setRows] = React.useState<any[]>([]);  // Initialize with an empty array
+
+  useEffect(() => {
+  if (branches) {
+    setRows(branches.map(branch => createData(
+      branch.id,
+      branch.branchName,
+      branch.province,
+      branch.city,
+      branch.fullAddress,
+      branch.openingTime,
+      branch.closingTime,
+      branch.acceptAdvancedOrder
+    )));
+  }
+  if(error){
+    toast.error('Something went wrong!', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Slide,
+    });
+  }
+}, [branches]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
@@ -314,9 +335,6 @@ export default function Branches() {
   
   const handleSubCategorySelect = (event: React.ChangeEvent<HTMLInputElement>, id: string) => {
     const newSelected: Set<string> = new Set(selected); // Explicitly type the Set
-
-  
-
     if (event.target.checked) {
       newSelected.add(id);
     } else {
@@ -370,11 +388,56 @@ export default function Branches() {
   const isAllSelected =
     visibleRows.length > 0 && visibleRows.every((row) => selected.has(`${row.id}`));
 
+    const handleDelete = async () => {
+      if (selected.size === 0) {
+        toast.warning('No branches selected for deletion.', {
+          position: "top-right",
+          autoClose: 3000,
+          theme: "light",
+          transition: Slide,
+        });
+        return;
+      }
+    
+      if (!confirm(`Are you sure you want to delete ${selected.size > 1 ? 'these branches?' : 'this branch?'}`)) {
+        return;
+      }
+    
+      try {
+        await Promise.all(Array.from(selected).map((id) => deleteBranch(id).unwrap()));
+    
+        toast.success(`${selected.size > 1 ? 'Branches' : 'Branch'} deleted successfully!`, {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Slide,
+        });
+    
+        setSelected(new Set()); // Clear selection after successful deletion
+      } catch (err) {
+        console.error('Failed to delete branch:', err);
+    
+        toast.error('Something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Slide,
+        });
+      }
+    };
+    
+    
+      useEffect(() => {
+        dispatch(setLoading(deleteLoading));
+      }, [deleteLoading]);
+
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
       <Box sx={{ width: '100%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
+            selected={selected}
+            handleDelete={handleDelete}
             cities={cities}  
             province={province}
             handleCitiesChange={handleCitiesChange}
@@ -383,47 +446,72 @@ export default function Branches() {
             numSelected={selected.size}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
+          <Table
               aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
+              size="small"
+              sx={{ width: '100%', minHeight: 100 }} // Ensures table has a minimum height
             >
-              <EnhancedTableHead
-                menuCategory={menuCategory}
-                sortBy={sortBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={filteredRows.length}
-                isAllSelected={isAllSelected} numSelected={0}              />
+          <EnhancedTableHead
+            menuCategory={menuCategory}
+            sortBy={sortBy}
+            onSelectAllClick={handleSelectAllClick}
+            onRequestSort={handleRequestSort}
+            rowCount={filteredRows.length}
+            isAllSelected={isAllSelected}
+            numSelected={0}
+          />
+
               <TableBody>
-                {visibleRows.map((row, index) => {
-                  const isSubCategorySelected = selected.has(`${row.id}`);
-                  return (
-                    <TableRow hover key={`${row.id}`}>
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isSubCategorySelected}
-                          onChange={(e) => handleSubCategorySelect(e, `${row.id}`)}
-                        />
-                      </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
-                        {row.branchName}
-                      </TableCell>
-                      <TableCell align="right">{row.province}</TableCell>
-                      <TableCell align="right">{row.city}</TableCell>
-                      <TableCell align="right">{row.fullAddress}</TableCell>
-                      <TableCell align="right">{row.openingTime}</TableCell>
-                      <TableCell align="right">{row.closingTime}</TableCell>
-                    </TableRow>
-                  );
-                })}
-                {emptyRows > 0 && (
+                {isLoading ? (
+                  // Centered loading indicator
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                        <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ) : visibleRows.length === 0 ? (
+                  // "No Data Available" message
+                  <TableRow>
+                    <TableCell colSpan={7} align="center" sx={{ color: "gray", fontStyle: "italic", py: 4 }}>
+                      No Data Available
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  // Display rows when data is available
+                  visibleRows.map((row) => {
+                    const isSubCategorySelected = selected.has(`${row.id}`);
+                    return (
+                      <TableRow hover key={`${row.id}`}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={isSubCategorySelected}
+                            onChange={(e) => handleSubCategorySelect(e, `${row.id}`)}
+                          />
+                        </TableCell>
+                        <TableCell component="th" scope="row" padding="none">
+                          {row.branchName}
+                        </TableCell>
+                        <TableCell align="right">{row.province}</TableCell>
+                        <TableCell align="right">{row.city}</TableCell>
+                        <TableCell align="right">{row.fullAddress}</TableCell>
+                        <TableCell align="right">{row.openingTime}</TableCell>
+                        <TableCell align="right">{row.closingTime}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+
+                {/* 🔹 Preserve table structure when empty but not loading */}
+                {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
                   <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
+                    <TableCell colSpan={7} />
                   </TableRow>
                 )}
               </TableBody>
             </Table>
+
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}
@@ -436,6 +524,7 @@ export default function Branches() {
           />
         </Paper>
       </Box>
+      <ToastContainer/>
     </div>
   );
 }

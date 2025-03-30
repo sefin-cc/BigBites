@@ -38,7 +38,7 @@ class SubCategoryController extends Controller
 
     public function show($id)
     {
-        $subCategory = SubCategory::all($id);
+        $subCategory = SubCategory::find($id);
 
         if (!$subCategory) {
             return response()->json(['error' => 'SubCategory not found'], 404);
@@ -55,10 +55,13 @@ class SubCategoryController extends Controller
             return response()->json(['error' => 'SubCategory not found'], 404);
         }
 
+        // Validate request data, including category_id
         $validated = $request->validate([
             'label' => 'required|string|max:255',
+            'category_id' => 'required|integer|exists:categories,id', 
         ]);
 
+        // Update both fields
         $subCategory->update($validated);
 
         return response()->json($subCategory);

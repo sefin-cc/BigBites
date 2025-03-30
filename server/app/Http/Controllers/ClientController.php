@@ -44,12 +44,15 @@ class ClientController extends Controller
             // Create a token for the client
             $token = $client->createToken('ClientToken')->plainTextToken;
 
-            // Return the created client and token as a JSON response
-            return response()->json([
-                'client' => $client,
-                'token' => $token,
-            ], 201);
 
+            return response()->json([
+                'client' => $client
+            ])->cookie(
+                'token', $token, 60 * 24, '/', null, true, true // HttpOnly & Secure
+            );
+
+            // Return the created client and token as a JSON response
+           
         } catch (ValidationException $e) {
             // If validation fails, return a custom JSON error response
             return response()->json([
@@ -59,32 +62,40 @@ class ClientController extends Controller
     }
 
     // Login an existing client
-    public function login(Request $request)
-    {
-        try {
-            $request->validate([
-                'email' => 'required|email|exists:clients',
-                'password' => 'required|min:6',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'errors' => $e->errors(),
-            ], 422);
-        }
-
-        $client = Client::where('email', $request->email)->first();
-
-        if (!$client || !Hash::check($request->password, $client->password)) {
-            return response()->json([
-                'email' => ['The provided credentials are incorrect.'],
-            ], 401);
-        }
-
-        // Create a token for the client
-        $token = $client->createToken('ClientToken')->plainTextToken;
-
-        return response()->json(['token' => $token, 'client' => $client], 200);
+   // Login an existing client
+public function login(Request $request)
+{
+    try {
+        $request->validate([
+            'email' => 'required|email|exists:clients',
+            'password' => 'required|min:6',
+        ]);
+    } catch (ValidationException $e) {
+        return response()->json([
+            'errors' => $e->errors(),
+        ], 422);
     }
+
+    $client = Client::where('email', $request->email)->first();
+
+    if (!$client || !Hash::check($request->password, $client->password)) {
+        return response()->json([
+            'email' => ['The provided credentials are incorrect.'],
+        ], 401);
+    }
+
+    // Create a token for the client
+    $token = $client->createToken('ClientToken')->plainTextToken;
+
+    // Store token in an HTTP-only cookie
+    return response()->json([
+        'message' => 'Login successful',
+        'client' => $client
+    ])->cookie(
+        'token', $token, 60 * 24, '/', null, true, true // HttpOnly & Secure
+    );
+}
+
 
     // Logout the client by deleting their token
     public function logout(Request $request)
@@ -94,7 +105,7 @@ class ClientController extends Controller
     
         return response()->json([
             'message' => 'You have been logged out successfully.',
-        ]);
+        ])->cookie('token', '', -1); // Remove the cookie
     }
     
 

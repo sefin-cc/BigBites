@@ -15,12 +15,17 @@ import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, Checkbox,
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddUserModal from './addUserModal';
 import EditUserModal from './editUserModal';
-
-
+import { useGetAdminsQuery, useDeleteAdminMutation } from '../../features/api/adminUsersApi';
+import { useGetBranchesQuery } from '../../features/api/branchApi';
+import ReactLoading from 'react-loading';
+import { Slide, ToastContainer, toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
 
 // Data Types
 interface Data {
-    id: string;
+    id: number;
     name: string;
     email: string;
     phone: string;
@@ -31,7 +36,7 @@ interface Data {
 
 // Data Row Creation
 function createData(
-    id: string,
+    id: number,
     name: string,
     email: string,
     phone: string,
@@ -51,28 +56,18 @@ function createData(
   };
 }
 
-const branches = [
-    { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false  },
-    { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-  ];
+interface Branch {
+  id: string;
+  branchName: string;
+  province: string;
+  city: string;
+  fullAddress: string;
+  openingTime: string;
+  closingTime: string;
+  acceptAdvancedOrder: boolean;
+}
 
 
-const users: Data[] = [
-    { id: "1", name: "Rogena Tibegar", email: "rogenasefin6@gmail.com", phone: "09500321222", address: "Mangaldan, Pangasinan",  branch: "SM DAGUPAN CITY", role: "Admin" },
-  
-  ];
-
-  const rows = users.map(users => createData(
-    users.id,
-    users.name,
-    users.email,
-    users.phone,
-    users.address,
-    users.branch,
-    users.role,
-));
 
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T): number {
   const valueA = a[sortBy];
@@ -183,12 +178,14 @@ interface EnhancedTableToolbarProps {
   handleBranchChange:  (event: SelectChangeEvent<string>) => void;
   role: string;
   handleRoleChange:  (event: SelectChangeEvent<string>) => void;
-  numSelected: number;
+  selected: Set<string>;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  branchesList: Branch[];
+  handleDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { onSearchChange, numSelected, role, handleRoleChange, branch, handleBranchChange } = props;
+  const {handleDelete, branchesList, onSearchChange, selected, role, handleRoleChange, branch, handleBranchChange } = props;
 
 
   return (
@@ -225,7 +222,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           }}
         >
            <MenuItem value="">All</MenuItem>
-           {branches.map((branch, key) => (
+           {branchesList.map((branch, key) => (
             <MenuItem key={key} value={branch.branchName}>
               {branch.branchName}
             </MenuItem>
@@ -252,26 +249,27 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           }}
         >
            <MenuItem value="">All</MenuItem>
-           <MenuItem value="Admin">Admin</MenuItem>
-           <MenuItem value="Employee">Employee</MenuItem>
+           <MenuItem value="Administrator">Administrator</MenuItem>
+           <MenuItem value="Manager">Manager</MenuItem>
+           <MenuItem value="Staff">Staff</MenuItem>
         </Select>
       </FormControl>
 
     
 
-      <AddUserModal branches={branches} />
+      <AddUserModal branches={branchesList} />
 
         {/* <AddPromoModal /> */}
-        {numSelected > 0 ? (
+        {selected.size > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
+            <button onClick={handleDelete} className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
               <DeleteIcon sx={{ color: "gray" }} />
             </button>
           </div>
         ) : null}
-        {numSelected === 1 ? (
+        {selected.size === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <EditUserModal  branches={branches} />
+            <EditUserModal  branches={branchesList} id={selected} />
           </div>
         ) : null}
       </Box>
@@ -288,7 +286,38 @@ export default function ManageAdmin() {
   const [searchTerm, setSearchTerm] = React.useState<string>('');
   const [role, setRoles] = React.useState<string>('');
   const [branch, setBranch] = React.useState<string>('');
-
+  const { data: branchesList } = useGetBranchesQuery();
+  const { data: users, error, isLoading } = useGetAdminsQuery();
+  const [rows, setRows] = React.useState<any[]>([]); 
+  const [deleteUser, { isLoading: deleteLoading}] = useDeleteAdminMutation();
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+  if (users) {
+    setRows(users.map(user => createData(
+        user.id,
+        user.name,
+        user.email,
+        user.phone,
+        user.address,
+        user.branch,
+        user.roles.length > 0 ? user.roles[0].name : 'No Role'
+    )));
+      }
+  if(error){
+      toast.error('Something went wrong!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
+    }
+  }, [users]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
@@ -362,45 +391,105 @@ export default function ManageAdmin() {
   const isAllSelected =
     visibleRows.length > 0 && visibleRows.every((row) => selected.has(`${row.id}`));
 
+  const handleDelete = async () => {
+    if (selected.size === 0) {
+      toast.warning('No users selected for deletion.', {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "light",
+        transition: Slide,
+      });
+      return;
+    }
+  
+    if (!confirm(`Are you sure you want to delete ${selected.size > 1 ? 'these users?' : 'this user?'}`)) {
+      return;
+    }
+  
+    try {
+      await Promise.all(Array.from(selected).map((id) => deleteUser(Number(id)).unwrap()));
+  
+      toast.success(`${selected.size > 1 ? 'Users' : 'User'} deleted successfully!`, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+  
+      setSelected(new Set()); // Clear selection after successful deletion
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+  
+      const errorMessage =
+        (err as any)?.data?.message ||
+        (err as any)?.error ||
+        "Something went wrong!";
+        
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+    }
+  };
+  
+  
+  useEffect(() => {
+    dispatch(setLoading(deleteLoading));
+  }, [deleteLoading]);
+
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
       <Box sx={{ width: '100%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
             branch={branch}
+            branchesList={branchesList || []}
             handleBranchChange={handleBranchChange}
             role={role}  
             handleRoleChange={handleRoleChange}
             onSearchChange={handleSearchChange}
-            numSelected={selected.size}
+            selected={selected}
+            handleDelete={handleDelete}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
-            >
-              <EnhancedTableHead
+          <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%', minHeight: 100 }}>
+            <EnhancedTableHead
                 menuCategory={menuCategory}
                 sortBy={sortBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={filteredRows.length}
-                isAllSelected={isAllSelected} numSelected={0}              />
-              <TableBody>
-                {visibleRows.map((row, index) => {
+                isAllSelected={isAllSelected} numSelected={0} 
+                />
+            <TableBody>
+              {isLoading ? (
+                // Show loading indicator when fetching data
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                      <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : visibleRows.length === 0 ? (
+                //  Show "No Data Available" when no rows exist
+                <TableRow>
+                  <TableCell colSpan={7} align="center" sx={{ color: "gray", fontStyle: "italic", py: 2 }}>
+                    No Data Available
+                  </TableCell>
+                </TableRow>
+              ) : (
+                //  Render table rows when data is available
+                visibleRows.map((row) => {
                   const isSubCategorySelected = selected.has(`${row.id}`);
                   return (
-                    <TableRow hover key={`${row.id}`}>
+                    <TableRow hover key={row.id}>
                       <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isSubCategorySelected}
-                          onChange={(e) => handleSubCategorySelect(e, `${row.id}`)}
-                        />
+                        <Checkbox checked={isSubCategorySelected} onChange={(e) => handleSubCategorySelect(e, `${row.id}`)} />
                       </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
-                        {row.name}
-                      </TableCell>
+                      <TableCell component="th" scope="row" padding="none">{row.name}</TableCell>
                       <TableCell align="right">{row.email}</TableCell>
                       <TableCell align="right">{row.phone}</TableCell>
                       <TableCell align="right">{row.address}</TableCell>
@@ -408,14 +497,18 @@ export default function ManageAdmin() {
                       <TableCell align="right">{row.role}</TableCell>
                     </TableRow>
                   );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                })
+              )}
+
+              {/* 🔹 Preserve table height when empty but not loading */}
+              {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+                <TableRow sx={{ height: 33 }}>
+                  <TableCell colSpan={7} />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}
@@ -428,6 +521,7 @@ export default function ManageAdmin() {
           />
         </Paper>
       </Box>
+      <ToastContainer/>
     </div>
   );
 }

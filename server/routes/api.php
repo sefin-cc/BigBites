@@ -15,11 +15,11 @@ use App\Http\Controllers\AddOnController;
 use App\Http\Controllers\OrderController;
 
 //Admin User Routes
-Route::post('admin/login', [AdminController::class, 'login']);
+Route::post('admin/login', [AdminController::class, 'login'])->middleware(['web']);
 
 
 // Protect these routes with authentication middleware
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin', function (Request $request) {
         return $request->user();
     });
@@ -29,6 +29,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('admin/show/{id}', [AdminController::class, 'show']);
     Route::put('admin/update/{id}', [AdminController::class, 'update']);
     Route::delete('admin/destroy/{id}', [AdminController::class, 'destroy']);
+    Route::put('/admin/update_account/{id}', [AdminController::class, 'updateAccount']);
+    Route::put('/admin/update_password/{id}', [AdminController::class, 'updatePassword']);
 });
 
 //Client User Routes
@@ -54,10 +56,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('branches', BranchController::class);
         Route::apiResource('promos', PromoController::class);
         Route::apiResource('role', RolesController::class);
-        Route::get('menu', [MenuController::class, 'index']);
+ 
         Route::apiResource('categories', CategoryController::class);
-        Route::apiResource('subcategories', SubCategoryController::class);
+  
         Route::apiResource('items', ItemController::class);
         Route::apiResource('addons', AddOnController::class);
         Route::apiResource('orders', OrderController::class);
+        Route::get('menu', [MenuController::class, 'index']);
+        Route::apiResource('subcategories', SubCategoryController::class);
     });

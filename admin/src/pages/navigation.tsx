@@ -25,14 +25,21 @@ import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSetting
 import ManageAccountsRoundedIcon from '@mui/icons-material/ManageAccountsRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import logo from '../assets/logo.png'; 
-import { useContext } from "react";
+import { useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { AppContext } from "../context/AppContext";
 import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
+import { useLogoutMutation } from '../features/auth/authApi';
+import { LoadingScreen } from '../components/LoadingScreen';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLoading } from '../features/loadingSlice';
+import { RootState } from '../store'
+import { useGetOrdersQuery } from '../features/api/orderApi';
+import useOrderCreated from '../hooks/useOrderCreated';
+import { ToastContainer } from 'react-toastify';
 
 const drawerWidth = 240;
 
@@ -86,11 +93,22 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function Navigation() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const navigate = useNavigate();
-  const context = useContext(AppContext);
-  if (!context) {
-      // Handle the case where the context is undefined
-      return <div>Loading...</div>;
-  }
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state: RootState) => state.loading.isLoading);
+  const [logout, { isLoading: logoutLoading }] = useLogoutMutation();
+  const { refetch } = useGetOrdersQuery();
+  
+  // Listen for new order events globally
+  useOrderCreated(refetch);
+
+  useEffect(() => {
+    console.log("Updating isLoading:", isLoading);
+    if (logoutLoading) { 
+        console.log("i am called");
+        dispatch(setLoading(logoutLoading));
+    }
+}, [logoutLoading, isLoading]);
+
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -100,32 +118,18 @@ export default function Navigation() {
     setAnchorElUser(null);
   };
 
-    // const { token, setToken, user, setUser } = context;
-
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
-  const handleLogout = async () =>{
-
-
-    // const res = await fetch('/api/logout', {
-    //     method: 'post',
-    //     headers:{
-    //         Authorization: `Bearer ${token}`,
-    //     }
-    // });
-
-    // const data = await res.json();
-    // console.log(data);
-
-    // if(res.ok){
-    //     setUser(null);
-    //     setToken(null);
-    //     localStorage.removeItem("token");
-    //     navigate('/');
-    // }
-    navigate('/login'); 
-}
+  const handleLogout = async () => {
+    try {
+      await logout({}).unwrap(); 
+      navigate('/login'); 
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
+  
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -136,8 +140,12 @@ export default function Navigation() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', position: "relative"}}>
+      {
+          isLoading && <LoadingScreen /> 
+      }
       <CssBaseline />
+  
       <AppBar position="fixed" open={open} sx={{ backgroundColor: '#FB7F3B' }}>
         <Toolbar>
           <IconButton
@@ -337,8 +345,9 @@ export default function Navigation() {
       <Main open={open}>
         <DrawerHeader />
         <Outlet />
+        <ToastContainer/>
       </Main>
-
+          
     </Box>
   );
 }

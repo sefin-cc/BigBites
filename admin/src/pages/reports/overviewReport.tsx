@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Box, Typography, Button, FormHelperText } from '@mui/material';
 import AssessmentRoundedIcon from '@mui/icons-material/AssessmentRounded';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -8,15 +8,10 @@ import dayjs, { Dayjs } from 'dayjs';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { logo } from '../../assets/logo64';
-import orders from "../../data/orders.json";
 import isBetween from 'dayjs/plugin/isBetween';
+import { useGetBranchesQuery } from '../../features/api/branchApi';
+import { useGetOrdersQuery } from '../../features/api/orderApi';
 
-const branches = [
-  { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-  { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-  { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-  { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-];
 
 function OverviewModal() {
   // State to control the opening and closing of the modal
@@ -25,7 +20,18 @@ function OverviewModal() {
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, 'day'));
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
   const [error, setError] = useState<string | null>(null);
+  const { data: branches, isLoading: branchesLoading } = useGetBranchesQuery();
+  const { data: orders, isLoading: ordersLoading } = useGetOrdersQuery();
+  const [isReady, setIsReady] = useState(false);
 
+  useEffect(() => {
+    if (!branchesLoading && !ordersLoading && branches && orders) {
+      setIsReady(true);
+    } else {
+      setIsReady(false);
+    }
+  }, [branchesLoading, ordersLoading, branches, orders]);
+  
   // Function to handle opening the modal
   const handleOpen = () => setOpen(true);
 
@@ -34,6 +40,10 @@ function OverviewModal() {
 
   // Validation function
   const handleGenerate = () => {
+    if (!isReady) return; 
+    if (!orders) return;
+    if (!branches) return;
+
     if (!startDate || !endDate) {
       setError('Both dates are required.');
       return;
@@ -57,51 +67,52 @@ function OverviewModal() {
   };
 
   const generatePDF = (filteredOrders: any[], allBranches: any[]) => {
-    // Create a map for branches with initial values
-    const branches = allBranches.reduce((acc, branch) => {
-      // Initialize each branch with default values
-      acc[branch.branchName] = {
-        completedOrders: 0,
-        grossEarnings: 0,
-        totalDiscounts: 0,
-        totalEarnings: 0,
-      };
-      return acc;
-    }, {});
-  
-    // Group orders by branch and accumulate the totals
-    filteredOrders.forEach(order => {
-      order.branch.forEach((branch: { branchName: string; }) => {
-        const branchName = branch.branchName;
-  
-        // Update the corresponding branch in the accumulator
-        if (branches[branchName]) {
-          branches[branchName].completedOrders += 1;
-          branches[branchName].grossEarnings += order.fees.subTotal;
-          branches[branchName].totalDiscounts += order.fees.discountDeduction;
-          branches[branchName].totalEarnings += order.fees.grandTotal;
-        }
-      });
-    });
-  
-    // Convert branches data into an array of rows for the table
-    const rows = Object.keys(branches).map(branchName => {
-      const branchData = branches[branchName];
-      return [
-        branchName,
-        branchData.completedOrders,
-        `PHP ${branchData.grossEarnings.toFixed(2)}`,
-        `PHP ${branchData.totalDiscounts.toFixed(2)}`,
-        `PHP ${branchData.totalEarnings.toFixed(2)}`
-      ];
-    });
+// Create a map for branches with initial values
+const branches = allBranches.reduce((acc, branch) => {
+  // Initialize each branch with default values
+  acc[branch.branchName] = {
+    completedOrders: 0,
+    grossEarnings: 0,
+    totalDiscounts: 0,
+    totalDeliveryFee: 0,
+    totalEarnings: 0,
+  };
+  return acc;
+}, {} as Record<string, { completedOrders: number; grossEarnings: number; totalDiscounts: number; totalDeliveryFee: number; totalEarnings: number }>);
+
+// Group orders by branch and accumulate the totals
+filteredOrders.forEach(order => {
+  const branchName = order.branch?.branchName;
+  if (branchName && branches[branchName]) {
+    branches[branchName].completedOrders += 1;
+    branches[branchName].grossEarnings += order.fees?.subTotal || 0;
+    branches[branchName].totalDiscounts += order.fees?.discountDeduction || 0;
+    branches[branchName].totalDeliveryFee += order.fees?.deliveryFee || 0;
+    branches[branchName].totalEarnings += order.fees?.grandTotal || 0;
+  }
+});
+
+// Convert branches data into an array of rows for the table
+const rows = Object.keys(branches).map(branchName => {
+  const branchData = branches[branchName];
+  return [
+    branchName,
+    branchData.completedOrders,
+    `PHP ${branchData.grossEarnings.toFixed(2)}`,
+    `PHP ${branchData.totalDiscounts.toFixed(2)}`,
+    `PHP ${branchData.totalDeliveryFee.toFixed(2)}`,
+    `PHP ${branchData.totalEarnings.toFixed(2)}`
+  ];
+});
+
   
     // Calculate grand totals for the bottom row
     const grandTotals = {
       completedOrders: rows.reduce((acc, row) => acc + row[1], 0),
       grossEarnings: rows.reduce((acc, row) => acc + parseFloat(row[2].replace('PHP ', '').replace(',', '')), 0),
       totalDiscounts: rows.reduce((acc, row) => acc + parseFloat(row[3].replace('PHP ', '').replace(',', '')), 0),
-      totalEarnings: rows.reduce((acc, row) => acc + parseFloat(row[4].replace('PHP ', '').replace(',', '')), 0)
+      totalDeliveryFee: rows.reduce((acc, row) => acc + parseFloat(row[4].replace('PHP ', '').replace(',', '')), 0),
+      totalEarnings: rows.reduce((acc, row) => acc + parseFloat(row[5].replace('PHP ', '').replace(',', '')), 0)
     };
   
     // Add Grand Total row
@@ -110,6 +121,7 @@ function OverviewModal() {
       grandTotals.completedOrders,
       `PHP ${grandTotals.grossEarnings.toFixed(2)}`,
       `PHP ${grandTotals.totalDiscounts.toFixed(2)}`,
+      `PHP ${grandTotals.totalDeliveryFee.toFixed(2)}`,
       `PHP ${grandTotals.totalEarnings.toFixed(2)}`
     ]);
   
@@ -150,7 +162,7 @@ function OverviewModal() {
     doc.text(`${startDate?.format('DD-MM-YYYY')} to ${endDate?.format('DD-MM-YYYY')}`, 15, 55);
   
     // Table headers
-    const headers = ['Branch Name', 'Completed Orders', 'Gross Earning', 'Total of Given Discounts', 'Total Earnings'];
+    const headers = ['Branch Name', 'Completed Orders', 'Gross Earning', 'Given Discounts', 'Given Delivery Fees','Total Earnings'];
     autoTable(doc, {
       startY: 60,
       head: [headers],

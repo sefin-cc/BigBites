@@ -13,51 +13,44 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, Checkbox, TextField } from '@mui/material';
-import menu from '../../data/menu.json';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddSubCategoryModal from './addSubcategoryModal';
 import EditSubCategoryModal from './editSubcategoryModal';
+import { useGetMenuQuery } from '../../features/api/menu/menu';
+import ReactLoading from 'react-loading';
+import { Slide, toast, ToastContainer } from 'react-toastify';
+import { useDeleteSubCategoryMutation } from '../../features/api/menu/subCategoryApi';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
 
 // Data Types
 interface Data {
-  id: number;
+  category_id: number;
   category: string;
-  subId: number;
+  sub_id: number;
   label: string;
-  noitems: number;
+  no_items: number;
 }
 
 // Data Row Creation
 function createData(
-  id: number,
+  category_id: number,
   category: string,
-  subId: number,
+  sub_id: number,
   label: string,
-  noitems: number,
+  no_items: number,
 ): Data {
   return {
-    id,
+    category_id,
     category,
-    subId,
+    sub_id,
     label,
-    noitems,
+    no_items,
   };
 }
-
-// Mapping orders to rows
-const rows = menu.flatMap((category) =>
-  category.subCategories.map((subCategories) =>
-    createData(
-      parseInt(category.id, 10),
-      category.category,
-      parseInt(subCategories.subId, 10),
-      subCategories.label,
-      subCategories.items.length
-    )
-  )
-);
 
 // Sorting Functions
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
@@ -98,7 +91,7 @@ interface HeadCell {
 const headCells: readonly HeadCell[] = [
   { id: 'category', numeric: false, disablePadding: true, label: 'Category' },
   { id: 'label', numeric: true, disablePadding: false, label: 'Sub-Category' },
-  { id: 'noitems', numeric: true, disablePadding: false, label: 'No. Items' },
+  { id: 'no_items', numeric: true, disablePadding: false, label: 'No. Items' },
 ];
 
 // Table Header Component
@@ -155,16 +148,18 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface EnhancedTableToolbarProps {
+  menu: any[]| undefined;
   numSelected: number;
   onFilterChange: (event: SelectChangeEvent<string>) => void;
   filterValue: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   selectedSubCategories: Set<string>;  // Keep track of selected sub-categories
   setSelectedSubCategories: React.Dispatch<React.SetStateAction<Set<string>>>; // Allow setting the selected sub-categories
+  handleDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, onFilterChange, filterValue, onSearchChange, selectedSubCategories, setSelectedSubCategories } = props;
+  const { menu, handleDelete, onFilterChange, filterValue, onSearchChange, selectedSubCategories } = props;
 
   // You can add any logic you need to manage or modify selectedSubCategories here if necessary
 
@@ -183,7 +178,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           onChange={onSearchChange}
           placeholder="Search..."
         />
-
+          
         <FormControl>
           <InputLabel id="type-filter-label">Categories</InputLabel>
           <Select
@@ -196,7 +191,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           >
             <MenuItem value="">All</MenuItem>
             {
-              [...new Set(rows.map(item => item.category))].map((category, key) => (
+              [...new Set(menu?.map(item => item.category))].map((category, key) => (
                 <MenuItem key={key} value={category}>
                   {category}
                 </MenuItem>
@@ -205,13 +200,11 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </Select>
         </FormControl>
 
-
-
-        <AddSubCategoryModal />
+        <AddSubCategoryModal menu={menu} />
 
         {selectedSubCategories.size > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
+            <button onClick={handleDelete} className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
               <DeleteIcon sx={{ color: "gray" }} />
             </button>
           </div>
@@ -219,7 +212,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
         {selectedSubCategories.size === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <EditSubCategoryModal />
+            <EditSubCategoryModal  menu={menu} id={selectedSubCategories}/>
           </div>
         ) : null}
       </Box>
@@ -231,12 +224,44 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 export default function SubCategory() {
   const [menuCategory, setMenuCategory] = React.useState<menuCategory>('asc');
   const [sortBy, setSortBy] = React.useState<keyof Data>('category');
-  const [selectedCategories, setSelectedCategories] = React.useState<Set<number>>(new Set()); // Tracks selected categories
   const [selectedSubCategories, setSelectedSubCategories] = React.useState<Set<string>>(new Set()); // Tracks selected subcategories
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [filterType, setFilterType] = React.useState<string>('');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const { data: menu, error, isLoading, refetch } = useGetMenuQuery();
+  const [deleteSubCategory, { isLoading: deleteLoading}] = useDeleteSubCategoryMutation();
+  const [rows, setRows] = React.useState<any[]>([]); 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (menu) {
+      setRows(menu.flatMap((category) =>
+          category.sub_categories.map((subCategories) =>
+            createData(
+              category.id,
+              category.category,
+              subCategories.id, 
+              subCategories.label,
+              subCategories.items.length
+            )
+          )));
+    }
+    if(error){
+        toast.error('Something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Slide,
+        });
+      }
+  }, [menu]);  
+
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
@@ -245,37 +270,18 @@ export default function SubCategory() {
   };
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const visibleRows = filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-    const newSelectedSubCategories = new Set<string>();
-    visibleRows.forEach((row) => {
-      newSelectedSubCategories.add(`${row.id}-${row.subId}`);
-    });
-
     if (event.target.checked) {
+      // Select all currently visible rows
+      const newSelectedSubCategories = new Set<string>(
+        visibleRows.map(row => `${row.category_id}-${row.sub_id}`)
+      );
       setSelectedSubCategories(newSelectedSubCategories);
     } else {
       setSelectedSubCategories(new Set());
     }
   };
+  
 
-  const handleCategorySelect = (event: React.ChangeEvent<HTMLInputElement>, categoryId: number) => {
-    const newSelectedCategories = new Set(selectedCategories);
-    const newSelectedSubCategories = new Set(selectedSubCategories);
-    if (event.target.checked) {
-      newSelectedCategories.add(categoryId);
-      rows
-        .filter((row) => row.id === categoryId)
-        .forEach((row) => newSelectedSubCategories.add(`${row.id}-${row.subId}`));
-    } else {
-      newSelectedCategories.delete(categoryId);
-      rows
-        .filter((row) => row.id === categoryId)
-        .forEach((row) => newSelectedSubCategories.delete(`${row.id}-${row.subId}`));
-    }
-
-    setSelectedCategories(newSelectedCategories);
-    setSelectedSubCategories(newSelectedSubCategories);
-  };
 
   const handleSubCategorySelect = (event: React.ChangeEvent<HTMLInputElement>, subId: string) => {
     const newSelectedSubCategories = new Set(selectedSubCategories);
@@ -322,9 +328,61 @@ export default function SubCategory() {
   );
 
   const isAllSelected =
-    visibleRows.length > 0 && visibleRows.every((row) =>
-      selectedSubCategories.has(`${row.id}-${row.subId}`)
-    );
+  visibleRows.length > 0 && visibleRows.every((row) =>
+    selectedSubCategories.has(`${row.category_id}-${row.sub_id}`)
+  );
+
+  const handleDelete = async () => {
+     
+        if (selectedSubCategories.size === 0) {
+          toast.warning('No Sub Catergory selected for deletion.', {
+            position: "top-right",
+            autoClose: 3000,
+            theme: "light",
+            transition: Slide,
+          });
+          return;
+        }
+      
+        if (!confirm(`Are you sure you want to delete ${selectedSubCategories.size > 1 ? 'these sub categories?' : 'this sub category?'}`)) {
+          return;
+        }
+      
+        try {
+          await Promise.all(
+            Array.from(selectedSubCategories).map((id) => {
+              const subCategoryId = Number(id.split("-")[1]) || 0; // Extract correct ID inside loop
+              return deleteSubCategory(subCategoryId).unwrap();
+            })
+          );
+
+          refetch();
+          
+          toast.success(`${selectedSubCategories.size > 1 ? 'Branches' : 'Branch'} deleted successfully!`, {
+            position: "top-right",
+            autoClose: 5000,
+            theme: "light",
+            transition: Slide,
+          });
+      
+          setSelectedSubCategories(new Set()); // Clear selection after successful deletion
+        } catch (err) {
+          console.error('Failed to delete branch:', err);
+      
+          toast.error('Something went wrong!', {
+            position: "top-right",
+            autoClose: 5000,
+            theme: "light",
+            transition: Slide,
+          });
+        }
+      };
+      
+      
+    useEffect(() => {
+      dispatch(setLoading(deleteLoading));
+    }, [deleteLoading]);
+
 
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
@@ -337,63 +395,71 @@ export default function SubCategory() {
             onSearchChange={handleSearchChange}
             selectedSubCategories={selectedSubCategories}
             setSelectedSubCategories={setSelectedSubCategories}
+            menu={menu}
+            handleDelete={handleDelete}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
-            >
-              <EnhancedTableHead
-                numSelected={selectedSubCategories.size}
-                menuCategory={menuCategory}
-                sortBy={sortBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={filteredRows.length}
-                isAllSelected={isAllSelected}
-              />
-              <TableBody>
-                {visibleRows.map((row, index) => {
-                  const isCategorySelected = selectedCategories.has(row.id);
-                  const isSubCategorySelected = selectedSubCategories.has(`${row.id}-${row.subId}`);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+          <Table
+            aria-labelledby="tableTitle"
+            size="small"
+            sx={{ width: '100%', minHeight: 100 }}
+          >
+            <EnhancedTableHead
+              numSelected={selectedSubCategories.size}
+              menuCategory={menuCategory}
+              sortBy={sortBy}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              rowCount={filteredRows.length}
+              isAllSelected={isAllSelected}
+          />
 
-                  return (
-                    <TableRow
-                      hover
-                      key={`${row.id}-${row.subId}`}
-                    >
-                      <TableCell padding="checkbox">
-                        {row.subId === 0 ? (
-                          // Category checkbox
-                          <Checkbox
-                            checked={isCategorySelected}
-                            onChange={(e) => handleCategorySelect(e, row.id)}
-                          />
-                        ) : (
-                          // Sub-category checkbox
-                          <Checkbox
-                            checked={isSubCategorySelected}
-                            onChange={(e) => handleSubCategorySelect(e, `${row.id}-${row.subId}`)}
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell component="th" id={labelId} scope="row" padding="none">
-                        {row.category}
-                      </TableCell>
-                      <TableCell align="right">{row.label}</TableCell>
-                      <TableCell align="right">{row.noitems}</TableCell>
-                    </TableRow>
-                  );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
+          <TableBody>
+            {isLoading ? (
+               <TableRow>
+                  <TableCell colSpan={7}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                      <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+            ) : visibleRows.length > 0 ? (
+              visibleRows.map((row, index) => {
+                const labelId = `enhanced-table-checkbox-${index}`;
+
+                return (
+                  <TableRow hover key={`${row.subId}`}>
+                    <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedSubCategories.has(`${row.category_id}-${row.sub_id}`)}
+                      onChange={(e) => handleSubCategorySelect(e, `${row.category_id}-${row.sub_id}`)}
+                    />
+
+                    </TableCell>
+                    <TableCell component="th" id={labelId} scope="row" padding="none">
+                      {row.category}
+                    </TableCell>
+                    <TableCell align="right">{row.label}</TableCell>
+                    <TableCell align="right">{row.no_items}</TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} align="center" sx={{ color: "gray", fontStyle: "italic", py: 4 }}>
+                  No Data Available
+                </TableCell>
+              </TableRow>
+            )}
+
+            {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+              <TableRow style={{ height: 33 }}>
+                <TableCell colSpan={4} />
+              </TableRow>
+            )}
+          </TableBody>
+          </Table>
+
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}
@@ -406,7 +472,7 @@ export default function SubCategory() {
           />
         </Paper>
       </Box>
-    
+      <ToastContainer/>
     </div>
   );
 }

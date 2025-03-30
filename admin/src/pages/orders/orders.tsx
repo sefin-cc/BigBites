@@ -5,6 +5,7 @@ import Tab from '@mui/material/Tab';
 import Pending from './pending';
 import Completed from './completed';
 import AdvanceOrders from './advanceOrder';
+import Canceled from './canceled';
 
 export default function Order() {
   const [value, setValue] = React.useState(0);
@@ -25,6 +26,7 @@ export default function Order() {
         <Tab label="Pending Orders" />
         <Tab label="Pending Advanced Orders" />
         <Tab label="Completed Orders" />
+        <Tab label="Canceled Orders" />
       </Tabs>
 
       {/* Content Below Tabs */}
@@ -42,6 +44,11 @@ export default function Order() {
          {value === 2 && (
           <Box>
             <Completed />
+          </Box>
+        )}
+        {value === 3 && (
+          <Box>
+            <Canceled />
           </Box>
         )}
       </Box>

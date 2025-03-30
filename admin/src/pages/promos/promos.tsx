@@ -19,6 +19,13 @@ import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddPromoModal from './addPromos';
 import EditPromoModal from './editPromos';
+import { useGetPromosQuery, useDeletePromoMutation } from '../../features/api/promoApi';
+import ReactLoading from 'react-loading';
+import { Slide, toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
+
 
 // Data Types
 interface Data {
@@ -36,12 +43,7 @@ function createData(id: number, label: string, image: string): Data {
   };
 }
 
-// Mapping orders to rows
-const rows = [
-  createData(1, "Promo 1", ""),
-  createData(2, "Promo 2", ""),
-  createData(3, "Promo 3", ""),
-];
+
 
 // Sorting Functions
 function descendingComparator<T>(a: T, b: T, sortBy: keyof T) {
@@ -135,16 +137,13 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface EnhancedTableToolbarProps {
-  numSelected: number;
-  onFilterChange: (event: SelectChangeEvent<string>) => void;
-  filterValue: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  selectedSubCategories: Set<string>;
-  setSelectedSubCategories: React.Dispatch<React.SetStateAction<Set<string>>>;
+  selected: Set<string>;
+  handleDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { onSearchChange, numSelected } = props;
+  const { onSearchChange, selected, handleDelete} = props;
 
   return (
     <Toolbar sx={{ flex: 1, flexDirection: "column" }}>
@@ -161,16 +160,16 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           placeholder="Search..."
         />
         <AddPromoModal />
-        {numSelected > 0 ? (
+        {selected.size > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
+            <button onClick={handleDelete} className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
               <DeleteIcon sx={{ color: "gray" }} />
             </button>
           </div>
         ) : null}
-        {numSelected === 1 ? (
+        {selected.size === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <EditPromoModal />
+            <EditPromoModal  id={selected}/>
           </div>
         ) : null}
       </Box>
@@ -186,6 +185,33 @@ export default function Promos() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [filterType, setFilterType] = React.useState<string>('');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const { data: promos, error, isLoading } = useGetPromosQuery();
+  const [rows, setRows] = React.useState<any[]>([]); 
+  const [deletePromo, { isLoading: deleteLoading}] = useDeletePromoMutation();
+  const dispatch = useDispatch();
+    
+  React.useEffect(() => {
+    if (promos) {
+      setRows(promos.map(promo => createData(
+        promo.id,
+        promo.label,
+        promo.image,
+      )));
+    }
+    if(error){
+      toast.error('Something went wrong!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
+    }
+  }, [promos]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
@@ -247,23 +273,62 @@ export default function Promos() {
   const isAllSelected =
     visibleRows.length > 0 && visibleRows.every((row) => selected.has(`${row.id}`));
 
+  const handleDelete = async () => {
+    if (selected.size === 0) {
+      toast.warning('No branches selected for deletion.', {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "light",
+        transition: Slide,
+      });
+      return;
+    }
+  
+    if (!confirm(`Are you sure you want to delete ${selected.size > 1 ? 'these branches?' : 'this branch?'}`)) {
+      return;
+    }
+  
+    try {
+      await Promise.all(Array.from(selected).map((id) => deletePromo(Number(id)).unwrap()));
+  
+      toast.success(`${selected.size > 1 ? 'Promos' : 'Promo'} deleted successfully!`, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+  
+      setSelected(new Set()); // Clear selection after successful deletion
+    } catch (err) {
+      console.error('Failed to delete promo:', err);
+  
+      toast.error('Something went wrong!', {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+    }
+  };
+
+      useEffect(() => {
+        dispatch(setLoading(deleteLoading));
+      }, [deleteLoading]);
+
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
       <Box sx={{ width: '100%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
-            onFilterChange={handleFilterChange}
-            filterValue={filterType}
             onSearchChange={handleSearchChange}
-            selectedSubCategories={selected}
-            setSelectedSubCategories={setSelected}
-            numSelected={selected.size}
+            selected={selected}
+            handleDelete={handleDelete}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
+          <Table
               aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
+              size="small"
+              sx={{ width: '100%', minHeight: 100 }} 
             >
               <EnhancedTableHead
                 menuCategory={menuCategory}
@@ -271,9 +336,23 @@ export default function Promos() {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={filteredRows.length}
-                isAllSelected={isAllSelected} numSelected={0}              />
-              <TableBody>
-                {visibleRows.map((row, index) => {
+                isAllSelected={isAllSelected}
+                numSelected={0}
+            />
+
+            <TableBody>
+              {isLoading ? (
+                // Show loading indicator first
+                <TableRow>
+                    <TableCell colSpan={7}>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                        <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+              ) : visibleRows.length > 0 ? (
+                // Show data if available
+                visibleRows.map((row) => {
                   const isSubCategorySelected = selected.has(`${row.id}`);
                   return (
                     <TableRow hover key={`${row.id}`}>
@@ -286,17 +365,36 @@ export default function Promos() {
                       <TableCell component="th" scope="row" padding="normal">
                         {row.label}
                       </TableCell>
-                      <TableCell align="right">{row.image}</TableCell>
+                      <TableCell align="right">
+                        <a href={row.image} target="_blank" >
+                          <img 
+                            src={row.image} 
+                            alt={row.label} 
+                            style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 5 }}
+                          />
+                        </a>
+                      </TableCell>
                     </TableRow>
                   );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
+                })
+              ) : (
+                // Show "No Data Available" only if not loading and empty
+                <TableRow>
+                  <TableCell colSpan={3} align="center" sx={{ color: "gray", fontStyle: "italic", py: 4 }}>
+                    No Data Available
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {/*  Preserve table structure when empty but not loading */}
+              {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+                <TableRow style={{ height: 33 }}>
+                  <TableCell colSpan={3} />
+                </TableRow>
+              )}
+            </TableBody>
             </Table>
+
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}

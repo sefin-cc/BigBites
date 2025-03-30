@@ -27,6 +27,11 @@ class OrderCreated implements ShouldBroadcastNow
         return new Channel('orders'); // Public channel
     }
 
+    public function broadcastAs()
+{
+    return 'OrderCreated';
+}
+
     public function broadcastWith()
     {
         return ['order' => $this->order];

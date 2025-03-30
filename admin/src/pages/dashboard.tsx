@@ -1,107 +1,90 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import dayjs, { Dayjs } from 'dayjs';
-import ordersData from '../data/orders.json';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store';
+import { useGetOrdersQuery, Order} from '../features/api/orderApi';
+import { useEffect, useMemo, useState } from 'react';
+import { setLoading } from '../features/loadingSlice';
 
-// Define the type for an Order
-interface Order {
-    timestamp: string;
-    fees: {
-      grandTotal: number;
-    };
-    status: string; // Add status field to the Order type
-  }
 
 export default function Dashboard() {
   const now: Dayjs = dayjs();
-  const today = now.format('DD/MM/YYYY');
+  const today = now.format('DD-MM-YYYY');
+  const admin = useSelector((state: RootState) => state.auth.admin);
+  const dispatch = useDispatch();
+  const { data: ordersData, isLoading: ordersLoading } = useGetOrdersQuery();
+  const [orders, setOrders] = useState<Order[]>([]);
 
-  // Utility function to get the month and year from a timestamp
-  const getMonthYear = (timestamp: string) => {
-    const date = dayjs(timestamp);
-    return date.format('YYYY-MM'); // Format: "2025-02"
-  };
 
-  // Calculate the total grandTotal and customers count for the last 5 months
+
+  // Get month and year
+  const getMonthYear = (timestamp: string) => dayjs(timestamp).format('YYYY-MM');
+
+  // Get last 5 months' earnings & customer data
   const getMonthlyData = (orders: Order[]) => {
-    const lastFiveMonths: {
-      Earnings: number;
-      name: string;
-      Customers: number;
-    }[] = [];
-  
-    // Get the last 5 months' data
+    const lastFiveMonths: Record<string, { name: string; Earnings: number; Customers: number }> = {};
+
     for (let i = 0; i < 5; i++) {
-      const month = now.subtract(i, 'month').format('YYYY-MM');
-      lastFiveMonths.push({ name: dayjs(month).format('MMM'), Earnings: 0, Customers: 0 });
+      const monthKey = now.subtract(i, 'month').format('YYYY-MM');
+      lastFiveMonths[monthKey] = { name: dayjs(monthKey).format('MMM'), Earnings: 0, Customers: 0 };
     }
-  
-    // Group the completed orders by month and calculate the totals
+
     orders.forEach((order) => {
-      if (order.status === 'completed') { // Only consider completed orders
+      if (order.status === 'completed') {
         const monthYear = getMonthYear(order.timestamp);
-        const index = lastFiveMonths.findIndex((item) => item.name === dayjs(monthYear).format('MMM'));
-  
-        if (index !== -1) {
-          lastFiveMonths[index].Earnings += order.fees.grandTotal;
-          lastFiveMonths[index].Customers += 1;
+        if (lastFiveMonths[monthYear]) {
+          lastFiveMonths[monthYear].Earnings += order.fees.grandTotal;
+          lastFiveMonths[monthYear].Customers += 1;
         }
       }
     });
-  
-    return lastFiveMonths;
+
+    return Object.values(lastFiveMonths);
   };
-  
 
+  // Get total earnings for today
+  const getTotalForToday = (orders: Order[]) => {
+    const todayStart = now.startOf('day');
+    const todayEnd = now.endOf('day');
 
-    // Function to get orders for today and calculate the total grandTotal
-    const getTotalForToday = (orders: Order[]) => {
-        const todayStart = now.startOf('day');
-        const todayEnd = now.endOf('day');
-      
-        const todayOrders = orders.filter((order) => {
-          const orderDate = dayjs(order.timestamp);
-          // Filter orders for today and ensure status is 'completed'
-          return orderDate.isBetween(todayStart, todayEnd, null, '[]') && order.status === 'completed';
-        });
-      
-        // Sum up the grandTotal for today's completed orders
-        const totalToday = todayOrders.reduce((sum, order) => sum + order.fees.grandTotal, 0);
-        return totalToday;
-      };
-      
-    // Function to get count of orders by status (e.g., "pending" or "completed")
-    const getOrderStatusCountForToday = (orders: Order[], status: string) => {
-        const todayStart = now.startOf('day'); // Start of the day (00:00:00)
-        const todayEnd = now.endOf('day'); // End of the day (23:59:59)
-    
-        const todayOrders = orders.filter((order) => {
-          const orderDate = dayjs(order.timestamp);
-          return orderDate.isBetween(todayStart, todayEnd, null, '[]'); // Filter orders for today
-        });
-    
-        return todayOrders.filter((order) => order.status === status).length; // Count by status
-      };
-  // Type the orders data as an array of Order objects
-  const orders: Order[] = ordersData;
+    return orders
+      .filter(order => dayjs(order.timestamp).isBetween(todayStart, todayEnd, null, '[]') && order.status === 'completed')
+      .reduce((sum, order) => sum + order.fees.grandTotal, 0);
+  };
 
-  const data = getMonthlyData(orders);
+  // Get count of orders by status (e.g., "pending" or "completed")
+  const getOrderStatusCountForToday = (orders: Order[], status: string) => {
+    const todayStart = now.startOf('day');
+    const todayEnd = now.endOf('day');
 
-  const totalToday = getTotalForToday(orders);
+    return orders.filter(order =>
+      dayjs(order.timestamp).isBetween(todayStart, todayEnd, null, '[]') && order.status === status
+    ).length;
+  };
 
-  // Get the count of pending and completed orders
-  const pendingOrders = getOrderStatusCountForToday(orders, 'pending');
-  const completedOrders = getOrderStatusCountForToday(orders, 'completed');
+  useEffect(() => {
+    if (ordersData) {
+      setOrders(ordersData as Order[]);
+    }
+  }, [ordersData]);
 
+  // Memoized values to prevent unnecessary recalculations
+  const data = useMemo(() => getMonthlyData(orders), [orders]);
+  const totalToday = useMemo(() => getTotalForToday(orders), [orders]);
+  const pendingOrders = useMemo(() => getOrderStatusCountForToday(orders, 'pending'), [orders]);
+  const completedOrders = useMemo(() => getOrderStatusCountForToday(orders, 'completed'), [orders]);
 
   // Format the grandTotal with ₱ symbol
-  const formatCurrency = (value: number) => {
-    return `₱${value.toFixed(2)}`; // Fix to 2 decimal places and prepend ₱ symbol
-  };
+  const formatCurrency = (value: number) => `₱${value.toFixed(2)}`;
 
+  useEffect(() => {
+    dispatch(setLoading(ordersLoading));
+  }, [ordersLoading]);
+  
   return (
     <div>
       <div className="p-4">
-        <p className="text-3xl" style={{ fontFamily: "Madimi One" }}>Welcome Back User!</p>
+        <p className="text-3xl" style={{ fontFamily: "Madimi One" }}>Welcome Back <p className='text-lg'>{admin?.name}!</p></p>
         <p className="text-sm text-gray-500">Here's what's happening with the store today.</p>
       </div>
 

@@ -4,6 +4,15 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { inputBaseClasses } from '@mui/material/InputBase';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
+import { Slide, toast, ToastContainer } from 'react-toastify';
+import { useAddItemMutation } from '../../features/api/menu/itemApi';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
+import { useGetMenuQuery } from '../../features/api/menu/menu';
+import ReactLoading from 'react-loading';
+import { useAddAddOnToItemMutation } from '../../features/api/menu/addOnApi';
+
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -17,12 +26,12 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-function AddMenuItemsModal({ rows }: { rows: any[] }) {
+function AddMenuItemsModal({menu} : {menu: any[]| undefined;}) {
   // State to control the opening and closing of the modal
   const [open, setOpen] = useState(false);
   // State for form values
-  const [category, setCategory] = useState('BURGERS');
-  const [subcategory, setSubcategory] = useState('');
+  const [category, setCategory] = useState(0);
+  const [subcategory, setSubcategory] = useState(0);
   const [itemLabel, setItemLabel] = useState('');
   const [itemFullLabel, setItemFullLabel] = useState('');
   const [description, setDescription] = useState('');
@@ -31,6 +40,10 @@ function AddMenuItemsModal({ rows }: { rows: any[] }) {
   const [image, setImage] = useState('');
   const [addOns, setAddOns] = useState<{ label: string; price: number }[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { refetch } = useGetMenuQuery(); 
+  const [addMenuItem] = useAddItemMutation();
+  const [addAddOnToItem] = useAddAddOnToItemMutation();
+  const [isLoading, setIsLoading] = useState<boolean>();
 
   const handleAddAddOns = () => {
     setAddOns((prev) => [...prev, { label: "", price: 0 }]);
@@ -48,12 +61,12 @@ function AddMenuItemsModal({ rows }: { rows: any[] }) {
   const handleClose = () => setOpen(false);
 
   // Function to handle category change (typed event as SelectChangeEvent)
-  const handleCategoryChange = (event: SelectChangeEvent) => {
-    setCategory(event.target.value);
-  };
+  const handleCategoryChange = (event: SelectChangeEvent<number>) => {
+    setCategory(Number(event.target.value)); // Convert value to a number
+  }
 
-  const handleSubCategoryChange = (event: SelectChangeEvent) => {
-    setSubcategory(event.target.value);
+  const handleSubCategoryChange = (event: SelectChangeEvent<number>) => {
+    setSubcategory(Number(event.target.value));
   };
 
   // Function to handle text input change dynamically
@@ -79,7 +92,7 @@ function AddMenuItemsModal({ rows }: { rows: any[] }) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate the required fields
     const newErrors: { [key: string]: string } = {};
 
@@ -95,16 +108,73 @@ function AddMenuItemsModal({ rows }: { rows: any[] }) {
 
     // If there are no errors, proceed with form submission
     if (Object.keys(newErrors).length === 0) {
-      // Handle your form submission logic here
-      console.log("Form data submitted successfully!");
-      console.log("Category:", category);
-      console.log("Subcategory:", subcategory);
-      console.log("Item Label:", itemLabel);
-      console.log("Item Full Label:", itemFullLabel);
-      console.log("Price:", price);
-      console.log("Preparation Time:", time);
-      console.log("Description:", description);
-      handleClose();
+        try {
+          setIsLoading(true);
+          const newItem = await addMenuItem({
+            sub_category_id: subcategory,
+            label: itemLabel,
+            full_label: itemFullLabel,
+            description: description,
+            price: price,
+            time: time.toString(),
+            image: "",
+          }).unwrap();
+
+        if (addOns.length > 0) {
+          await Promise.all(
+            addOns.map((addon) =>
+              addAddOnToItem({
+                item_id: newItem.id, // Use the newly created item's ID
+                label: addon.label,
+                price: addon.price,
+              })
+            )
+          );
+        }
+    
+        refetch();
+
+        toast.success('Menu Item added successfully!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Slide,
+        });
+        handleClose(); // Close modal after successful submission
+        
+        // Reset form fields
+        setCategory(0);
+        setSubcategory(0);
+        setItemLabel('');
+        setItemFullLabel('');
+        setDescription('');
+        setPrice(0);
+        setTime(0);
+        setAddOns([]);
+        setErrors({});
+
+      } catch (err) {
+        setIsLoading(false);
+        console.error('Failed to add Menu Item:', err);
+          toast.error('Something went wrong!', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Slide,
+            });
+      }finally{
+        setIsLoading(false);
+      }
     }
   };
 
@@ -171,11 +241,13 @@ function AddMenuItemsModal({ rows }: { rows: any[] }) {
                 label="Category"
                 required
               >
-                <MenuItem value="BURGERS">BURGERS</MenuItem>
-                <MenuItem value="BARKADAS">BARKADAS</MenuItem>
-                <MenuItem value="SIDES">SIDES</MenuItem>
-                <MenuItem value="DRINKS">DRINKS</MenuItem>
-                <MenuItem value="DESSERTS">DESSERTS</MenuItem>
+                {
+                  [...new Map(menu?.map(item => [item.id, item])).values()].map((item, index) => (
+                    <MenuItem key={index} value={item.id}>
+                      {item.category}
+                    </MenuItem>
+                  ))
+                }       
               </Select>
               {errors.category && <Typography color="error" variant="caption">{errors.category}</Typography>}
             </FormControl>
@@ -190,15 +262,16 @@ function AddMenuItemsModal({ rows }: { rows: any[] }) {
                 label="Sub-Category"
                 required
               >
-               {
-                // Filter rows based on selected categoryType and extract unique subLabels
-                [...new Set(rows.filter(item => item.category === category).map(item => item.subLabel))]
-                  .map((subLabel, key) => (
-                    <MenuItem key={key} value={subLabel}>
-                      {subLabel}
-                    </MenuItem>
-                  ))
-              }
+                {
+                  menu
+                    ?.find(cat => cat.id === category) 
+                    ?.sub_categories 
+                    ?.map((subcat:any, key:number) => (
+                      <MenuItem key={key} value={subcat.id}>
+                        {subcat.label}
+                      </MenuItem>
+                    )) || [] 
+                }
               </Select>
               {errors.subcategory && <Typography color="error" variant="caption">{errors.subcategory}</Typography>}
             </FormControl>
@@ -372,13 +445,18 @@ function AddMenuItemsModal({ rows }: { rows: any[] }) {
             <button
               onClick={handleSubmit}
               className="text text-white w-full"
-              style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: "5px 20px" }}
+              style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: "5px 20px",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'}}
+              disabled={isLoading} 
             >
-              SAVE
+              {isLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "ADD ITEM"}
             </button>
           </div>
         </Box>
       </Modal>
+      <ToastContainer/>
     </div>
   );
 }

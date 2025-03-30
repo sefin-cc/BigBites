@@ -19,6 +19,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
+import { useGetOrdersQuery } from '../../features/api/orderApi';
+import ReactLoading from 'react-loading';
+
 
 interface Data {
 
@@ -73,25 +76,6 @@ function createData(
   };
 }
 
-// Mapping orders to rows
-const rows = orders.map((order, index) =>
-  createData(
-    index + 1,
-    order.timestamp,
-    order.costumer || 'Unknown',
-    order.location?.description || order.branch[0].branchName +', '+ order.branch[0].fullAddress,
-    order.costumer || '0978787877',
-    order.fees.discountDeduction,
-    order.fees.deliveryFee,
-    order.fees.subTotal,
-    order.fees.grandTotal,
-    order.type,
-    order.pickUpType || '',
-    order.order,
-    order.status,
-    order.dateTimePickUp
-  )
-);
 
 // Sorting Functions
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -256,7 +240,34 @@ export default function Completed() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [filterType, setFilterType] = React.useState<string>('');
   const [filterOrder, setFilterOrder] = React.useState<string>('');
- const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const [searchTerm, setSearchTerm] = React.useState<string>('');
+  const { data: orders, error, isLoading } = useGetOrdersQuery();
+  const [rows, setRows] = React.useState<any[]>([]); 
+     
+   React.useEffect(() => {
+     if (orders) {
+ 
+       setRows(orders.map((order, index) =>
+         createData(
+           index + 1,
+           order.timestamp,
+           order.user.name,
+           order.location?.description || order.branch.branchName +', '+ order.branch.fullAddress,
+           order.user.email,
+           order.fees.discountDeduction,
+           order.fees.deliveryFee,
+           order.fees.subTotal,
+           order.fees.grandTotal,
+           order.type,
+           order.pick_up_type || '',
+           order.order_items,
+           order.status,
+           order.date_time_pickup
+         )
+       ));
+    
+     }
+   }, [orders]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -355,11 +366,7 @@ export default function Completed() {
           filterOrder={filterOrder}
           />
           <TableContainer sx={{ width: '100%' }}>
-            <Table
-              aria-labelledby="tableTitle"
-              size={'small'}
-              sx={{ width: '100%' }}
-            >
+            <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%' }}>
               <EnhancedTableHead
                 numSelected={selected.length}
                 order={order}
@@ -369,51 +376,58 @@ export default function Completed() {
                 rowCount={filteredRows.length}
               />
               <TableBody>
-                {visibleRows.map((row, index) => {
-                  const isItemSelected = selected.includes(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6}>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                        <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ) : visibleRows.length > 0 ? (
+                  visibleRows.map((row, index) => {
+                    const isItemSelected = selected.includes(row.id);
+                    const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      <TableCell padding="checkbox">
-                      
-                      </TableCell>
-                      <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
+                    return (
+                      <TableRow
+                        hover
+                        onClick={(event) => handleClick(event, row.id)}
+                        role="checkbox"
+                        aria-checked={isItemSelected}
+                        tabIndex={-1}
+                        key={row.id}
+                        selected={isItemSelected}
+                        sx={{ cursor: 'pointer' }}
                       >
-                        {row.datatime}
-                      </TableCell>
-                      <TableCell align="right">{row.name}</TableCell>
-                      <TableCell align="right">{row.address}</TableCell>
-                      <TableCell align="right">{row.phone}</TableCell>
-                      <TableCell align="right">{row.grandTotal}</TableCell>
-                    </TableRow>
-                  );
-                })}
-                {emptyRows > 0 && (
-                  <TableRow
-                    style={{
-                      height: 33,
-                    }}
-                  >
+                        <TableCell padding="checkbox"></TableCell>
+                        <TableCell component="th" id={labelId} scope="row" padding="none">
+                          {row.datatime}
+                        </TableCell>
+                        <TableCell align="right">{row.name}</TableCell>
+                        <TableCell align="right">{row.address}</TableCell>
+                        <TableCell align="right">{row.phone}</TableCell>
+                        <TableCell align="right">{row.grandTotal}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ color: 'gray', fontStyle: 'italic', py: 4 }}>
+                      No Data Available
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+                  <TableRow style={{ height: 33 }}>
                     <TableCell colSpan={6} />
                   </TableRow>
                 )}
               </TableBody>
             </Table>
           </TableContainer>
+
           <TablePagination
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
             component="div"
@@ -491,7 +505,7 @@ export default function Completed() {
                   <div className=' rounded-2xl mt-1 border-4 ' style={{borderColor:"#FB7F3B"}}>
                   <div className='pr-4 pl-4 pt-2 rounded-2xl' style={{backgroundColor: "#FFEEE5"}}>
                       {
-                        selectedRow?.order.map((item, index) => (
+                        selectedRow?.order.map((item: { label: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; price: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; addOns: any[]; }, index: React.Key | null | undefined) => (
                           <div key={index}>
                             <div className="flex justify-between text-end ">
                               <p className="font-bold w-full">{item.label}</p>

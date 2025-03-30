@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Modal, Box, Button, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, styled } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { useAddPromoMutation } from '../../features/api/promoApi';
+import ReactLoading from 'react-loading';
+import { Slide, ToastContainer, toast } from 'react-toastify';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -16,10 +19,10 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 function AddPromoModal() {
-  // State to control the opening and closing of the modal
   const [open, setOpen] = useState(false);
-  // State for form values
   const [label, setLabel] = useState('');
+  const [addPromo, {isLoading}] = useAddPromoMutation();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Function to handle opening the modal
   const handleOpen = () => setOpen(true);
@@ -28,10 +31,60 @@ function AddPromoModal() {
   const handleClose = () => setOpen(false);
 
   // Function to handle category change (typed event as SelectChangeEvent)
-  const handleLabelChange = (event: SelectChangeEvent) => {
+  const handleLabelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLabel(event.target.value);
   };
 
+
+
+  const handleSubmit = async () => {
+    const newErrors: { [key: string]: string } = {};
+    
+    if (!label) newErrors.label = 'Promo name is required';
+    // if (!province) newErrors.province = 'Province is required';
+   
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      try {
+        await addPromo({
+          label: label,
+          image: "https://phmenu.net/wp-content/uploads/2024/01/promo-1024x683.webp"
+        }).unwrap(); // Ensure errors are handled correctly
+
+        toast.success('Promo added successfully!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Slide,
+        });
+        handleClose(); // Close modal after successful submission
+        
+        // Reset form fields
+        setLabel('');
+        setErrors({});
+      } catch (err) {
+        console.error('Failed to add promo:', err);
+         toast.error('Something went wrong!', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Slide,
+            });
+      }
+    }
+  };
 
 
   return (
@@ -69,14 +122,20 @@ function AddPromoModal() {
             ADD PROMO
           </Typography>
 
-          <TextField
-            label="Promos Label"
-            value={label}
-            onChange={() =>handleLabelChange}
-            fullWidth
-            sx={{ mt: 2 }}
-            size="small"
-          />
+          <Box>
+            <TextField
+              label="Promos Label"
+              value={label}
+              onChange={handleLabelChange}
+              fullWidth
+              sx={{ mt: 2 }}
+              size="small"
+              required
+              error={!!errors.label}
+            />
+            {errors.label && <Typography color="error" variant="caption">{errors.label}</Typography>}
+          </Box>
+          
 
         <Button
             component="label"
@@ -103,15 +162,16 @@ function AddPromoModal() {
             </button>
 
             <button
-            onClick={() => {
-                // Handle your form submission logic here
-                console.log("LAbel:", label);
-                handleClose();
-            }}
-                className="text text-white w-full"
-                style={{ backgroundColor: "#2C2C2C", borderRadius: "4px",  padding: "5px 20px"}}
+              onClick={handleSubmit}
+              className="text text-white w-full"
+              style={{ backgroundColor: "#2C2C2C", borderRadius: "4px",  padding: "5px 20px",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              disabled={isLoading} 
             >
-                SAVE
+              {isLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "ADD PROMO"}
             </button>
         </div>
             
@@ -119,6 +179,7 @@ function AddPromoModal() {
           
         </Box>
       </Modal>
+      <ToastContainer/>
     </div>
   );
 }

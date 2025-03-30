@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Button, styled, Checkbox } from '@mui/material';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
+import { useGetAdminByIdQuery, useUpdateAdminMutation } from '../../features/api/adminUsersApi';
+import ReactLoading from 'react-loading';
+import { Slide, ToastContainer, toast } from 'react-toastify';
 
 
 
-
-function EditUserModal({ branches }: { branches: any[] }) {
+function EditUserModal({ branches, id }: { branches: any[], id: Set<string> }) {
   // State to control the opening and closing of the modal
   const [open, setOpen] = useState(false);
   // State for form values
@@ -16,7 +18,9 @@ function EditUserModal({ branches }: { branches: any[] }) {
   const [branch, setBranch] = useState('');
   const [role, setRole] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
- 
+  const promoId = Number(id.values().next().value); 
+  const { data: user, isLoading: userLoading } = useGetAdminByIdQuery(promoId);
+  const [updateUser, { isLoading }] = useUpdateAdminMutation();
 
 
   // Function to handle opening the modal
@@ -30,10 +34,9 @@ function EditUserModal({ branches }: { branches: any[] }) {
     setBranch(event.target.value);
   };
 
-  const handleRoleChange = (event: SelectChangeEvent) => {
-    setRole(event.target.value);
+  const handleRoleChange = (event: SelectChangeEvent<string>) => {
+    setRole(event.target.value as string);
   };
-
 
 
   // Function to handle text input change dynamically
@@ -56,8 +59,15 @@ function EditUserModal({ branches }: { branches: any[] }) {
         break;
     }
   };
+  
+  const roleMapping: { [key: string]: number } = {
+    Administrator: 1,
+    Manager: 2,
+    Staff: 3,
+  };
 
-  const handleSubmit = () => {
+
+  const handleSubmit = async () => {
     // Validate the required fields
     const newErrors: { [key: string]: string } = {};
 
@@ -83,20 +93,75 @@ function EditUserModal({ branches }: { branches: any[] }) {
    
 
     setErrors(newErrors);
-
+    const roleIds = roleMapping[role]; 
     // If there are no errors, proceed with form submission
     if (Object.keys(newErrors).length === 0) {
-      // Handle your form submission logic here
-      console.log("Form data submitted successfully!");
-      console.log("Name:", name);
-      console.log("Email:", email);
-      console.log("Phone:", phone);
-      console.log("Address:", address);
-      console.log("Branch:", branch);
-      console.log("Role:", role);
-      handleClose();
+     try {
+        // Make API request to register a new admin
+        await updateUser({
+          id: promoId,
+          data:{
+            name,
+            email,
+            phone,
+            address,
+            branch,
+            role: roleIds 
+          },
+         
+        }).unwrap();
+    
+        // Show success toast notification
+        toast.success("Admin updated successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+          transition: Slide,
+        });
+    
+        handleClose(); // Close modal after success
+    
+        // Reset form fields
+        setName("");
+        setEmail("");
+        setPhone("");
+        setAddress("");
+        setBranch("");
+        setRole("");
+    
+        setErrors({}); // Clear validation errors
+      } catch (error) {
+        console.error("Failed to update admin:", error);
+    
+        const errorMessage =
+          (error as any)?.data?.message ||
+          (error as any)?.error ||
+          "Something went wrong!";
+          
+        toast.error(errorMessage, {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Slide,
+        });
+      }
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      setName(user?.name);
+      setEmail(user?.email);
+      setPhone(user?.phone);
+      setAddress(user?.address);
+      setBranch(user?.branch);
+      setRole(user?.roles[0].name);
+    }
+  }, [user]);
 
   return (
     <div>
@@ -235,10 +300,10 @@ function EditUserModal({ branches }: { branches: any[] }) {
             </FormControl>
 
             {/* Dropdown for Sub-Category */}
-            <FormControl fullWidth size="small" sx={{ mt: 2 }} error={!!errors.subcategory}>
-              <InputLabel id="city-select-label">Role</InputLabel>
+            <FormControl fullWidth size="small" sx={{ mt: 2 }} error={!!errors.role}>
+              <InputLabel id="role-select-label">Role</InputLabel>
               <Select
-                labelId="city-select-label"
+                labelId="role-select-label"
                 value={role}
                 onChange={handleRoleChange}
                 label="Role"
@@ -246,14 +311,15 @@ function EditUserModal({ branches }: { branches: any[] }) {
                 MenuProps={{
                   PaperProps: {
                     style: {
-                        maxHeight: 100, 
-                        overflowY: 'auto', 
-                    }
-                  }
+                      maxHeight: 100,
+                      overflowY: 'auto',
+                    },
+                  },
                 }}
               >
-                <MenuItem value="Admin">Admin</MenuItem>
-                <MenuItem value="Employee">Employee</MenuItem>
+                <MenuItem value="Administrator">Administrator</MenuItem>
+                <MenuItem value="Manager">Manager</MenuItem>
+                <MenuItem value="Staff">Staff</MenuItem>
               </Select>
               {errors.role && <Typography color="error" variant="caption">{errors.role}</Typography>}
             </FormControl>
@@ -278,13 +344,19 @@ function EditUserModal({ branches }: { branches: any[] }) {
             <button
               onClick={handleSubmit}
               className="text text-white w-full"
-              style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: "5px 20px" }}
+              style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: "5px 20px",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+                }}
+              disabled={isLoading} 
             >
-              SAVE
+              {isLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "UPDATE USER"}
             </button>
           </div>
         </Box>
       </Modal>
+      <ToastContainer />
     </div>
   );
 }

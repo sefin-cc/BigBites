@@ -43,7 +43,7 @@ class ItemController extends Controller
 
     public function show($id)
     {
-        $item = Item::all($id);
+        $item =  Item::with('addOns')->find($id); 
 
         if (!$item) {
             return response()->json(['error' => 'Item not found'], 404);
@@ -61,17 +61,32 @@ class ItemController extends Controller
         }
 
         $validated = $request->validate([
+            'sub_category_id' => 'required|exists:sub_categories,id',
             'label' => 'required|string|max:255',
             'full_label' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric',
-            'time' => 'required|string',
+            'price' => 'required|numeric|min:0', 
+            'time' => 'required|string|max:50', 
             'image' => 'nullable|string',
+
+            'add_ons' => 'nullable|array', 
+            'add_ons.*.label' => 'required|string|max:255', 
+            'add_ons.*.price' => 'required|numeric|min:0', 
         ]);
 
         $item->update($validated);
 
-        return response()->json($item);
+        // Update or Create Add-ons
+        if ($request->has('add_ons')) {
+            foreach ($request->add_ons as $addon) {
+                $item->addOns()->create([
+                    'label' => $addon['label'],
+                    'price' => $addon['price']
+                ]);
+            }
+        }
+
+        return  response()->json($item->load('addOns'));
     }
 
     public function destroy($id)
