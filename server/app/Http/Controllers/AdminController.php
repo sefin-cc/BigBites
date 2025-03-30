@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controller;
+use Spatie\Permission\Models\Role;
 
 class AdminController extends Controller
 {
@@ -22,6 +23,7 @@ class AdminController extends Controller
     public function register(Request $request)
     {
         try {
+           
             // Validate the input fields
             $fields = $request->validate([
                 'name' => 'required|max:255',
@@ -31,6 +33,19 @@ class AdminController extends Controller
                 'branch' => 'required',
                 'role' => 'required',
             ]);
+
+            $role = Role::findById($fields['role'], 'admin');  // If role is an ID
+
+            // Prevent users from assigning roles higher than their own
+            if (!Auth::user()->hasRole('Administrator')) {
+                // Get the role of the authenticated user
+                $currentUserRole = Auth::user()->roles()->get()->sortByDesc('id')->first();
+    
+                if ($currentUserRole->id > $role->id) {
+                    return abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
+                }
+            
+            }
 
             // Create a new admin in the database
             $admin = Admin::create([
@@ -42,7 +57,7 @@ class AdminController extends Controller
                 'password' => bcrypt("password"),
             ]);
 
-
+           
             $admin->assignRole($fields['role']);
 
             // Return the created admin and token as a JSON response
@@ -147,6 +162,16 @@ public function login(Request $request)
         // Find the admin by ID
         $admin = Admin::find($id);
 
+        if ($admin->id == Auth::user()->id)
+        {
+            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
+        }
+
+        if ($admin->hasRole('Administrator') &&  !Auth::user()->hasRole('Administrator'))
+        {
+            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
+        }
+
         // If the admin doesn't exist, return an error
         if (!$admin) {
             return response()->json(['error' => 'Admin not found'], 404);
@@ -163,7 +188,36 @@ public function login(Request $request)
         ]);
 
         // Update the admin's information
-        $admin->update($request->all());
+        $admin->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'branch' => $request->branch,
+        ]);
+
+
+        $role = Role::findById($request->role, 'admin');  // If role is an ID
+
+        // Prevent users from assigning roles higher than their own
+        if (!Auth::user()->hasRole('Administrator')) {
+            // Get the role of the authenticated user
+            $currentUserRole = Auth::user()->roles()->get()->sortByDesc('id')->first();
+
+            if ($currentUserRole->id > $role->id) {
+                abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
+            }
+        
+        }
+
+    
+        if ($role) {
+            $admin->syncRoles([$role->name]); // Replaces all roles
+        } else {
+            return response()->json(['error' => 'Role not found'], 404);
+        }
+
+
 
         // Return the updated admin as a JSON response
         return response()->json($admin);
@@ -172,6 +226,7 @@ public function login(Request $request)
     // Delete a specific admin
     public function destroy($id)
     {
+      
         // Find the admin by ID
         $admin = Admin::find($id);
 
@@ -179,8 +234,13 @@ public function login(Request $request)
         if (!$admin) {
             return response()->json(['error' => 'Admin not found'], 404);
         }
-        // Abort if user is Administrator or User ID belongs to Auth User
-        if ($admin->hasRole('Administrator') || $admin->id == Auth::user()->id)
+
+        if ($admin->id == Auth::user()->id)
+        {
+            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
+        }
+
+        if ($admin->hasRole('Administrator') &&  !Auth::user()->hasRole('Administrator'))
         {
             abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
         }

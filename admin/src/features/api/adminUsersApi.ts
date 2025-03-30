@@ -50,7 +50,7 @@ export const adminUserApi = createApi({
     }),
 
     // Register a new admin
-    registerAdmin: builder.mutation<Admin, { name: string; email: string; password: string }>({
+    registerAdmin: builder.mutation<Admin, { name: string; email: string; phone: string; address: string; branch: string; role: number }>({
       query: (adminData) => ({
         url: '/admin/register',
         method: 'POST',
@@ -60,7 +60,7 @@ export const adminUserApi = createApi({
     }),
 
     // Update an existing admin
-    updateAdmin: builder.mutation<Admin, { id: number; data: Partial<Admin> }>({
+    updateAdmin: builder.mutation<Admin, { id: number; data:{ name: string; email: string; phone: string; address: string; branch: string; role: number }}>({
       query: ({ id, data }) => ({
         url: `/admin/update/${id}`,
         method: 'PUT',

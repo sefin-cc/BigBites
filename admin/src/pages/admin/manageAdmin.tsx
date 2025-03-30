@@ -15,9 +15,13 @@ import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, Checkbox,
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddUserModal from './addUserModal';
 import EditUserModal from './editUserModal';
-import { useGetAdminsQuery } from '../../features/api/adminUsersApi';
+import { useGetAdminsQuery, useDeleteAdminMutation } from '../../features/api/adminUsersApi';
 import { useGetBranchesQuery } from '../../features/api/branchApi';
 import ReactLoading from 'react-loading';
+import { Slide, ToastContainer, toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/loadingSlice';
 
 // Data Types
 interface Data {
@@ -174,13 +178,14 @@ interface EnhancedTableToolbarProps {
   handleBranchChange:  (event: SelectChangeEvent<string>) => void;
   role: string;
   handleRoleChange:  (event: SelectChangeEvent<string>) => void;
-  numSelected: number;
+  selected: Set<string>;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   branchesList: Branch[];
+  handleDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { branchesList, onSearchChange, numSelected, role, handleRoleChange, branch, handleBranchChange } = props;
+  const {handleDelete, branchesList, onSearchChange, selected, role, handleRoleChange, branch, handleBranchChange } = props;
 
 
   return (
@@ -255,16 +260,16 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       <AddUserModal branches={branchesList} />
 
         {/* <AddPromoModal /> */}
-        {numSelected > 0 ? (
+        {selected.size > 0 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <button className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
+            <button onClick={handleDelete} className="bg-white hover:bg-gray-200" style={{ padding: 10, borderRadius: "4px" }}>
               <DeleteIcon sx={{ color: "gray" }} />
             </button>
           </div>
         ) : null}
-        {numSelected === 1 ? (
+        {selected.size === 1 ? (
           <div style={{ display: "flex", gap: 5 }}>
-            <EditUserModal  branches={branchesList} />
+            <EditUserModal  branches={branchesList} id={selected} />
           </div>
         ) : null}
       </Box>
@@ -284,20 +289,34 @@ export default function ManageAdmin() {
   const { data: branchesList } = useGetBranchesQuery();
   const { data: users, error, isLoading } = useGetAdminsQuery();
   const [rows, setRows] = React.useState<any[]>([]); 
+  const [deleteUser, { isLoading: deleteLoading}] = useDeleteAdminMutation();
+  const dispatch = useDispatch();
   
-  React.useEffect(() => {
- if (users) {
-        setRows(users.map(user => createData(
-            user.id,
-            user.name,
-            user.email,
-            user.phone,
-            user.address,
-            user.branch,
-            user.roles.length > 0 ? user.roles[0].name : 'No Role' // Handling multiple roles
-        )));
+  useEffect(() => {
+  if (users) {
+    setRows(users.map(user => createData(
+        user.id,
+        user.name,
+        user.email,
+        user.phone,
+        user.address,
+        user.branch,
+        user.roles.length > 0 ? user.roles[0].name : 'No Role'
+    )));
+      }
+  if(error){
+      toast.error('Something went wrong!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
     }
-
   }, [users]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
@@ -372,6 +391,54 @@ export default function ManageAdmin() {
   const isAllSelected =
     visibleRows.length > 0 && visibleRows.every((row) => selected.has(`${row.id}`));
 
+  const handleDelete = async () => {
+    if (selected.size === 0) {
+      toast.warning('No users selected for deletion.', {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "light",
+        transition: Slide,
+      });
+      return;
+    }
+  
+    if (!confirm(`Are you sure you want to delete ${selected.size > 1 ? 'these users?' : 'this user?'}`)) {
+      return;
+    }
+  
+    try {
+      await Promise.all(Array.from(selected).map((id) => deleteUser(Number(id)).unwrap()));
+  
+      toast.success(`${selected.size > 1 ? 'Users' : 'User'} deleted successfully!`, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+  
+      setSelected(new Set()); // Clear selection after successful deletion
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+  
+      const errorMessage =
+        (err as any)?.data?.message ||
+        (err as any)?.error ||
+        "Something went wrong!";
+        
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        theme: "light",
+        transition: Slide,
+      });
+    }
+  };
+  
+  
+  useEffect(() => {
+    dispatch(setLoading(deleteLoading));
+  }, [deleteLoading]);
+
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
       <Box sx={{ width: '100%' }}>
@@ -383,7 +450,8 @@ export default function ManageAdmin() {
             role={role}  
             handleRoleChange={handleRoleChange}
             onSearchChange={handleSearchChange}
-            numSelected={selected.size}
+            selected={selected}
+            handleDelete={handleDelete}
           />
           <TableContainer sx={{ width: '100%' }}>
           <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%', minHeight: 100 }}>
@@ -453,6 +521,7 @@ export default function ManageAdmin() {
           />
         </Paper>
       </Box>
+      <ToastContainer/>
     </div>
   );
 }
