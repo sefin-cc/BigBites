@@ -129,6 +129,15 @@ export const authApi = createApi({
       invalidatesTags: ['User'], 
     }),
     
+    updatePassword: builder.mutation<Admin, { id: number; data: { old_password: string; new_password: string; new_password_confirmation: string } }>(
+      {
+        query: ({ id, data }) => ({
+          url: `/admin/update_password/${id}`, 
+          method: 'PUT',
+          body: data,
+        }),
+        invalidatesTags: ['User'], 
+      }),
 
   }),
 });
@@ -138,5 +147,6 @@ export const {
   useLoginMutation, 
   useLogoutMutation, 
   useGetLoggedInAdminQuery,
-  useUpdateAccountMutation 
+  useUpdateAccountMutation,
+  useUpdatePasswordMutation 
 } = authApi;

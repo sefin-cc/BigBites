@@ -60,8 +60,11 @@ export default function UserSettings() {
 
 
             <div className='border-b border-gray-300 mt-4  mb-4'></div>
+            {
+                user &&
+                <ChangePasswordModal id={user.id} />
+            }
 
-            <ChangePasswordModal />
         </div>
     );
 }

@@ -2,41 +2,51 @@ import React, { useState } from 'react';
 import { Modal, Box, Button, Typography, TextField, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useUpdatePasswordMutation  } from '../../features/auth/authApi';
+import { Slide, toast, ToastContainer } from 'react-toastify';
+import ReactLoading from 'react-loading';
 
-function ChangePasswordModal() {
-  // State to control the opening and closing of the modal
+
+function ChangePasswordModal({id}: {id: number}) {
+  // Modal open state
   const [open, setOpen] = useState(false);
 
   // State for form values
-  const [email, setEmail] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+
+  // Show password toggle states
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [updateUserPassword, { isLoading }] = useUpdatePasswordMutation();
+
+  // Error messages
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // Password visibility toggle functions
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  // Toggle functions
+  const toggleOldPasswordVisibility = () => setShowOldPassword((prev) => !prev);
+  const toggleNewPasswordVisibility = () => setShowNewPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
+
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
 
-  // Function to handle opening the modal
+  // Open and close modal functions
   const handleOpen = () => setOpen(true);
-
-  // Function to handle closing the modal
   const handleClose = () => setOpen(false);
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors: { [key: string]: string } = {};
 
-    // Validate email format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!email) newErrors.email = 'Email is required';
-    else if (!emailRegex.test(email)) newErrors.email = 'Please enter a valid email address';
+    if (!oldPassword) newErrors.oldPassword = 'Old password is required';
 
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'New password is required';
     } else if (password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
     } else if (!/[A-Z]/.test(password)) {
@@ -47,19 +57,64 @@ function ChangePasswordModal() {
       newErrors.password = 'Password must contain at least one number';
     }
 
-
-
-    if (!confirmPassword) newErrors.confirmPassword = 'Confirm password is required';
-    if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Confirm password is required';
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
 
     setErrors(newErrors);
 
-    // If no errors, proceed with form submission logic
     if (Object.keys(newErrors).length === 0) {
-      console.log('Form submitted successfully');
-      console.log('Email:', email);
-      console.log('Password:', password);
-      handleClose();
+     
+       try {
+          // Make API request to register a new admin
+          await updateUserPassword({
+            id: id,
+            data:{
+              old_password: oldPassword,
+              new_password: password,
+              new_password_confirmation: confirmPassword
+            },
+            
+          }).unwrap();
+      
+          // Show success toast notification
+          toast.success("Updated password successfully!", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Slide,
+          });
+      
+          handleClose(); // Close modal after success
+      
+          // Reset form fields
+          setOldPassword("");
+          setPassword("");
+          setConfirmPassword("");
+
+          setErrors({}); // Clear validation errors
+        } catch (error) {
+          console.error("Failed to update password:", error);
+
+          // Extract error response properly
+          const backendError = (error as any)?.data || (error as any);
+        
+          // Check if "error" key exists in response
+          const errorMessage = backendError?.error || "Something went wrong!";
+        
+          toast.error(errorMessage, {
+            position: "top-right",
+            autoClose: 5000,
+            theme: "light",
+            transition: Slide,
+          });
+        }
     }
   };
 
@@ -97,48 +152,73 @@ function ChangePasswordModal() {
             CHANGE YOUR PASSWORD
           </Typography>
 
-          <TextField
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            fullWidth
-            required
-            error={!!errors.email}
-            helperText={errors.email}
-          />
-
-          <FormControl sx={{ mt: 2, width: '100%' }} variant="outlined" required error={!!errors.password}>
-            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+        {/* Old Password Input */}
+        <FormControl sx={{ mt: 2, width: '100%' }} variant="outlined" error={!!errors.oldPassword}>
+            <InputLabel htmlFor="old-password">Old Password</InputLabel>
             <OutlinedInput
-              id="outlined-adornment-password"
-              type={showPassword ? 'text' : 'password'}
+              id="old-password"
+              type={showOldPassword ? 'text' : 'password'}
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={toggleOldPasswordVisibility}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showOldPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label="Old Password"
+            />
+            {errors.oldPassword && <Typography color="error" variant="caption">{errors.oldPassword}</Typography>}
+          </FormControl>
+
+          {/* New Password Input */}
+          <FormControl sx={{ mt: 2, width: '100%' }} variant="outlined" error={!!errors.password}>
+            <InputLabel htmlFor="new-password">New Password</InputLabel>
+            <OutlinedInput
+              id="new-password"
+              type={showNewPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
-                    aria-label={showPassword ? 'hide the password' : 'display the password'}
-                    onClick={handleClickShowPassword}
+                    onClick={toggleNewPasswordVisibility}
                     onMouseDown={handleMouseDownPassword}
-                    onMouseUp={handleMouseDownPassword}
                     edge="end"
                   >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                    {showNewPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               }
-              label="Password"
+              label="New Password"
             />
             {errors.password && <Typography color="error" variant="caption">{errors.password}</Typography>}
           </FormControl>
 
-          <FormControl sx={{ mt: 2, width: '100%' }} variant="outlined" required error={!!errors.confirmPassword}>
-            <InputLabel htmlFor="outlined-adornment-confirm-password">Confirm Password</InputLabel>
+          {/* Confirm Password Input */}
+          <FormControl sx={{ mt: 2, width: '100%' }} variant="outlined" error={!!errors.confirmPassword}>
+            <InputLabel htmlFor="confirm-password">Confirm Password</InputLabel>
             <OutlinedInput
-              id="outlined-adornment-confirm-password"
-              type="password"
+              id="confirm-password"
+              type={showConfirmPassword ? 'text' : 'password'}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={toggleConfirmPasswordVisibility}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
               label="Confirm Password"
             />
             {errors.confirmPassword && <Typography color="error" variant="caption">{errors.confirmPassword}</Typography>}
@@ -153,16 +233,22 @@ function ChangePasswordModal() {
               CLOSE
             </button>
 
-            <button
+             <button
               onClick={handleSubmit}
               className="text text-white w-full"
-              style={{ backgroundColor: '#2C2C2C', borderRadius: '4px', padding: '5px 20px' }}
-            >
-              SAVE
-            </button>
+              style={{ backgroundColor: "#2C2C2C", borderRadius: "4px", padding: "5px 20px",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                  }}
+              disabled={isLoading} 
+              >
+              {isLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "UPDATE"}
+              </button>
           </div>
         </Box>
       </Modal>
+      <ToastContainer />
     </div>
   );
 }

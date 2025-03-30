@@ -254,7 +254,39 @@ public function login(Request $request)
         return response()->json($admin);
     }
     
-
+    public function updatePassword(Request $request, $id)
+    {
+        // Find the admin by ID
+        $admin = Admin::find($id);
+    
+        // Ensure the admin exists
+        if (!$admin) {
+            return response()->json(['error' => 'Admin not found'], 404);
+        }
+    
+        // Check if the authenticated user is updating their own password
+        if ($admin->id !== Auth::user()->id) {
+            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
+        }
+    
+        // Validate the input fields
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => 'required|min:8|confirmed', // Requires confirmation field
+        ]);
+    
+        // Verify the old password
+        if (!Hash::check($request->old_password, $admin->password)) {
+            return response()->json(['error' => 'Old password is incorrect'], 400);
+        }
+    
+        // Update the password
+        $admin->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+    
+        return response()->json(['message' => 'Password updated successfully']);
+    }
 
     // Delete a specific admin
     public function destroy($id)
