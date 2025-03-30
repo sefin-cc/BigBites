@@ -12,22 +12,26 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import orders from "../../data/orders.json";
+import DeleteIcon from '@mui/icons-material/Delete';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { TextField } from '@mui/material';
-import { useGetOrdersQuery, useUpdateOrderMutation } from '../../features/api/orderApi';
+import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
+import { useGetOrdersQuery } from '../../features/api/orderApi';
 import ReactLoading from 'react-loading';
-import { Slide, toast, ToastContainer } from 'react-toastify';
-import { useEffect } from 'react';
 
 
-// Data Types
 interface Data {
+
   id: number;
   datatime: string;
   name: string;
   address: string;
   phone: string;
   discountDeduction: number;
+  deliveryFee: number;
   subTotal: number;
   grandTotal: number;
   type: string;
@@ -45,6 +49,7 @@ function createData(
   address: string,
   phone: string,
   discountDeduction: number,
+  deliveryFee: number,
   subTotal: number,
   grandTotal: number,
   type: string,
@@ -60,6 +65,7 @@ function createData(
     address,
     phone,
     discountDeduction,
+    deliveryFee,
     subTotal,
     grandTotal,
     type,
@@ -108,24 +114,25 @@ interface HeadCell {
 
 // Head Cells
 const headCells: readonly HeadCell[] = [
-    { id: 'dateTimePickUp', numeric: false, disablePadding: true, label: 'Expected Date and Time' },
-    { id: 'datatime', numeric: false, disablePadding: true, label: 'Timestamp' },
-    { id: 'name', numeric: true, disablePadding: false, label: 'Name' },
-    { id: 'address', numeric: true, disablePadding: false, label: 'Address' },
-    { id: 'phone', numeric: true, disablePadding: false, label: 'Phone' },
-    { id: 'grandTotal', numeric: true, disablePadding: false, label: 'Total Price' },
+  { id: 'datatime', numeric: false, disablePadding: true, label: 'Date and Time' },
+  { id: 'name', numeric: true, disablePadding: false, label: 'Name' },
+  { id: 'address', numeric: true, disablePadding: false, label: 'Address' },
+  { id: 'phone', numeric: true, disablePadding: false, label: 'Phone' },
+  { id: 'grandTotal', numeric: true, disablePadding: false, label: 'Total Price' },
 ];
 
 // Table Header Component
 interface EnhancedTableProps {
+  numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
+  rowCount: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const {  order, orderBy, onRequestSort } = props;
+  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
   const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -160,79 +167,107 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   );
 }
 
+// Toolbar Component with Filter
 interface EnhancedTableToolbarProps {
+  numSelected: number;
+  onFilterChange: (event: SelectChangeEvent<string>) => void;
+  filterValue: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFilterOrderChange: (event: SelectChangeEvent<string>) => void;
+  filterOrder: string;
 }
-
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-    const { onSearchChange } = props;
-    return (
-        <Toolbar>
-            <Typography sx={{ marginRight:2, fontFamily:"Madimi One"}} variant="h6" component="div">
-                PENDING ADVANCE ORDERS
-            </Typography>
-            <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
-                <TextField
-                    label="Search"
-                    variant="outlined"
-                    size="small"
-                    sx={{ flex: 1 }}
-                    onChange={onSearchChange}
-                    placeholder="Search..."
-                />
-            </Box>
-        </Toolbar>
-    );
+  const { onSearchChange, onFilterChange, filterValue, filterOrder,handleFilterOrderChange} = props;
+
+  return (
+    <Toolbar>
+      <Typography sx={{ marginRight:2, fontFamily:"Madimi One"}} variant="h6" component="div">
+        CANCELED ORDERS
+      </Typography>
+
+       <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
+          <TextField
+              label="Search"
+              variant="outlined"
+              size="small"
+              sx={{ flex: 1 }}
+              onChange={onSearchChange}
+              placeholder="Search..."
+          />
+          <FormControl>
+            <InputLabel id="type-filter-label">Type</InputLabel>
+            <Select
+              labelId="type-filter-label"
+              value={filterValue}
+              onChange={onFilterChange}
+              label="Type"
+              size="small"
+              sx={{ width: 110 }}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="PickUp">PickUp</MenuItem>
+              <MenuItem value="Delivery">Delivery</MenuItem>
+            </Select>
+        </FormControl>
+        <FormControl>
+            <InputLabel id="type-filter-label">Order Type</InputLabel>
+            <Select
+              labelId="type-filter-label"
+              value={filterOrder}
+              onChange={handleFilterOrderChange}
+              label="Type"
+              size="small"
+              sx={{ width: 110 }}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="Advance Order">Advance Order</MenuItem>
+              <MenuItem value="Normal Order">Normal Order</MenuItem>
+            </Select>
+        </FormControl>
+      </Box>
+      
+    </Toolbar>
+  );
 }
 
-// Main Pending Orders Component
-export default function AdvanceOrders() {
+
+export default function Canceled() {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('dateTimePickUp');
+  const [orderBy, setOrderBy] = React.useState<keyof Data>('datatime');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [filterType, setFilterType] = React.useState<string>('');
+  const [filterOrder, setFilterOrder] = React.useState<string>('');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
-  const { data: orders, error, isLoading, refetch} = useGetOrdersQuery();
+  const { data: orders, error, isLoading } = useGetOrdersQuery();
   const [rows, setRows] = React.useState<any[]>([]); 
-  const [updateOrder, { isLoading: orderLoading }] = useUpdateOrderMutation();
-
-  useEffect(() => {
-   if (orders) {
-     setRows(orders.map((order, index) =>
-       createData(
-         index + 1,
-         order.timestamp,
-         order.user.name,
-         order.location?.description || order.branch.branchName +', '+ order.branch.fullAddress,
-         order.user.email,
-         order.fees.discountDeduction,
-         order.fees.subTotal,
-         order.fees.grandTotal,
-         order.type,
-         order.pick_up_type || '',
-         order.order_items,
-         order.status,
-         order.date_time_pickup
-       )
-     ));
-   }
-   if(error){
-       toast.error('Something went wrong!', {
-         position: "top-right",
-         autoClose: 5000,
-         hideProgressBar: false,
-         closeOnClick: true,
-         pauseOnHover: true,
-         draggable: true,
-         progress: undefined,
-         theme: "light",
-         transition: Slide,
-       });
+     
+   React.useEffect(() => {
+     if (orders) {
+ 
+       setRows(orders.map((order, index) =>
+         createData(
+           index + 1,
+           order.timestamp,
+           order.user.name,
+           order.location?.description || order.branch.branchName +', '+ order.branch.fullAddress,
+           order.user.email,
+           order.fees.discountDeduction,
+           order.fees.deliveryFee,
+           order.fees.subTotal,
+           order.fees.grandTotal,
+           order.type,
+           order.pick_up_type || '',
+           order.order_items,
+           order.status,
+           order.date_time_pickup
+         )
+       ));
+    
      }
- }, [orders]);  
-
+   }, [orders]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -270,17 +305,32 @@ export default function AdvanceOrders() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    };
-
+  const handleFilterChange = (event: SelectChangeEvent<string>) => {
+    setFilterType(event.target.value);
+  };
+  const handleFilterOrderChange = (event: SelectChangeEvent<string>) => {
+    setFilterOrder(event.target.value);
+  };
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
     const filteredRows = rows
-    .filter(row => row.status === 'pending')  // Apply filter for 'completed' status
-    .filter(row => row.dateTimePickUp)  
+    .filter(row => !filterType || row.type === filterType)  
+    .filter(row => row.status === 'canceled')  
+    .filter(row => {
+      // Apply the filter based on filterOrder
+      if (filterOrder === 'All') {
+        return true; // Show all rows
+      } else if (filterOrder === 'Advance Order') {
+        return row.dateTimePickUp; // Show rows with a dateTimePickUp
+      } else if (filterOrder === 'Normal Order') {
+        return !row.dateTimePickUp; // Show rows without a dateTimePickUp
+      }
+      return true; // Default case to show all rows if no filterOrder is set
+    })
     .filter(row => {
       const searchTermLower = searchTerm.toLowerCase();
       // Apply search term across multiple fields (name, phone, datatime)
@@ -291,7 +341,9 @@ export default function AdvanceOrders() {
       );
     });
   
-     
+
+    
+  
 
   const visibleRows = React.useMemo(
     () =>
@@ -301,97 +353,32 @@ export default function AdvanceOrders() {
     [order, orderBy, page, rowsPerPage, filteredRows],
   );
 
-  const setOrderCompleted = async (orderId: number) => {
-    if (!confirm(`Are you sure you want to set this order to "Completed"`)) {
-      return;
-    }
-    try{
-      await updateOrder({
-        id: orderId,
-        data: { 
-          status: "completed"
-        },
-        
-      }).unwrap(); 
-
-      refetch();
-      toast.success(`Order updated successfully!`, {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "light",
-        transition: Slide,
-      });
-              
-    }catch(error){
-      console.error('Failed to set order:', error);
-        toast.error('Something went wrong!', {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Slide,
-        });
-    }
-  }
-  const setOrderCancel = async (orderId: number) => {
-    if (!confirm(`Are you sure you want to set this order to "Canceled"`)) {
-      return;
-    }
-    try{
-      await updateOrder({
-        id: orderId,
-        data: { 
-          status: "canceled"
-        },
-        
-      }).unwrap(); 
-
-      refetch();
-      toast.success(`Order canceled successfully!`, {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "light",
-        transition: Slide,
-      });
-              
-    }catch(error){
-      console.error('Failed to cancel order:', error);
-        toast.error('Something went wrong!', {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Slide,
-        });
-    }
-  }
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20}}>
        <Box sx={{ width: '70%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar 
-            onSearchChange={handleSearchChange}
-        />
+          numSelected={selected.length} 
+          onFilterChange={handleFilterChange} 
+          filterValue={filterType} 
+          onSearchChange={handleSearchChange}
+          handleFilterOrderChange={handleFilterOrderChange}
+          filterOrder={filterOrder}
+          />
           <TableContainer sx={{ width: '100%' }}>
             <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%' }}>
               <EnhancedTableHead
+                numSelected={selected.length}
                 order={order}
                 orderBy={orderBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
+                rowCount={filteredRows.length}
               />
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={7}>
+                    <TableCell colSpan={6}>
                       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
                         <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
                       </Box>
@@ -415,9 +402,8 @@ export default function AdvanceOrders() {
                       >
                         <TableCell padding="checkbox"></TableCell>
                         <TableCell component="th" id={labelId} scope="row" padding="none">
-                          {row.dateTimePickUp}
+                          {row.datatime}
                         </TableCell>
-                        <TableCell align="right">{row.datatime}</TableCell>
                         <TableCell align="right">{row.name}</TableCell>
                         <TableCell align="right">{row.address}</TableCell>
                         <TableCell align="right">{row.phone}</TableCell>
@@ -427,7 +413,7 @@ export default function AdvanceOrders() {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ color: 'gray', fontStyle: 'italic', py: 4 }}>
+                    <TableCell colSpan={6} align="center" sx={{ color: 'gray', fontStyle: 'italic', py: 4 }}>
                       No Data Available
                     </TableCell>
                   </TableRow>
@@ -435,7 +421,7 @@ export default function AdvanceOrders() {
 
                 {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
                   <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={7} />
+                    <TableCell colSpan={6} />
                   </TableRow>
                 )}
               </TableBody>
@@ -469,7 +455,7 @@ export default function AdvanceOrders() {
 
             return (
             <div className='p-2 '>
-      
+            
                 <div className='flex flex-row gap-20 w-full'>
                   <div>
                     <div>
@@ -480,7 +466,6 @@ export default function AdvanceOrders() {
                       <p className='font-bold'>Phone:</p>
                       <p>{selectedRow?.phone}</p>
                     </div>
-                    
                   </div>
 
                   <div>
@@ -494,8 +479,12 @@ export default function AdvanceOrders() {
                   </div>
                   </div>
 
-                  </div>
-                  <div>
+              </div>
+
+              {
+                selectedRow?.dateTimePickUp ?
+
+                <div>
                   <div>
                     <p className='font-bold'>Advance Order:</p>
                     <p>Yes</p>
@@ -504,7 +493,14 @@ export default function AdvanceOrders() {
                     <p className='font-bold'>Expected Date and Time:</p>
                     <p>{selectedRow?.dateTimePickUp}</p>
                   </div>
+                </div> :
+
+                <div>
+                  <p className='font-bold'>Advance Order:</p>
+                  <p>No</p>
                 </div>
+
+              }
                   <p className='font-bold'>Order List:</p>
                   <div className=' rounded-2xl mt-1 border-4 ' style={{borderColor:"#FB7F3B"}}>
                   <div className='pr-4 pl-4 pt-2 rounded-2xl' style={{backgroundColor: "#FFEEE5"}}>
@@ -532,6 +528,7 @@ export default function AdvanceOrders() {
                       <div className=' bg-white border-t-4 border-dashed flex flex-col text-end pr-3 p-2' style={{borderColor:"#FB7F3B"}}>
                           <p className='font-bold'>SubTotal: PHP {selectedRow?.subTotal}</p>
                           <p className='font-bold'>Discount: PHP {selectedRow?.discountDeduction}</p>
+                          <p className='font-bold'>Delivery Fee: PHP {selectedRow?.deliveryFee}</p>
                       </div>
                       <div className='text-white flex flex-row  justify-end items-center gap-3 pr-3 rounded-b-sm' style={{backgroundColor:"#FB7F3B"}}>
                         <p className=' font-bold text-lg'>Grand Total:  </p>
@@ -539,19 +536,11 @@ export default function AdvanceOrders() {
                       </div>
                   </div>
                     
-                  <div className="flex justify-between mt-4 w-full">
-                    <button onClick={() => setOrderCompleted(selectedRow?.id)}  className="text text-white  px-4 py-2 rounded-md focus:outline-none" style={{backgroundColor: "#2C2C2C"}}>
-                      { orderLoading ? <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "COMPLETED" }
-                      </button>
-                    <button onClick={() => setOrderCancel(selectedRow?.id)}  className="text text-white  px-4 py-2 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
-                      { orderLoading ? <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "CANCEL ORDER" }
-                    </button>
-                  </div>
+      
               </div>
             );
           })()) : <div className="w-full h-full flex justify-center items-center text-center"><p className='text text-gray-800'>Click a row to see the details.</p></div>}
       </Box>  
-      <ToastContainer/>
     </div>
   );
 }

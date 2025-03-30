@@ -19,8 +19,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
-import { useGetOrdersQuery } from '../../features/api/orderApi';
+import { useGetOrdersQuery, useUpdateOrderMutation} from '../../features/api/orderApi';
 import ReactLoading from 'react-loading';
+import { Slide, toast, ToastContainer } from 'react-toastify';
 
 // Data Types
 interface Data {
@@ -223,8 +224,9 @@ export default function Pending() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [filterType, setFilterType] = React.useState<string>('');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
-  const { data: orders, error, isLoading } = useGetOrdersQuery();
+  const { data: orders, error, isLoading, refetch } = useGetOrdersQuery();
   const [rows, setRows] = React.useState<any[]>([]); 
+   const [updateOrder, { isLoading: orderLoading }] = useUpdateOrderMutation();
     
   React.useEffect(() => {
     if (orders) {
@@ -249,6 +251,19 @@ export default function Pending() {
       ));
    
     }
+    if(error){
+        toast.error('Something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Slide,
+        });
+      }
   }, [orders]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
@@ -320,6 +335,79 @@ export default function Pending() {
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [order, orderBy, page, rowsPerPage, filteredRows],
   );
+
+    const setOrderCompleted = async (orderId: number) => {
+      if (!confirm(`Are you sure you want to set this order to "Completed"`)) {
+        return;
+      }
+      try{
+        await updateOrder({
+          id: orderId,
+          data: { 
+            status: "completed"
+          },
+          
+        }).unwrap(); 
+  
+        refetch();
+        toast.success(`Order updated successfully!`, {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Slide,
+        });
+                
+      }catch(error){
+        console.error('Failed to set order:', error);
+          toast.error('Something went wrong!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+          });
+      }
+    }
+    const setOrderCancel = async (orderId: number) => {
+      if (!confirm(`Are you sure you want to set this order to "Canceled"`)) {
+        return;
+      }
+      try{
+        await updateOrder({
+          id: orderId,
+          data: { 
+            status: "canceled"
+          },
+          
+        }).unwrap(); 
+  
+        refetch();
+        toast.success(`Order canceled successfully!`, {
+          position: "top-right",
+          autoClose: 5000,
+          theme: "light",
+          transition: Slide,
+        });
+                
+      }catch(error){
+        console.error('Failed to cancel order:', error);
+          toast.error('Something went wrong!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+          });
+      }
+    }
 
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20}}>
@@ -482,15 +570,18 @@ export default function Pending() {
                   </div>
                     
                   <div className="flex justify-between mt-4 w-full">
-                    <button className="text text-white  px-4 py-2 rounded-md focus:outline-none" style={{backgroundColor: "#2C2C2C"}}>COMPLETED</button>
-                    <button className="text text-white  px-4 py-2 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
-                      <p>CANCEL ORDER</p>
+                    <button onClick={() => setOrderCompleted(selectedRow?.id)}  className="text text-white  px-4 py-2 rounded-md focus:outline-none" style={{backgroundColor: "#2C2C2C"}}>
+                      { orderLoading ? <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "COMPLETED" }
+                      </button>
+                    <button onClick={() => setOrderCancel(selectedRow?.id)}  className="text text-white  px-4 py-2 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}>
+                      { orderLoading ? <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "CANCEL ORDER" }
                     </button>
                   </div>
               </div>
             );
           })()) : <div className="w-full h-full flex justify-center items-center text-center"><p className='text text-gray-800'>Click a row to see the details.</p></div>}
       </Box>  
+      <ToastContainer/>
     </div>
   );
 }

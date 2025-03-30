@@ -37,7 +37,9 @@ import { LoadingScreen } from '../components/LoadingScreen';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading } from '../features/loadingSlice';
 import { RootState } from '../store'
-
+import { useGetOrdersQuery } from '../features/api/orderApi';
+import useOrderCreated from '../hooks/useOrderCreated';
+import { ToastContainer } from 'react-toastify';
 
 const drawerWidth = 240;
 
@@ -94,6 +96,10 @@ export default function Navigation() {
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.loading.isLoading);
   const [logout, { isLoading: logoutLoading }] = useLogoutMutation();
+  const { refetch } = useGetOrdersQuery();
+  
+  // Listen for new order events globally
+  useOrderCreated(refetch);
 
   useEffect(() => {
     console.log("Updating isLoading:", isLoading);
@@ -339,8 +345,9 @@ export default function Navigation() {
       <Main open={open}>
         <DrawerHeader />
         <Outlet />
+        <ToastContainer/>
       </Main>
-
+          
     </Box>
   );
 }

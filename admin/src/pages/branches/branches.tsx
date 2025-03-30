@@ -290,7 +290,7 @@ export default function Branches() {
   const [deleteBranch, { isLoading: deleteLoading}] = useDeleteBranchMutation();
   const [rows, setRows] = React.useState<any[]>([]);  // Initialize with an empty array
 
-React.useEffect(() => {
+  useEffect(() => {
   if (branches) {
     setRows(branches.map(branch => createData(
       branch.id,
