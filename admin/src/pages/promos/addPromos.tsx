@@ -5,6 +5,8 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useAddPromoMutation } from '../../features/api/promoApi';
 import ReactLoading from 'react-loading';
 import { Slide, ToastContainer, toast } from 'react-toastify';
+import { useUploadImageMutation } from '../../features/api/imageApi';
+
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -21,8 +23,11 @@ const VisuallyHiddenInput = styled('input')({
 function AddPromoModal() {
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState('');
-  const [addPromo, {isLoading}] = useAddPromoMutation();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [addPromo] = useAddPromoMutation();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [uploadImage] = useUploadImageMutation();
+  const [isLoading, setIsLoading] = useState<boolean>();
 
   // Function to handle opening the modal
   const handleOpen = () => setOpen(true);
@@ -41,17 +46,28 @@ function AddPromoModal() {
     const newErrors: { [key: string]: string } = {};
     
     if (!label) newErrors.label = 'Promo name is required';
-    // if (!province) newErrors.province = 'Province is required';
+    if (!imageFile) newErrors.image = "Image is required";
    
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
       try {
+        setIsLoading(true);
+        const imageResponse = await uploadImage({
+          image: imageFile as File,
+          type: "promo", 
+        }).unwrap();        
+        
+        // If upload fails, stop execution
+        if (!imageResponse.url) {
+          throw new Error("Image upload failed.");
+        }
+
         await addPromo({
           label: label,
-          image: "https://phmenu.net/wp-content/uploads/2024/01/promo-1024x683.webp"
-        }).unwrap(); // Ensure errors are handled correctly
+          image: imageResponse.url
+        }).unwrap(); 
 
         toast.success('Promo added successfully!', {
           position: "top-right",
@@ -68,6 +84,7 @@ function AddPromoModal() {
         
         // Reset form fields
         setLabel('');
+        setImageFile(null);
         setErrors({});
       } catch (err) {
         console.error('Failed to add promo:', err);
@@ -82,6 +99,8 @@ function AddPromoModal() {
               theme: "light",
               transition: Slide,
             });
+      }finally{
+        setIsLoading(false);
       }
     }
   };
@@ -137,20 +156,19 @@ function AddPromoModal() {
           </Box>
           
 
-        <Button
-            component="label"
-            role={undefined}
-            variant="contained"
-            tabIndex={-1}
-            startIcon={<CloudUploadIcon />}
-            sx={{ mt: 2, backgroundColor: "#2C2C2C" }}
-          > Upload Image
-            <VisuallyHiddenInput
-              type="file"
-              onChange={(event: any) => console.log(event.target.files)}
-              multiple
-            />
-          </Button>
+          <Button sx={{ mt: 2, backgroundColor: "#2C2C2C" }} component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+              Upload Image
+              <VisuallyHiddenInput
+                type="file"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  if (event.target.files && event.target.files[0]) {
+                    setImageFile(event.target.files[0]); 
+                  }
+                }}
+              />
+            </Button>
+            {imageFile && <Typography variant="caption">{imageFile.name}</Typography>}
+       
 
         <div style={{ display: "flex", flexDirection: "row", gap: 20 , marginTop: 20}}>
             <button

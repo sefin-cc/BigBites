@@ -14,12 +14,6 @@ interface UploadRequest {
   type: "profile" | "menuitem" | "promo"; 
 }
 
-// Define request type for deleting an image
-interface DeleteRequest {
-  url: string; 
-}
-
-
 
 export const imageApi = createApi({
   reducerPath: "imageApi",

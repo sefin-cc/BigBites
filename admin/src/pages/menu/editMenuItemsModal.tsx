@@ -192,6 +192,7 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
         setTime(0);
         setAddOns([]);
         setDeletedAddOns([]);
+        setImageFile(null);
         setErrors({});
         handleClose(); 
       } catch (err) {

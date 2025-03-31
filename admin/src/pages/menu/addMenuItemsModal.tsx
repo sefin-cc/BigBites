@@ -71,11 +71,6 @@ function AddMenuItemsModal({menu} : {menu: any[]| undefined;}) {
     setSubcategory(Number(event.target.value));
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      setImageFile(event.target.files[0]);
-    }
-  };
 
   // Function to handle text input change dynamically
   const handleTextFieldChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,6 +171,7 @@ function AddMenuItemsModal({menu} : {menu: any[]| undefined;}) {
         setDescription('');
         setPrice(0);
         setTime(0);
+        setImageFile(null);
         setAddOns([]);
         setErrors({});
 
