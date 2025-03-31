@@ -41,7 +41,7 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { refetch } = useGetMenuQuery(); 
   const [updateMenuItem] = useUpdateItemMutation();
-  const { data: item, isLoading: itemLoading } = useGetItemByIdQuery(itemId);
+  const { data: item, isLoading: itemLoading, refetch: refetchItem } = useGetItemByIdQuery(itemId);
   const [updateAddOn] = useUpdateAddOnMutation();
   const [isLoading, setIsLoading] = useState<boolean>();
   const [deleteAddOn ] = useDeleteAddOnMutation();
@@ -64,7 +64,7 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
   };
 
   // Function to handle opening the modal
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {setOpen(true); refetchItem();};
 
   // Function to handle closing the modal
   const handleClose = () => setOpen(false);

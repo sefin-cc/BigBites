@@ -42,9 +42,9 @@ function EditBranches({ location, id }: { location: Location, id: Set<string>}) 
   const [selectedClosingTime, setSelectedClosingTime] = useState<string>('');
   const [checked, setChecked] = useState(false);
   const branchId = id.values().next().value || ""; 
-  const { data: branch, isLoading: branchLoading } = useGetBranchByIdQuery(branchId);
+  const { data: branch, isLoading: branchLoading, refetch } = useGetBranchByIdQuery(branchId);
   const [updateBranch, { isLoading }] = useUpdateBranchMutation();
-  const [imageFile, setImageFile] = useState<File | null>(null);
+
 
 
 
@@ -70,7 +70,7 @@ function EditBranches({ location, id }: { location: Location, id: Set<string>}) 
   };
 
   // Function to handle opening the modal
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {setOpen(true); refetch();};
 
   // Function to handle closing the modal
   const handleClose = () => setOpen(false);

@@ -19,12 +19,12 @@ function EditUserModal({ branches, id }: { branches: any[], id: Set<string> }) {
   const [role, setRole] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const promoId = Number(id.values().next().value); 
-  const { data: user, isLoading: userLoading } = useGetAdminByIdQuery(promoId);
+  const { data: user, refetch} = useGetAdminByIdQuery(promoId);
   const [updateUser, { isLoading }] = useUpdateAdminMutation();
 
 
   // Function to handle opening the modal
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {setOpen(true); refetch();};
 
   // Function to handle closing the modal
   const handleClose = () => setOpen(false);

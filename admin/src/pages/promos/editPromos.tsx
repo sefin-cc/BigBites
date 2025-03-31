@@ -26,14 +26,14 @@ function EditPromoModal({id}: {id: Set<string>}) {
   const promoId = Number(id.values().next().value);
   const [updatePromo] = useUpdatePromoMutation();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { data: promo, isLoading: promoLoading } = useGetPromoByIdQuery(promoId);
+  const { data: promo, isLoading: promoLoading, refetch } = useGetPromoByIdQuery(promoId);
   const [uploadImage] = useUploadImageMutation();
   const [deleteImage] = useDeleteImageMutation();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>();
 
   // Function to handle opening the modal
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {setOpen(true); refetch();};
 
   // Function to handle closing the modal
   const handleClose = () => {
@@ -81,7 +81,7 @@ function EditPromoModal({id}: {id: Set<string>}) {
           },
         }).unwrap(); // Ensure errors are handled correctly
 
-        toast.success('Promo added successfully!', {
+        toast.success('Promo updated successfully!', {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -99,7 +99,7 @@ function EditPromoModal({id}: {id: Set<string>}) {
         setImageFile(null);
         setErrors({});
       } catch (err) {
-        console.error('Failed to add promo:', err);
+        console.error('Failed to update promo:', err);
          toast.error('Something went wrong!', {
               position: "top-right",
               autoClose: 5000,
@@ -154,7 +154,7 @@ function EditPromoModal({id}: {id: Set<string>}) {
             promoLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> :
             <Box>
               <Typography variant="h6" id="simple-modal-title" sx={{ marginBottom: 3, fontWeight: "bold", fontFamily: "Madimi One" }}>
-                ADD PROMO
+                UPDATE PROMO
               </Typography>
 
               <Box>

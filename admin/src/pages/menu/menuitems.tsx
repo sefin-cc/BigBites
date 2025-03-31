@@ -494,13 +494,15 @@ export default function MenuItems() {
 
             return (
             <div className='p-2 '>
-
+              <div className='w-ful flex justify-center'>
                 <img src={selectedRow?.image}
-                  style={{
-                    backgroundColor: "#d6d5d2",
-                    borderRadius: 3,
-                    height: 200
-                }}/>
+                    style={{
+                      backgroundColor: "#d6d5d2",
+                      borderRadius: 3,
+                      height: 200
+                  }}/>
+              </div>
+
 
                 <div className='flex flex-row gap-20 w-full mt-5'>
                   <div>
