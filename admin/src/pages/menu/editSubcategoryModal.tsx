@@ -15,12 +15,12 @@ function EditSubCategoryModal({menu, id} : {menu: any[]| undefined, id: Set<stri
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const subCategoryIdString = [...id][0] || ""; // Get the first value
   const subCategoryId = Number(subCategoryIdString.split("-")[1]) || 0;
-  const { data: subCategory, isLoading: subCategoryLoading } = useGetSubCategoryByIdQuery(subCategoryId);
+  const { data: subCategory, isLoading: subCategoryLoading , refetch: refetchSub} = useGetSubCategoryByIdQuery(subCategoryId);
   const { refetch } = useGetMenuQuery(); 
 
 
   // Function to handle opening the modal
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {setOpen(true); refetchSub();};
 
   // Function to handle closing the modal
   const handleClose = () => setOpen(false);

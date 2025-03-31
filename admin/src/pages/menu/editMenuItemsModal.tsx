@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
 import ReactLoading from 'react-loading';
 import { useUpdateAddOnMutation,useDeleteAddOnMutation } from '../../features/api/menu/addOnApi';
+import { useDeleteImageMutation, useUploadImageMutation } from '../../features/api/imageApi';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -40,12 +41,14 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { refetch } = useGetMenuQuery(); 
   const [updateMenuItem] = useUpdateItemMutation();
-  const { data: item, isLoading: itemLoading } = useGetItemByIdQuery(itemId);
+  const { data: item, isLoading: itemLoading, refetch: refetchItem } = useGetItemByIdQuery(itemId);
   const [updateAddOn] = useUpdateAddOnMutation();
   const [isLoading, setIsLoading] = useState<boolean>();
   const [deleteAddOn ] = useDeleteAddOnMutation();
   const [deletedAddOns, setDeletedAddOns] = useState<number[]>([]);
-
+  const [uploadImage] = useUploadImageMutation();
+  const [deleteImage] = useDeleteImageMutation();
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleAddAddOns = () => {
     setAddOns((prev) => [...prev, { label: "", price: 0 }]);
@@ -61,7 +64,7 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
   };
 
   // Function to handle opening the modal
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {setOpen(true); refetchItem();};
 
   // Function to handle closing the modal
   const handleClose = () => setOpen(false);
@@ -108,6 +111,7 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
 
     // If there are no errors, proceed with form submission
     if (Object.keys(newErrors).length === 0) {
+        let newImageUrl = item?.image;
         try {
           setIsLoading(true);
 
@@ -116,6 +120,19 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
               await deleteAddOn(addOnId).unwrap();
             }
            }   
+
+           if (imageFile && item) {
+             if (item.image !== "") {
+               await deleteImage({ url: item.image }).unwrap();
+             }
+           
+             const imageResponse = await uploadImage({
+               image: imageFile as File,
+               type: "menuitem",
+             }).unwrap();
+           
+             newImageUrl = imageResponse.url; // Store the new image URL
+           }
  
 
           await updateMenuItem({
@@ -127,7 +144,7 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
               description,
               price,
               time: time.toString(),
-              image,
+              image: newImageUrl,
               add_ons: [],
             }
         }).unwrap(); // Ensure errors are handled correctly
@@ -175,6 +192,7 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
         setTime(0);
         setAddOns([]);
         setDeletedAddOns([]);
+        setImageFile(null);
         setErrors({});
         handleClose(); 
       } catch (err) {
@@ -431,22 +449,19 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
                 </Box>
               ))}
 
-              <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUploadIcon />}
-                sx={{ mt: 2, backgroundColor: "#2C2C2C" }}
-              >
-                Upload files
-                <VisuallyHiddenInput
-                  type="file"
-                  onChange={(event: any) => console.log(event.target.files)}
-                  multiple
-                />
-              </Button>
-
+              <Button sx={{ mt: 2, backgroundColor: "#2C2C2C" }} component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+              Replace Image
+              <VisuallyHiddenInput
+                type="file"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  if (event.target.files && event.target.files[0]) {
+                    setImageFile(event.target.files[0]); 
+                  }
+                }}
+              />
+            </Button>
+            {imageFile && <Typography variant="caption">{imageFile.name}</Typography>}
+       
               {/* Action Buttons */}
               <div style={{ display: "flex", flexDirection: "row", gap: 20, marginTop: 20 }}>
                 <button

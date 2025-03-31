@@ -10,6 +10,7 @@ import { orderApi } from './features/api/orderApi';
 import { adminUserApi } from './features/api/adminUsersApi';
 import authReducer from './features/auth/authSlice';
 import loadingReducer from './features/loadingSlice';
+import {imageApi} from './features/api/imageApi';
 
 
 export const store = configureStore({
@@ -23,6 +24,7 @@ export const store = configureStore({
     [menuApi.reducerPath]: menuApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
     [adminUserApi.reducerPath]: adminUserApi.reducer,
+    [imageApi.reducerPath]: imageApi.reducer,
     auth: authReducer,
     loading: loadingReducer,
   },
@@ -36,7 +38,8 @@ export const store = configureStore({
       addOnApi.middleware,
       menuApi.middleware,
       orderApi.middleware,
-      adminUserApi.middleware
+      adminUserApi.middleware,
+      imageApi.middleware
     ), 
 });
 

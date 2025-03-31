@@ -15,6 +15,7 @@ export interface Admin {
   phone: string;
   address: string;
   branch: string;
+  image: string;
   created_at: string;
   updated_at: string;
 }
@@ -120,7 +121,7 @@ export const authApi = createApi({
     }),
 
 
-    updateAccount: builder.mutation<Admin, { id: number; data:{ name: string; email: string; phone: string; address: string; branch: string; }}>({
+    updateAccount: builder.mutation<Admin, { id: number; data:{ name: string; email: string; phone: string; address: string; branch: string; image: string | null;}}>({
       query: ({ id, data }) => ({
         url: `/admin/update_account/${id}`,
         method: 'PUT',

@@ -32,7 +32,7 @@ import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
-import { useLogoutMutation } from '../features/auth/authApi';
+import { useLogoutMutation, useGetLoggedInAdminQuery } from '../features/auth/authApi';
 import { LoadingScreen } from '../components/LoadingScreen';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading } from '../features/loadingSlice';
@@ -96,6 +96,7 @@ export default function Navigation() {
   const dispatch = useDispatch();
   const isLoading = useSelector((state: RootState) => state.loading.isLoading);
   const [logout, { isLoading: logoutLoading }] = useLogoutMutation();
+  const { data: user} = useGetLoggedInAdminQuery();
   const { refetch } = useGetOrdersQuery();
   
   // Listen for new order events globally
@@ -183,7 +184,7 @@ export default function Navigation() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="Remy Sharp" src={user?.image || 'https://res.cloudinary.com/dqp0ejscz/image/upload/v1735899431/blank-profile-picture-973460_1280_idgyn3.png'} />
               </IconButton>
             </Tooltip>
             <Menu

@@ -25,6 +25,7 @@ import { Slide, toast } from 'react-toastify';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../../features/loadingSlice';
+import { useDeleteImageMutation } from '../../features/api/imageApi';
 
 
 // Data Types
@@ -185,11 +186,13 @@ export default function Promos() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [filterType, setFilterType] = React.useState<string>('');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
-  const { data: promos, error, isLoading } = useGetPromosQuery();
+  const { data: promos, error, isLoading: promoLoading } = useGetPromosQuery();
   const [rows, setRows] = React.useState<any[]>([]); 
-  const [deletePromo, { isLoading: deleteLoading}] = useDeletePromoMutation();
+  const [deletePromo] = useDeletePromoMutation();
   const dispatch = useDispatch();
-    
+  const [deleteImage] = useDeleteImageMutation();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+
   React.useEffect(() => {
     if (promos) {
       setRows(promos.map(promo => createData(
@@ -289,7 +292,16 @@ export default function Promos() {
     }
   
     try {
-      await Promise.all(Array.from(selected).map((id) => deletePromo(Number(id)).unwrap()));
+      setIsLoading(true);
+      for (const promoId of selected) {
+        const promo = rows.find((row) => `${row.id}` === promoId); 
+        if (promo && promo.image) {
+          await deleteImage({ url: promo.image }).unwrap(); 
+        }
+        
+        await deletePromo(Number(promoId)).unwrap(); 
+      }
+      // await Promise.all(Array.from(selected).map((id) => deletePromo(Number(id)).unwrap()));
   
       toast.success(`${selected.size > 1 ? 'Promos' : 'Promo'} deleted successfully!`, {
         position: "top-right",
@@ -308,12 +320,14 @@ export default function Promos() {
         theme: "light",
         transition: Slide,
       });
+    }finally{
+      setIsLoading(false);
     }
   };
 
       useEffect(() => {
-        dispatch(setLoading(deleteLoading));
-      }, [deleteLoading]);
+        dispatch(setLoading(isLoading));
+      }, [isLoading]);
 
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20 }}>
@@ -341,7 +355,7 @@ export default function Promos() {
             />
 
             <TableBody>
-              {isLoading ? (
+              {promoLoading ? (
                 // Show loading indicator first
                 <TableRow>
                     <TableCell colSpan={7}>
@@ -387,7 +401,7 @@ export default function Promos() {
               )}
 
               {/*  Preserve table structure when empty but not loading */}
-              {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
+              {emptyRows > 0 && !promoLoading && visibleRows.length > 0 && (
                 <TableRow style={{ height: 33 }}>
                   <TableCell colSpan={3} />
                 </TableRow>

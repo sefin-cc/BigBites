@@ -13,6 +13,7 @@ use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\AddOnController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ImageController;
 
 //Admin User Routes
 Route::post('admin/login', [AdminController::class, 'login'])->middleware(['web']);
@@ -31,6 +32,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('admin/destroy/{id}', [AdminController::class, 'destroy']);
     Route::put('/admin/update_account/{id}', [AdminController::class, 'updateAccount']);
     Route::put('/admin/update_password/{id}', [AdminController::class, 'updatePassword']);
+
+    Route::post('/image_upload', [ImageController::class, 'upload']);
+    Route::post('/image_delete', [ImageController::class, 'delete']);
+    Route::post('/image_edit', [ImageController::class, 'edit']);
 });
 
 //Client User Routes

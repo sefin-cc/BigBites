@@ -5,6 +5,8 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useUpdatePromoMutation, useGetPromoByIdQuery } from '../../features/api/promoApi';
 import ReactLoading from 'react-loading';
 import { Slide, ToastContainer, toast } from 'react-toastify';
+import { useDeleteImageMutation, useUploadImageMutation } from '../../features/api/imageApi';
+
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -22,13 +24,16 @@ function EditPromoModal({id}: {id: Set<string>}) {
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState('');
   const promoId = Number(id.values().next().value);
-  const [updatePromo, {isLoading}] = useUpdatePromoMutation();
+  const [updatePromo] = useUpdatePromoMutation();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { data: promo, isLoading: promoLoading } = useGetPromoByIdQuery(promoId);
-  
+  const { data: promo, isLoading: promoLoading, refetch } = useGetPromoByIdQuery(promoId);
+  const [uploadImage] = useUploadImageMutation();
+  const [deleteImage] = useDeleteImageMutation();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>();
 
   // Function to handle opening the modal
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {setOpen(true); refetch();};
 
   // Function to handle closing the modal
   const handleClose = () => {
@@ -47,22 +52,36 @@ function EditPromoModal({id}: {id: Set<string>}) {
     const newErrors: { [key: string]: string } = {};
     
     if (!label) newErrors.label = 'Promo name is required';
-    // if (!province) newErrors.province = 'Province is required';
+
    
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
+      let newImageUrl = promo?.image;
       try {
+        setIsLoading(true);
+        if (imageFile && promo) {
+          if (promo.image !== "") {
+            await deleteImage({ url: promo.image }).unwrap();
+          }
+        
+          const imageResponse = await uploadImage({
+            image: imageFile as File,
+            type: "promo",
+          }).unwrap();
+        
+          newImageUrl = imageResponse.url; // Store the new image URL
+        }
         await updatePromo({
           id: promoId,
           data:{
              label: label,
-             image: "https://phmenu.net/wp-content/uploads/2024/01/promo-1024x683.webp"
+             image: newImageUrl
           },
         }).unwrap(); // Ensure errors are handled correctly
 
-        toast.success('Promo added successfully!', {
+        toast.success('Promo updated successfully!', {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -77,9 +96,10 @@ function EditPromoModal({id}: {id: Set<string>}) {
         
         // Reset form fields
         setLabel('');
+        setImageFile(null);
         setErrors({});
       } catch (err) {
-        console.error('Failed to add promo:', err);
+        console.error('Failed to update promo:', err);
          toast.error('Something went wrong!', {
               position: "top-right",
               autoClose: 5000,
@@ -91,6 +111,8 @@ function EditPromoModal({id}: {id: Set<string>}) {
               theme: "light",
               transition: Slide,
             });
+      }finally{
+        setIsLoading(false);
       }
     }
   };
@@ -132,7 +154,7 @@ function EditPromoModal({id}: {id: Set<string>}) {
             promoLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> :
             <Box>
               <Typography variant="h6" id="simple-modal-title" sx={{ marginBottom: 3, fontWeight: "bold", fontFamily: "Madimi One" }}>
-                ADD PROMO
+                UPDATE PROMO
               </Typography>
 
               <Box>
@@ -150,20 +172,19 @@ function EditPromoModal({id}: {id: Set<string>}) {
               </Box>
               
 
-            <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUploadIcon />}
-                sx={{ mt: 2, backgroundColor: "#2C2C2C" }}
-              > Upload Image
-                <VisuallyHiddenInput
-                  type="file"
-                  onChange={(event: any) => console.log(event.target.files)}
-                  multiple
-                />
-              </Button>
+            <Button sx={{ mt: 2, backgroundColor: "#2C2C2C" }} component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+              Replace Image
+              <VisuallyHiddenInput
+                type="file"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  if (event.target.files && event.target.files[0]) {
+                    setImageFile(event.target.files[0]); 
+                  }
+                }}
+              />
+            </Button>
+            {imageFile && <Typography variant="caption">{imageFile.name}</Typography>}
+       
 
             <div style={{ display: "flex", flexDirection: "row", gap: 20 , marginTop: 20}}>
                 <button
