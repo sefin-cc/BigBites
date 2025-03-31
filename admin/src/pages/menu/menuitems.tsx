@@ -26,6 +26,7 @@ import { useDeleteItemMutation } from '../../features/api/menu/itemApi';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../../features/loadingSlice';
+import { useDeleteImageMutation } from '../../features/api/imageApi';
 
 // Data Types
 interface Data {
@@ -256,6 +257,8 @@ export default function MenuItems() {
   const { data: menu, error, isLoading, refetch} = useGetMenuQuery();
   const [rows, setRows] = React.useState<any[]>([]); 
   const [deleteMenuItem, { isLoading: deleteLoading}] = useDeleteItemMutation();
+  const [deleteImage] = useDeleteImageMutation();
+
   const dispatch = useDispatch();
 
   React.useEffect(() => {
@@ -350,7 +353,7 @@ export default function MenuItems() {
     [menuCategory, sortBy, page, rowsPerPage, filteredRows],
   );
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number, url:string) => {
     
       if (selected.length === 0) {
         toast.warning('No Menu item selected for deletion.', {
@@ -367,6 +370,12 @@ export default function MenuItems() {
       }
     
       try {
+
+      if(url !==""){
+          await deleteImage({url}).unwrap();
+      }
+      
+
         await deleteMenuItem(id).unwrap();
 
         refetch();
@@ -541,7 +550,7 @@ export default function MenuItems() {
 
                   <div className="flex justify-between mt-5 w-full">
                     <EditMenuItemsModal menu={menu} itemId={selectedRow?.itemId} categoryId={selectedRow?.id}/>
-                    <button onClick={() =>handleDelete(selectedRow.itemId)}  className="text text-white  px-6 py-1 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}   disabled={deleteLoading} >
+                    <button onClick={() =>handleDelete(selectedRow.itemId, selectedRow.image)}  className="text text-white  px-6 py-1 rounded-md focus:outline-none justify-center gap-1 items-center flex " style={{backgroundColor: "#C1272D"}}   disabled={deleteLoading} >
                       {deleteLoading ?  <ReactLoading type="bubbles" color="#FFEEE5" height={30} width={30} /> : "DELETE"}
                     </button>
                   </div>

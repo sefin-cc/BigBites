@@ -12,6 +12,7 @@ import { setLoading } from '../../features/loadingSlice';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
 import ReactLoading from 'react-loading';
 import { useAddAddOnToItemMutation } from '../../features/api/menu/addOnApi';
+import { useUploadImageMutation } from '../../features/api/imageApi';
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -37,13 +38,14 @@ function AddMenuItemsModal({menu} : {menu: any[]| undefined;}) {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [time, setTime] = useState(0);
-  const [image, setImage] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [addOns, setAddOns] = useState<{ label: string; price: number }[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { refetch } = useGetMenuQuery(); 
   const [addMenuItem] = useAddItemMutation();
   const [addAddOnToItem] = useAddAddOnToItemMutation();
   const [isLoading, setIsLoading] = useState<boolean>();
+  const [uploadImage] = useUploadImageMutation();
 
   const handleAddAddOns = () => {
     setAddOns((prev) => [...prev, { label: "", price: 0 }]);
@@ -67,6 +69,12 @@ function AddMenuItemsModal({menu} : {menu: any[]| undefined;}) {
 
   const handleSubCategoryChange = (event: SelectChangeEvent<number>) => {
     setSubcategory(Number(event.target.value));
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setImageFile(event.target.files[0]);
+    }
   };
 
   // Function to handle text input change dynamically
@@ -103,6 +111,7 @@ function AddMenuItemsModal({menu} : {menu: any[]| undefined;}) {
     if (price <= 0) newErrors.price = 'Price must be greater than 0';
     if (time <= 0) newErrors.time = 'Preparation time must be greater than 0';
     if (!description) newErrors.description = 'Description is required';
+    if (!imageFile) newErrors.image = "Image is required";
 
     setErrors(newErrors);
 
@@ -110,6 +119,18 @@ function AddMenuItemsModal({menu} : {menu: any[]| undefined;}) {
     if (Object.keys(newErrors).length === 0) {
         try {
           setIsLoading(true);
+     
+          const imageResponse = await uploadImage({
+            image: imageFile as File,
+            type: "menuitem", 
+          }).unwrap();        
+          
+          // If upload fails, stop execution
+          if (!imageResponse.url) {
+            throw new Error("Image upload failed.");
+          }
+
+
           const newItem = await addMenuItem({
             sub_category_id: subcategory,
             label: itemLabel,
@@ -117,7 +138,7 @@ function AddMenuItemsModal({menu} : {menu: any[]| undefined;}) {
             description: description,
             price: price,
             time: time.toString(),
-            image: "",
+            image: imageResponse.url,
           }).unwrap();
 
         if (addOns.length > 0) {
@@ -413,24 +434,26 @@ function AddMenuItemsModal({menu} : {menu: any[]| undefined;}) {
               >
                 <RemoveRoundedIcon sx={{ color: "white" }} />
               </Button>
+
+              
             </Box>
           ))}
 
-          <Button
-            component="label"
-            role={undefined}
-            variant="contained"
-            tabIndex={-1}
-            startIcon={<CloudUploadIcon />}
-            sx={{ mt: 2, backgroundColor: "#2C2C2C" }}
-          >
-            Upload files
-            <VisuallyHiddenInput
-              type="file"
-              onChange={(event: any) => console.log(event.target.files)}
-              multiple
-            />
-          </Button>
+
+            <Button sx={{ mt: 2, backgroundColor: "#2C2C2C" }} component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+              Upload Image
+              <VisuallyHiddenInput
+                type="file"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  if (event.target.files && event.target.files[0]) {
+                    setImageFile(event.target.files[0]); 
+                  }
+                }}
+              />
+            </Button>
+            {imageFile && <Typography variant="caption">{imageFile.name}</Typography>}
+       
+          
 
           {/* Action Buttons */}
           <div style={{ display: "flex", flexDirection: "row", gap: 20, marginTop: 20 }}>

@@ -44,6 +44,8 @@ function EditBranches({ location, id }: { location: Location, id: Set<string>}) 
   const branchId = id.values().next().value || ""; 
   const { data: branch, isLoading: branchLoading } = useGetBranchByIdQuery(branchId);
   const [updateBranch, { isLoading }] = useUpdateBranchMutation();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
 
 
   // Function to generate time options in 15-minute intervals
