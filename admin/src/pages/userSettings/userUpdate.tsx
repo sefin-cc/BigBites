@@ -1,10 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Button, styled, Checkbox } from '@mui/material';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import { useGetLoggedInAdminQuery, useUpdateAccountMutation } from '../../features/auth/authApi';
 import ReactLoading from 'react-loading';
 import { Slide, ToastContainer, toast } from 'react-toastify';
 import { useGetBranchesQuery } from '../../features/api/branchApi';
+import { useDeleteImageMutation, useUploadImageMutation } from '../../features/api/imageApi';
+
+const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+});
+
 
 
 function UpdateUserModal() {
@@ -16,14 +31,17 @@ function UpdateUserModal() {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [branch, setBranch] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const { data: user, isLoading: userLoading } = useGetLoggedInAdminQuery();
+  const { data: user, isLoading: userLoading , refetch} = useGetLoggedInAdminQuery();
   const { data: branches } = useGetBranchesQuery();
-  const [updateUser, { isLoading }] = useUpdateAccountMutation();
-
+  const [updateUser] = useUpdateAccountMutation();
+  const [isLoading, setIsLoading] = useState<boolean>();
+  const [uploadImage] = useUploadImageMutation();
+  const [deleteImage] = useDeleteImageMutation();
 
   // Function to handle opening the modal
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {setOpen(true); refetch();};
 
   // Function to handle closing the modal
   const handleClose = () => setOpen(false);
@@ -88,7 +106,22 @@ function UpdateUserModal() {
 
     // If there are no errors, proceed with form submission
     if (Object.keys(newErrors).length === 0) {
+    let newImageUrl = user?.image;
      try {
+      setIsLoading(true);
+      if (imageFile && user) {
+        if (user.image && user.image !== "") {
+          await deleteImage({ url: user.image }).unwrap();
+        }
+        
+        const imageResponse = await uploadImage({
+          image: imageFile as File,
+          type: "profile",
+        }).unwrap();
+      
+        newImageUrl = imageResponse.url; // Store the new image URL
+      }
+
         // Make API request to register a new admin
         await updateUser({
           id: user.id,
@@ -98,6 +131,7 @@ function UpdateUserModal() {
             phone,
             address,
             branch,
+            image: newImageUrl,
           },
          
         }).unwrap();
@@ -122,7 +156,7 @@ function UpdateUserModal() {
         setPhone("");
         setAddress("");
         setBranch("");
-    
+        setImageFile(null);
         setErrors({}); // Clear validation errors
       } catch (error) {
         console.error("Failed to update user:", error);
@@ -138,6 +172,8 @@ function UpdateUserModal() {
           theme: "light",
           transition: Slide,
         });
+      } finally{
+        setIsLoading(false);
       }
     }
   };
@@ -295,6 +331,21 @@ function UpdateUserModal() {
                         {errors.branch && <Typography color="error" variant="caption">{errors.branch}</Typography>}
                         </FormControl>
                     </Box>
+
+                    
+                    <Button sx={{ mt: 2, backgroundColor: "#2C2C2C" }} component="label" variant="contained" startIcon={<CloudUploadIcon />}>
+                    Replace Image
+                    <VisuallyHiddenInput
+                      type="file"
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        if (event.target.files && event.target.files[0]) {
+                          setImageFile(event.target.files[0]); 
+                        }
+                      }}
+                    />
+                  </Button>
+                  {imageFile && <Typography variant="caption">{imageFile.name}</Typography>}
+              
 
                     {/* Action Buttons */}
                     <div style={{ display: "flex", flexDirection: "row", gap: 20, marginTop: 20 }}>

@@ -34,7 +34,7 @@ export default function UserSettings() {
                         alignItems: 'center'
                         }}>
                         <img 
-                            src={'https://res.cloudinary.com/dqp0ejscz/image/upload/v1735899431/blank-profile-picture-973460_1280_idgyn3.png'} 
+                            src={user.image || 'https://res.cloudinary.com/dqp0ejscz/image/upload/v1735899431/blank-profile-picture-973460_1280_idgyn3.png'} 
                             alt="Circular" 
                             style={{ 
                                 width: '100%', 

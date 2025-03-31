@@ -18,33 +18,36 @@ class AdminSeeder extends Seeder
 
                // Creating Super Admin User
             $admin = Admin::create([
-                'name' => 'Javed Ur Rehman', 
-                'email' => 'javed@allphptricks.com',
+                'name' => 'Javed', 
+                'email' => 'javed@gmail.com',
                 'phone' => '09323232323',
                 'address' => 'Mangaldan, Pangasinan',
                 'branch' => 'SM DAGUPAN CITY',
+                'image' => null,
                 'password' => Hash::make('password')
             ]);
             $admin->assignRole('Administrator');
     
             // Creating Admin User
             $manager = Admin::create([
-                'name' => 'Syed Ahsan Kamal', 
-                'email' => 'ahsan@allphptricks.com',
+                'name' => 'Noel', 
+                'email' => 'noel@gmail.com',
                 'phone' => '09323232323',
                 'address' => 'Mangaldan, Pangasinan',
                 'branch' => 'SM DAGUPAN CITY',
+                'image' => null,
                 'password' => Hash::make('password')
             ]);
             $manager->assignRole('Manager');
     
             // Creating Product Manager User
             $staff = Admin::create([
-                'name' => 'Abdul Muqeet', 
-                'email' => 'muqeet@allphptricks.com',
+                'name' => 'Catalin Muqeet', 
+                'email' => 'cat@gmail.com',
                 'phone' => '09323232323',
                 'address' => 'Mangaldan, Pangasinan',
                 'branch' => 'SM DAGUPAN CITY',
+                'image' => null,
                 'password' => Hash::make('password')
             ]);
             $staff->assignRole('Staff');

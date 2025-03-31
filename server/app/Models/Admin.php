@@ -26,6 +26,7 @@ class Admin extends Authenticatable
         'address',
         'branch',
         'password',
+        'image',
     ];
 
     /**

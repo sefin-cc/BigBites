@@ -245,10 +245,11 @@ public function login(Request $request)
             'phone' => 'required',
             'address' => 'required',
             'branch' => 'required',
+            'image' => 'string'
         ]);
     
         // Update the admin's information
-        $admin->update($request->only(['name', 'email', 'phone', 'address', 'branch']));
+        $admin->update($request->only(['name', 'email', 'phone', 'address', 'branch', 'image']));
     
         // Return the updated admin as a JSON response
         return response()->json($admin);
