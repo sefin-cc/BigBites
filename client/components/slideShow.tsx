@@ -1,54 +1,56 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, Dimensions, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
+import { useGetPromosQuery } from "../redux/feature/apiSlice";
 
 const { width, height } = Dimensions.get('window');
 
-const images = [
-  { id: 1, uri: 'https://pbs.twimg.com/media/EZL87HLWoAAEepO?format=jpg&name=4096x4096' },
-  { id: 2, uri: 'https://smartcanucks.ca/wp-content/uploads/2024/08/Screenshot-2024-08-30-at-12.35.02%E2%80%AFAM-500x252.png' },
-];
-
 export default function Slideshow() {
-    const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(0);
+    const { data: promos, isLoading } = useGetPromosQuery();
 
-  return (
-    <View style={styles.container}>
-      <Carousel
-        loop
-        autoPlayInterval={3000}
-        width={width}
-        height={height * 0.2}
-        autoPlay={true} 
-        data={images}
-        renderItem={({ index, item }) => (
-            <TouchableOpacity onPress={() => router.push("/(app)/menu/menu-featured")}>
+    return (
+      <View style={styles.container}>
+        {/* Show Loader When Data is Loading */}
+        {isLoading ? (
+          <View style={{ height: 150, justifyContent: "center", alignItems: "center" }}>
+            <ActivityIndicator animating={isLoading} color={"#FB7F3B"} size="large" />
+          </View>
+        ) : promos && promos.length > 0 ? (
+          <>
+            <Carousel
+              loop
+              autoPlayInterval={3000}
+              width={width}
+              height={height * 0.2}
+              autoPlay
+              data={promos}
+              renderItem={({ index, item }) => (
                 <View style={styles.slide}>
-                    <Image source={{ uri: item.uri }} style={styles.image} />
+                  <Image source={{ uri: item?.image }} style={styles.image} />
                 </View>
-            </TouchableOpacity>
+              )}
+              onSnapToItem={(index) => setActiveIndex(index)}
+            />
+    
+            {/* Dots Indicator */}
+            <View style={styles.indicatorContainer}>
+              {promos.map((_, index) => (
+                <Text
+                  key={index}
+                  style={[styles.indicator, activeIndex === index && styles.activeIndicator]}
+                >
+                  ●
+                </Text>
+              ))}
+            </View>
+          </>
+        ) : (
+          <Text style={{ textAlign: "center", marginTop: 20 }}>No promos available</Text>
         )}
-        onSnapToItem={(index) => setActiveIndex(index)}
-      />
-
-      <View style={styles.indicatorContainer}>
-        {images.map((_, index) => (
-          <Text
-            key={index}
-            style={[
-              styles.indicator,
-              activeIndex === index && styles.activeIndicator,
-            ]}
-          >
-            ●
-          </Text>
-        ))}
       </View>
-
-    </View>
-  );
+    );
 }
 
 const styles = StyleSheet.create({

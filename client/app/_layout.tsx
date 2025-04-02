@@ -2,7 +2,8 @@ import { Stack } from "expo-router";
 import AppProvider from "./context/AppContext";
 import { Text } from "react-native";
 import { useFonts } from 'expo-font';
-
+import { Provider } from "react-redux";
+import {store} from "../redux/store";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -13,8 +14,9 @@ export default function RootLayout() {
     return <Text></Text>;
   }
 
-  return (
-    <AppProvider>
+  return (  
+  <Provider store={store}>
+     <AppProvider>
       <Stack>
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
 
@@ -27,6 +29,8 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
       </Stack>
     </AppProvider>
+  </Provider>
+   
   );
 }
 

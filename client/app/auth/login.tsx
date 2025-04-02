@@ -1,66 +1,45 @@
 
 
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import React, { useContext } from "react";
 import { useState } from "react";
-import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image } from "react-native";
-import { AppContext } from "../context/AppContext";
+import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image, ActivityIndicator } from "react-native";
 import { Checkbox } from "react-native-paper";
+import { useLoginMutation } from "../../redux/feature/auth/clientApiSlice";
+
 
 
 export default function Login() {
-  const context = useContext(AppContext);
-  const router = useRouter();
-  if (!context) {
-    return <Text>Error: AppContext is not available</Text>;
-  }
+  const [login, { isLoading, error }] = useLoginMutation();
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
 
-  // const {setToken} = context;
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string[]; password?: string[] }>({});
   const [formData, setFormData] = useState({
       email: '',
       password: '',
   });
-  const [rememberMe, toggleRememberMe] = useState(false);
 
 
   const handleLogin = async () => {
-      // setIsLoading(true);
-    
-      // try {
-      //   const res = await API.post("/login", formData);
-      //   const data = res.data;
-    
-      //   if (data.errors) {
-      //     // Set form errors if they exist in the response
-      //     setErrors(data.errors);
-      //   } else {
-      //     // Store token in AsyncStorage for persistence in React Native
-      //     await AsyncStorage.setItem("token", data.token);
-      //     setToken(data.token);
-      //   }
-    
-      //   // Navigate to the homepage after successful login
-      //   router.replace("/");
-    
-      // } catch (error) {
-      //   // Handle Axios errors
-      //   if (axios.isAxiosError(error)) {
-      //     console.error("Axios error:", error.response?.data || error.message);
-      //     // Setting error messages from the response or a general error message
-      //     setErrors(error.response?.data?.errors || { general: "Something went wrong" });
-      //   } else {
-      //     // Handle other unexpected errors
-      //     console.error("Unexpected error:", error);
-
-      //   }
-      // } finally {
-      //   // Ensure loading state is reset whether successful or failed
-      //   setIsLoading(false);
-      // }
-    };
-
+    try {
+      await login(formData).unwrap();
+      router.replace("/"); // Redirect after successful login
+    } catch (err: any) {
+      console.log("Error Response:", JSON.stringify(err, null, 2));
+  
+      // Extract error response
+      const errorData = err.response?.data || err.data || err;
+  
+      if (errorData?.errors) {
+        setErrors(errorData.errors); // Handles Laravel validation errors
+      } else if (errorData?.email) {
+        setErrors({ email: errorData.email }); // Handles direct error response
+      } else {
+        setErrors({ general: ["An unexpected error occurred."] });
+      }
+    }
+  };
+  
+  
 
   return (
     <View style={styles.container}>
@@ -89,15 +68,17 @@ export default function Login() {
           </View>
       </SafeAreaView>
             
-      <View style={styles.forgotPasswordCard}>
-            <TouchableOpacity onPress={() =>{}} >
-              <Text style={[styles.label, {fontSize: 16}]}>Forgot Password?</Text>
-            </TouchableOpacity>
-          </View>
 
           <View style={{marginTop:20}}>
-            <TouchableOpacity onPress={() =>{}} style={styles.loginBtn}>
-              <Text style={styles.loginBtnText}>LOGIN</Text>
+            <TouchableOpacity onPress={() =>{handleLogin()}} style={styles.loginBtn} disabled={isLoading}>
+                { 
+                  isLoading ?
+                  <ActivityIndicator animating={isLoading} color={"#FFEEE5"}  size="large" hidesWhenStopped={true}/>:
+                
+                  <Text style={styles.loginBtnText}>
+                    LOGIN 
+                  </Text>
+                } 
             </TouchableOpacity>
           </View>
     </View>

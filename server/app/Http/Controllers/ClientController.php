@@ -46,10 +46,9 @@ class ClientController extends Controller
 
 
             return response()->json([
-                'client' => $client
-            ])->cookie(
-                'token', $token, 60 * 24, '/', null, true, true // HttpOnly & Secure
-            );
+                'client' => $client,
+                'token' => $token
+            ]);
 
             // Return the created client and token as a JSON response
            
@@ -90,10 +89,9 @@ public function login(Request $request)
     // Store token in an HTTP-only cookie
     return response()->json([
         'message' => 'Login successful',
+        'token' => $token,
         'client' => $client
-    ])->cookie(
-        'token', $token, 60 * 24, '/', null, true, true // HttpOnly & Secure
-    );
+    ]);
 }
 
 
@@ -105,7 +103,7 @@ public function login(Request $request)
     
         return response()->json([
             'message' => 'You have been logged out successfully.',
-        ])->cookie('token', '', -1); // Remove the cookie
+        ]);
     }
     
 

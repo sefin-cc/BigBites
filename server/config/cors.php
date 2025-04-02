@@ -19,7 +19,12 @@ return [
 
 'allowed_methods' => ['*'],
 
-'allowed_origins' => [env('FRONTEND_URL', 'http://127.0.0.1:8000')], // Change to your frontend URL
+'allowed_origins' => [
+    env('FRONTEND_URL', 'http://127.0.0.1:8000'),
+    'exp://192.168.1.5:8081',
+    'http://192.168.137.1:8000'
+],
+
 
 'allowed_origins_patterns' => [],
 

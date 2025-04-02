@@ -39,15 +39,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 //Client User Routes
-Route::post('client/login', [ClientController::class, 'login']);
+Route::post('client/login', [ClientController::class, 'login'])->middleware(['api']);
 Route::post('client/register', [ClientController::class, 'register']);
 
 // Protect client routes that require authentication
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'api'])->group(function () {
     Route::get('/client', function (Request $request) {
         return $request->user();
     });
 
+    
     Route::post('client/logout', [ClientController::class, 'logout']);  // Logout route
 
     // CRUD operations for clients
@@ -56,9 +57,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('client/update/{id}', [ClientController::class, 'update']);
     Route::delete('client/destroy/{id}', [ClientController::class, 'destroy']);
 });
-
+Route::apiResource('branches', BranchController::class);
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::apiResource('branches', BranchController::class);
+     //   Route::apiResource('branches', BranchController::class);
         Route::apiResource('promos', PromoController::class);
         Route::apiResource('role', RolesController::class);
  

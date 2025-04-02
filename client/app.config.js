@@ -41,5 +41,6 @@ export default {
   extra: {
     // You can now access environment variables in app.config.js
     OPENCAGE_API_KEY: process.env.OPENCAGE_API_KEY,  // From your .env file
+    BACKEND_URL: process.env.BACKEND_URL, 
   },
 };

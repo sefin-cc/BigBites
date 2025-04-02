@@ -1,8 +1,10 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AppContext } from "@/app/context/AppContext";
 import { useRouter } from "expo-router";
+import { useLogoutMutation, useGetProfileQuery } from "../../../redux/feature/auth/clientApiSlice";
+
 
 export default function Login() {
   const context = useContext(AppContext);
@@ -11,25 +13,21 @@ export default function Login() {
     return <Text>Error: AppContext is not available</Text>;
   }
   const {user, setUser, setToken} = context;
-
+  const [logout, { isLoading }] = useLogoutMutation();
+  const { data: profile } = useGetProfileQuery();
   const handleLogout = async () => {
-    // try {
-    //   await API.post("/logout");
-  
-    //   setUser(null);
-    //   setToken(null);
-    //   await AsyncStorage.removeItem("token");
-  
+    try {
+
+    // await logout().unwrap();
       router.replace("/auth/choose");
-    // } catch (error) {
-    //   if (error instanceof Error) {
-    //     console.error("Logout error:", error.message);
-    //   } else {
-    //     console.error("An unknown error occurred");
-    //   }
-    // }
+    } catch (error) {
+      console.log(error);
+    }
   };
   
+  useEffect(()=>{
+    console.log("profile: "+ profile);
+  },[]);
   
   return (
     <View style={styles.container}>
@@ -37,14 +35,22 @@ export default function Login() {
           source={{ uri: 'https://res.cloudinary.com/dqp0ejscz/image/upload/v1735899431/blank-profile-picture-973460_1280_idgyn3.png' }} 
           style={styles.img}
         />
-      <Text style={styles.userInfoTextTitle} >{user.email}</Text>
-      <Text style={styles.userInfoText} >{user.name}</Text>
+        
+      <Text style={styles.userInfoTextTitle} >{profile?.email}</Text>
+      <Text style={styles.userInfoText} >{profile?.name}</Text>
       <TouchableOpacity
         onPress={handleLogout}
-        style={styles.button}>
-        <Text style={styles.buttonText}>
-          LOGOUT
-        </Text>
+        style={styles.button}
+        disabled={isLoading}
+        >
+        { 
+          isLoading ?
+          <ActivityIndicator animating={isLoading} color={"#FFEEE5"}  size="large" hidesWhenStopped={true}/>:
+        
+          <Text style={styles.buttonText}>
+            LOGOUT 
+          </Text>
+        } 
       </TouchableOpacity>
     </View>
   );
