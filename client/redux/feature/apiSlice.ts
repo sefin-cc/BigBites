@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "./auth/baseQuery"; 
-import { Promo } from "@/types/clients";
+import { Promo, Branch } from "@/types/clients";
 
 // Create API Slice
 export const apiSlice = createApi({
@@ -10,7 +10,7 @@ export const apiSlice = createApi({
     getAddons: builder.query<any, void>({
       query: () => "/addons",
     }),
-    getBranches: builder.query<any, void>({
+    getBranches: builder.query<Branch[], void>({
       query: () => "/branches",
     }),
     getCategories: builder.query<any, void>({

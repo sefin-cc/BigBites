@@ -65,18 +65,17 @@ interface User {
     updated_at: string;
 }
 
-interface Branch {
-    id: number;
-    branchName: string;
-    province: string;
-    city: string;
-    fullAddress: string;
-    openingTime: string;
-    closingTime: string;
-    acceptAdvancedOrder: boolean;
-    created_at: string;
-    updated_at: string;
+export interface Branch {
+  id: string;
+  branchName: string;
+  province: string;
+  city: string;
+  fullAddress: string;
+  openingTime: string;
+  closingTime: string;
+  acceptAdvancedOrder: boolean;
 }
+
 
 interface Location {
     description: string;
@@ -101,3 +100,4 @@ export interface Order {
     user: User;
     branch: Branch;
 }
+

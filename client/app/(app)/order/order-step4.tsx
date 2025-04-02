@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router, useRouter } from "expo-router";
 import globalStyle from "../../../assets/styles/globalStyle";
 import { useContext, useEffect, useState } from "react";
@@ -6,17 +6,9 @@ import DropDownPicker from "react-native-dropdown-picker";
 import location from "../../../data/location.json"
 import { AppContext } from "@/app/context/AppContext";
 import { Snackbar } from "react-native-paper";
+import { useGetBranchesQuery } from "../../../redux/feature/apiSlice";
+import { Branch } from "@/types/clients";
 
-interface Branch {
-  id: string;
-  branchName: string;
-  province: string;
-  city: string;
-  fullAddress: string;
-  openingTime: string;
-  closingTime: string;
-  acceptAdvancedOrder: boolean;
-}
 
 // Function to check if current time is within opening hours
 const isBranchOpen = (openingTime: string, closingTime: string) => {
@@ -36,13 +28,7 @@ const isBranchOpen = (openingTime: string, closingTime: string) => {
 };
 
 export default function BranchesStep3() {
-  //This is temporary data
-  const branches: Branch[] = [
-    { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false  },
-    { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-    { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-    { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-  ];
+  const { data: branches, isLoading } = useGetBranchesQuery();
 
   const context = useContext(AppContext);
   if (!context) {
@@ -83,7 +69,7 @@ export default function BranchesStep3() {
   }, [province]);
 
     // Filter branches based on selected province and city
-    const filteredBranches = branches.filter((branch) => {
+    const filteredBranches = branches?.filter((branch) => {
       const isProvinceMatch = province ? branch.province === province : true;
       const isCityMatch = city ? branch.city === city : true;
       return isProvinceMatch && isCityMatch;
@@ -175,31 +161,35 @@ export default function BranchesStep3() {
       </View>
     
  
+      {isLoading ? (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#FB7F3B" />
+      </View>
+    ) : (
       <FlatList
         data={filteredBranches}
-        contentContainerStyle={{ flex: 1 }}
-        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyExtractor={(item) => item.id.toString()} // Ensure id is a string
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handleSelectedBranch(item)}>
             <View style={styles.card}>
-            <Text style={styles.branchName}>{item.branchName}</Text>
-            <Text style={styles.address}>{item.fullAddress}</Text>
-            <View style={styles.tagContainer}>
-                {
-                  !isBranchOpen(item.openingTime, item.closingTime) &&
-                  <Text style={[ styles.tag, { backgroundColor:"#C1272D" } ]}>
+              <Text style={styles.branchName}>{item.branchName}</Text>
+              <Text style={styles.address}>{item.fullAddress}</Text>
+
+              <View style={styles.tagContainer}>
+                {!isBranchOpen(item.openingTime, item.closingTime) && (
+                  <Text style={[styles.tag, { backgroundColor: "#C1272D" }]}>
                     CURRENTLY CLOSED
                   </Text>
-                }
+                )}
 
-                {
-                  (item.acceptAdvancedOrder && (order.pickUpType !== "DineIn")) &&
-                  <Text style={[ styles.tag, { backgroundColor:"#FB7F3B" } ]}>
+                {item.acceptAdvancedOrder && order.pickUpType !== "DineIn" && (
+                  <Text style={[styles.tag, { backgroundColor: "#FB7F3B" }]}>
                     ADVANCE ORDER
                   </Text>
-                }
+                )}
+              </View>
             </View>
-          </View>
           </TouchableOpacity>
         )}
         ListEmptyComponent={
@@ -208,6 +198,7 @@ export default function BranchesStep3() {
           </View>
         }
       />
+    )}
 
     <View style={{width: "100%", backgroundColor:"black", justifyContent: "center", marginBottom: 20}}>
       <Snackbar
@@ -267,6 +258,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#f2aa83',
     fontFamily: 'MadimiOne',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

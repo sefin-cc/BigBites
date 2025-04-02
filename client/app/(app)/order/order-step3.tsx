@@ -11,27 +11,12 @@ import Loading from "@/components/loading";
 
 import Constants from 'expo-constants';
 import { Snackbar } from "react-native-paper";
-
-interface Branch {
-  id: string;
-  branchName: string;
-  province: string;
-  city: string;
-  fullAddress: string;
-  openingTime: string;
-  closingTime: string;
-  acceptAdvancedOrder: boolean;
-}
-
-const branches: Branch[] = [
-  { id: "1", branchName: "SM DAGUPAN CITY", province: "Pangasinan", city: "Dagupan", fullAddress: "M.H. Del Pilar &, Herrero Rd, Dagupan, 2400 Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false  },
-  { id: "2", branchName: "SM CITY URDANETA", province: "Pangasinan", city: "Urdaneta", fullAddress: "2nd St, Urdaneta, Pangasinan", openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-  { id: "3", branchName: "CITYMALL SAN CARLOS", province: "Pangasinan", city: "San Carlos", fullAddress: "Bugallon St, cor Posadas St, San Carlos City, Pangasinan",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: false },
-  { id: "4", branchName: "ROBINSONS PLACE LA UNION", province: "La Union", city: "San Fernando", fullAddress: "Brgy, MacArthur Hwy, San Fernando, La Union",  openingTime: "07:00", closingTime: "23:00", acceptAdvancedOrder: true },
-];
+import { useGetBranchesQuery } from "../../../redux/feature/apiSlice";
+import { Branch } from "@/types/clients";
 
 export default function MapLocationStep3() {
   const OPENCAGE_API_KEY = Constants.expoConfig?.extra?.OPENCAGE_API_KEY;
+  const { data: branches, isLoading: branchLoading } = useGetBranchesQuery();
   const context = useContext(AppContext);
   if (!context) {
     return <Text>Error: AppContext is not available</Text>;
@@ -189,7 +174,7 @@ export default function MapLocationStep3() {
  
   const handleConfirm = () => {
     // Find a branch with a matching city or town from the selected location
-    const isLocationAvailable = branches.find(
+    const isLocationAvailable = branches?.find(
       (branch) => branch.city === townCity.city || branch.city === townCity.town
     );
 
