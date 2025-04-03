@@ -9,7 +9,8 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { AddOn } from "@/types/clients";
 import { useGetProfileQuery } from "../../redux/feature/auth/clientApiSlice";
 import { useCreateOrderMutation } from "../../redux/feature/ordersApi"
-
+import Loading from "@/components/loading";
+import { useRouter } from "expo-router";
 
 interface MenuItems {
   qty: number;
@@ -27,12 +28,13 @@ interface MenuItems {
 
 
 export default function Checkout() {
+    const router = useRouter();
     const { data: user, isLoading } = useGetProfileQuery();
     const context = useContext(AppContext);
     if (!context) {
       return <Text>Error: AppContext is not available</Text>;
     }
-    const { order, setOrder } = context;
+    const { order, setOrder, resetOrder } = context;
     const [name, setName] = useState(""); 
     const [discountCard, setDiscountCard] = useState(""); 
     const [discount, toggleDiscount] = useState(false);
@@ -41,8 +43,7 @@ export default function Checkout() {
     const [errors, setErrors] = useState({ name: "", card: "" });
     const currentTimestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
     const [visible, setVisible] = useState<boolean>(false);
-    const [addOrder, {isLoading: orderLoading}] = useCreateOrderMutation();
-   
+    const [createOrder,  {isLoading: orderLoading}] = useCreateOrderMutation();
 
    const validateForm = () => {
     if(discount){
@@ -101,10 +102,6 @@ export default function Checkout() {
       showDialog();
 
     }
-
-   
-
-    //post to server
   }
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -116,9 +113,42 @@ export default function Checkout() {
   const hideDialog = () => setModalVisible(false);
 
     // Function to handle confirmation
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
+      try {
 
-      setVisible(true);
+        if(!user){
+          return;
+        }
+    
+        const response = await createOrder({
+          user_id: user.id,
+          type: order.type,
+          pick_up_type: order.pickUpType,
+          location: order.location,
+          branch_id :order.branch && order.branch.length > 0 ? Number(order.branch[0].id) : undefined, 
+          order_items: order.order,
+          base_price: order.basePrice,
+          timestamp: order.timestamp,
+          date_time_pickup: order.dateTimePickUp,
+          status: "pending",
+          discount_card_details: order.discountCardDetails,
+          fees: order.fees,
+          user: user,
+          branch: order.branch && order.branch.length > 0 ? order.branch[0] : null,
+        }).unwrap();
+        
+
+        console.log("Order created:", response);
+        setVisible(true);
+        resetOrder();
+        setTimeout(() => {
+          router.replace(`/(app)/(nav)`); 
+        }, 500);
+
+      } catch (err) {
+        console.error("Error creating order:", err);
+      }
+
       hideDialog();
     };
   
@@ -143,7 +173,7 @@ export default function Checkout() {
 
   return (
     <View style={[globalStyle.container, {padding: "5%"}]}>
-     
+     <Loading isLoading={orderLoading} />
       <ScrollView>
         <View style={{marginBottom: 10}}>
           <TitleDashed title="ORDER DETAIL" />

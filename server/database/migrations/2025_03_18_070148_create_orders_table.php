@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             Schema::create('orders', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+                $table->foreignId('user_id')->nullable()->constrained('clients')->onDelete('set null');
                 $table->enum('type', ['PickUp', 'Delivery']);
                 $table->string('pick_up_type')->nullable();
                 $table->json('location')->nullable();

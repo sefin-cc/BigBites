@@ -57,12 +57,12 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     Route::put('client/update/{id}', [ClientController::class, 'update']);
     Route::delete('client/destroy/{id}', [ClientController::class, 'destroy']);
 });
-Route::apiResource('branches', BranchController::class);
+
     Route::middleware(['auth:sanctum'])->group(function () {
-     //   Route::apiResource('branches', BranchController::class);
+
         Route::apiResource('promos', PromoController::class);
         Route::apiResource('role', RolesController::class);
- 
+        Route::apiResource('branches', BranchController::class);
         Route::apiResource('categories', CategoryController::class);
   
         Route::apiResource('items', ItemController::class);

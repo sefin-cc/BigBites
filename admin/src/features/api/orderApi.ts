@@ -56,12 +56,10 @@ export interface Order {
     order_items: OrderItem[];
     base_price: number;
     timestamp: string;
-    date_time_pickup: string;
+    date_time_pickup: string  | null;
     status: string;
     discount_card_details: DiscountCardDetails;
     fees: Fees;
-    created_at: string;
-    updated_at: string;
     user: User;
     branch: Branch;
 }

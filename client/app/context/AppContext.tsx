@@ -17,6 +17,17 @@ interface Branch {
   closingTime: string;
   acceptAdvancedOrder: boolean;
 }
+interface discountCardDetails {
+  name: string;
+  discountCard: string
+}
+
+interface Fees {
+  subTotal: number,
+  discountDeduction: number, 
+  deliveryFee: number, 
+  grandTotal: number
+}
 
 interface Order {
   costumer: any | null;
@@ -29,6 +40,8 @@ interface Order {
   timestamp: string | null;
   status: string;
   dateTimePickUp: any | null;
+  discountCardDetails: discountCardDetails | undefined,
+  fees: Fees
 }
 
 // Define the context type
@@ -37,6 +50,7 @@ interface AppContextType {
   setUser: React.Dispatch<React.SetStateAction<any>>;
   order: Order;
   setOrder: React.Dispatch<React.SetStateAction<Order>>;
+  resetOrder: () => void;
 }
 
 // Create the context with a default value
@@ -63,7 +77,37 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     timestamp: null,
     status: "pending",
     dateTimePickUp: null,
+    discountCardDetails: undefined,
+    fees: {
+      subTotal: 0,
+      discountDeduction: 0, 
+      deliveryFee: 0, 
+      grandTotal: 0
+    }
   });
+
+  const resetOrder = () => {
+    setOrder({
+      costumer: null,
+      type: "",
+      pickUpType: null,
+      location: null,
+      branch: null,
+      order: [],
+      basePrice: 0,
+      timestamp: null,
+      status: "pending",
+      dateTimePickUp: null,
+      discountCardDetails: undefined,
+      fees: {
+        subTotal: 0,
+        discountDeduction: 0,
+        deliveryFee: 0,
+        grandTotal: 0,
+      },
+    });
+  };
+  
 
   //Set userId and favourites when profile data is available
   useEffect(() => {
@@ -78,7 +122,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   // Function to update favourites
   const handleUpdateFavourites = async () => {
     if (user.userId === null) {
-      console.error("User ID is not set.");
       return;
     }
 
@@ -100,7 +143,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   }, [user]);
 
   return (
-    <AppContext.Provider value={{ user, setUser, order, setOrder}}>
+    <AppContext.Provider value={{ user, setUser, order, setOrder, resetOrder}}>
       {children}
     </AppContext.Provider>
   );
