@@ -12,6 +12,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Modalize } from "react-native-modalize";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { Snackbar } from "react-native-paper";
 
 interface AddOns {
   label: string;
@@ -45,13 +46,13 @@ export default function ViewCart() {
   const [selectedItem, setSelectedItem] = useState<MenuItems>();
   const [qtyCount, setQtyCount] = useState(1);
   const [tappedItems, setTappedItems] = useState<{ [key: string]: boolean}>({}); 
+  const [visible, setVisible] = useState<boolean>(false);
 
   const openEditModal =()=>{
     setQtyCount(1);
     setTappedItems({});
     modalizeRef.current?.open();
   }
-
 
   useEffect(() => {
     if (order) {
@@ -157,18 +158,32 @@ export default function ViewCart() {
   }, [tappedItems]);
 
   const handleCheckOut = () => {
-    setOrder(prev => ({
-      ...prev,
-      basePrice: orderTotal,
-    }));
-    router.push(`/(app)/checkout`); 
+    if(orderItems.length > 0 ){
+      setOrder(prev => ({
+        ...prev,
+        basePrice: orderTotal,
+      }));
+      router.push(`/(app)/checkout`); 
+    }else{
+      setVisible(true);
+    }
+   
   }
+  useEffect(() => {
+    if (visible) {
+      const timer = setTimeout(() => {
+        setVisible(false);
+      }, 3000);
 
+      // Cleanup timer on component unmount or when visible changes
+      return () => clearTimeout(timer);
+    }
+  }, [visible]); 
   return (
    
     <BottomSheetModalProvider >
     <GestureHandlerRootView  >
-    <View style={[globalStyle.container]}>
+    <View style={[globalStyle.container]} >
 
       <View style ={{padding: "5%", flexGrow: 1}}>
         <View style={{ flexDirection: "row", paddingBottom: 10 }}>
@@ -218,10 +233,32 @@ export default function ViewCart() {
               <View style={{ borderBottomWidth: 4, borderColor: "#FB7F3B" }}></View>
             );
           }}
-          
+          ListEmptyComponent={() => (
+            <View style={styles.emptyCartContainer}>
+              <FontAwesome6 name="cart-plus" size={60} color="#f2aa83" />
+              <Text style={styles.emptyCartText}>CART IS EMPTY</Text>
+            </View>
+          )}
         />
-
-
+        <View style={{alignItems: "center"}}>
+        <Snackbar
+            visible={visible}
+            onDismiss={() => setVisible(false)}
+            duration={Snackbar.DURATION_LONG} 
+            style={{
+              position: 'absolute',  
+              left: 0,             
+              right: 0, 
+              bottom: 0,
+              backgroundColor: '#2C2C2C', 
+              borderRadius: 10,     
+              zIndex: 10000,      
+            }}
+          >
+            <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> THE CART IS EMPTY!</Text>
+          </Snackbar>
+        </View>
+          
 
       </View>
 
@@ -328,6 +365,18 @@ export default function ViewCart() {
 }
 
 const styles = StyleSheet.create({
+  emptyCartContainer: {
+    flex: 1,
+    height: 500,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  emptyCartText: {
+    fontSize: 20,
+    color: "#f2aa83", 
+    fontFamily: 'MadimiOne',
+  },
   cartItemContainer: {
     borderBottomWidth: 4,
     borderColor: "#FB7F3B",

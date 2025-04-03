@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "../../assets/styles/globalStyle";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
@@ -6,11 +6,10 @@ import TitleDashed from "@/components/titledashed";
 import { format } from 'date-fns';
 import { Checkbox, Dialog, Portal, RadioButton, Snackbar, TextInput, Button as PaperButton } from "react-native-paper";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { AddOn } from "@/types/clients";
+import { useGetProfileQuery } from "../../redux/feature/auth/clientApiSlice";
 
-interface AddOns {
-  label: string;
-  price: number;
-}
+
 
 interface MenuItems {
   qty: number;
@@ -22,17 +21,18 @@ interface MenuItems {
   price: number;
   time: string;
   image: string;
-  addOns: Array<AddOns>;
-  selectedAddOns: Array<AddOns> | [];  
+  addOns: Array<AddOn>;
+  selectedAddOns: Array<AddOn> | [];  
 }
 
 
 export default function Checkout() {
+    const { data: user, isLoading } = useGetProfileQuery();
     const context = useContext(AppContext);
     if (!context) {
       return <Text>Error: AppContext is not available</Text>;
     }
-    const { order, setOrder, setUser, user} = context;
+    const { order, setOrder } = context;
     const [name, setName] = useState(""); 
     const [discountCard, setDiscountCard] = useState(""); 
     const [discount, toggleDiscount] = useState(false);
@@ -153,8 +153,18 @@ export default function Checkout() {
               <Text style={styles.text}>YOUR INFORMATION:</Text>
             </View>
             <View style={{flex: 1}}>
-              <Text style={styles.collapsibleText}>Rogena Sefin Tibegar </Text>
-              <Text style={styles.collapsibleText}>09212121212 </Text>
+              {
+                user && !isLoading ? 
+                <View>
+                  <Text style={styles.collapsibleText}>{user.name}</Text>
+                  <Text style={styles.collapsibleText}>{user.phone} </Text>
+                </View> :
+                <View>
+                  <ActivityIndicator animating={isLoading} color={"#FB7F3B"}  size="large" hidesWhenStopped={true}/>:
+                </View>
+              }
+              
+              
             </View>
           </View>
 
