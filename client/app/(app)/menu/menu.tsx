@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity, SafeAreaView, Dimensions, ToastAndroid } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
-import menuData from "../../../data/menu.json";
+
 import Feather from "@expo/vector-icons/Feather";
 import { useState, useEffect, useRef, useMemo, useCallback, useContext } from "react";
 import TitleDashed from "@/components/titledashed";
@@ -16,53 +16,24 @@ import ViewCartContainer from "@/components/ViewCartContainer";
 import SearchMenu from "@/components/SearchMenu";
 import Loading from "@/components/loading";
 import { Snackbar } from "react-native-paper";
+import { useGetMenuQuery } from "../../../redux/feature/apiSlice";
+import { Category, Item} from "@/types/clients";
 
 
-
-
-interface AddOns {
-  label: string;
-  price: number;
-}
-
-interface MenuItems {
-  [x: string]: any;
-  itemId: string;
-  label: string;
-  fullLabel: string;
-  description: string;
-  price: number;
-  time: string;
-  image: string;
-  addOns: Array<AddOns>;
-}
-
-interface SubCategories {
-  subId: string;
-  label: string;
-  items: Array<MenuItems>;
-}
-
-interface Menu {
-  id: string;
-  category: string;
-  subCategories: Array<SubCategories>;
-}
 
 interface MenuItemCard {
-  id: string;
-  subId: string;
+  id: number;
+  sub_category_id: number;
   name: string;
   image: string;
 }
 
 interface User {
-  favourites: MenuItems[];
+  favourites: Item[];
 }
 
-type MenuData = typeof menuData;
-
 export default function Menu() {
+  const { data: menuData, isLoading: menuLoading } = useGetMenuQuery();
   const context = useContext(AppContext);
   if (!context) {
     return <Text>Error: AppContext is not available</Text>;
@@ -70,23 +41,21 @@ export default function Menu() {
   const { order, setOrder, setUser, user} = context;
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const [menu, setMenu] = useState<Menu | null>(null);
+  const [menu, setMenu] = useState<Category | null>(null);
   const [visible, setVisible] = useState<boolean>(false);
   const modalizeRef = useRef<Modalize>(null);
-  const [itemId, setItemId] = useState<string | null>(null);
-  const [subCategoryId, setSubCategoryId] = useState<string | null>(null);
+  const [itemId, setItemId] = useState<number | null>(null);
+  const [subCategoryId, setSubCategoryId] = useState<number | null>(null);
   const [favourite, toggleFavourite] = useState(false);
   const [qtyCount, setQtyCount] = useState(1);
   const [tappedItems, setTappedItems] = useState<{ [key: number]: boolean }>({}); 
-  const [isLoading, setIsLoading] = useState(false);
 
-  const getMenuData = () =>{
-    
-  }
 
   const setMenuData = () => {
     const categoryId = parseInt(id as string);
-    setMenu(menuData[categoryId]); 
+    if (menuData && categoryId in menuData) {
+        setMenu(menuData[categoryId]);  
+    }
   };
 
   const handleTapItem =()=>{
@@ -98,9 +67,9 @@ export default function Menu() {
 
   const getSelectedItem = () => {
     if (!menu || !subCategoryId || !itemId) return null;
-    const subCategory = menu.subCategories.find(sub => sub.subId === subCategoryId);
+    const subCategory = menu.sub_categories.find(sub => sub.id === subCategoryId);
     if (subCategory) {
-      return subCategory.items.find(item => item.itemId === itemId);
+      return subCategory.items.find(item => item.id === itemId);
     }
     return null;
   }
@@ -109,8 +78,8 @@ export default function Menu() {
 
   useEffect(() => {
     setMenuData();
-    console.log(menu);
-  }, [setMenuData]);
+    console.log(menuData);
+  }, [menuData]);
 
   useEffect(() => {
     console.log(order);
@@ -120,7 +89,7 @@ export default function Menu() {
     if (selectedItem) {
       // Check if the selected item is in the user's favourites
       const isFavourite = user.favourites.some(
-        (item: { fullLabel: string; }) => selectedItem.fullLabel === item.fullLabel
+        (item: { full_label: string; }) => selectedItem.full_label === item.full_label
       );
       
       // Update the favourite state accordingly
@@ -145,7 +114,7 @@ export default function Menu() {
     }));
   };
 
-  const setFavourite = (itemMenu: MenuItems) => {
+  const setFavourite = (itemMenu: Item) => {
     // Toggle the favourite state
     toggleFavourite(prevState => {
       const newFavouriteState = !prevState;
@@ -154,7 +123,7 @@ export default function Menu() {
       setUser((prev: User) => {
         const updatedFavourites = newFavouriteState
           ? [...prev.favourites, itemMenu] // Add the item if it's being set as favourite
-          : prev.favourites.filter((fav) => fav.fullLabel !== itemMenu.fullLabel); // Remove the item if it's being unfavoured
+          : prev.favourites.filter((fav) => fav.full_label !== itemMenu.full_label); // Remove the item if it's being unfavoured
   
         return {
           ...prev,
@@ -167,10 +136,10 @@ export default function Menu() {
   };
 
 
-  const handleAddToCart = (itemMenu: MenuItems) => {
+  const handleAddToCart = (itemMenu: Item) => {
     // Check if a similar item already exists in the order
     const existingItem = Object.entries(order.order).find(
-      ([key, item]) => itemMenu.fullLabel === item.fullLabel
+      ([key, item]) => itemMenu.full_label === item.full_label
     );
   
     // If the item exists, update the quantity instead of adding a new item
@@ -195,7 +164,7 @@ export default function Menu() {
         .filter(([key, item]) => item === true) // keep only the items that are true
         .map(([key, item]) => Number(key)); // map to get the keys (which are the selected add-ons)
   
-      const newSelectedItem = selectedAddOns.map((key) => itemMenu.addOns[key]);
+      const newSelectedItem = selectedAddOns.map((key) => itemMenu.add_ons[key]);
   
       // Add the new item to the order
       const newItemMenu = { ...itemMenu, selectedAddOns: newSelectedItem, qty: qtyCount };
@@ -232,7 +201,7 @@ export default function Menu() {
   return (
 
     <View style={[globalStyle.container]}>
-      <Loading isLoading={isLoading} />
+      <Loading isLoading={menuLoading} />
       <BottomSheetModalProvider >
       <GestureHandlerRootView >
       
@@ -241,36 +210,47 @@ export default function Menu() {
         {/* Menu */}
       <View style={{ minHeight: 700}}>
       <ScrollView >
-          <View style={styles.contentContainer}>
-            {menu && (
-              <>
-                {menu.subCategories.map((item, key) => {
-                  const menuData: MenuItemCard[] = item.items.map((menuItem) => ({
-                    id: menuItem.itemId,
-                    subId:menuItem.subId,
-                    name: menuItem.label,
-                    image: menuItem.image,
-                  }));
+      <View style={styles.contentContainer}>
+        {menu ? (
+          menu.sub_categories.length > 0 ? (
+            menu.sub_categories.map((item, key) => {
+              const menuData: MenuItemCard[] = item.items.map((menuItem) => ({
+                id: menuItem.id,
+                sub_category_id: menuItem.sub_category_id,
+                name: menuItem.label,
+                image: menuItem.image,
+              }));
 
-                  return (
-                    <View key={key}>
-                        <View style={{ marginBottom: 10 }}>
-                          <TitleDashed title={item.label} />
-                        </View>
+              return (
+                <View key={key}>
+                  <View style={{ marginBottom: 10 }}>
+                    <TitleDashed title={item.label} />
+                  </View>
 
-                        {/* Pass the entire menuData array to MenuContainer */}
-                        <MenuContainer
-                          menuData={menuData}  // Pass the array of menu items
-                          handleTapItem={() => handleTapItem()}  // Tap callback to trigger bottom sheet
-                          setItemId={setItemId}
-                          setSubCategoryId={setSubCategoryId}
-                        />
-                    </View>
-                  );
-                })}
-              </>
-            )}
+                  {/* Pass the entire menuData array to MenuContainer */}
+                  <MenuContainer
+                    menuData={menuData} // Pass the array of menu items
+                    handleTapItem={() => handleTapItem()} // Tap callback to trigger bottom sheet
+                    setItemId={setItemId}
+                    setSubCategoryId={setSubCategoryId}
+                  />
+                </View>
+              );
+            })
+          ) : (
+            <View style={styles.noMenuContainer} >
+              <Text style={styles.noMenuText}>NO MENU ITEMS AVAILABLE</Text>
+            </View>
+
+            
+          )
+        ) : (
+          <View style={styles.noMenuContainer} >
+            <Text style={styles.noMenuText}>NO MENU ITEMS AVAILABLE</Text>
           </View>
+        )}
+      </View>
+
 
             
           <Snackbar
@@ -306,7 +286,7 @@ export default function Menu() {
                   />
                   <View style={globalStyle.modalContainer}>
                     <View style={{flexDirection: "row"}}>
-                      <Text style={globalStyle.modalLabel}>{selectedItem.fullLabel}</Text>
+                      <Text style={globalStyle.modalLabel}>{selectedItem.full_label}</Text>
                       <TouchableOpacity
                         onPress={() => {setFavourite(selectedItem)}}
                       >
@@ -330,7 +310,7 @@ export default function Menu() {
                     <View style={globalStyle.addOnsContainer}>
                       {
 
-                            selectedItem.addOns.map((item, key) => {
+                            selectedItem.add_ons.map((item, key) => {
                               return (
                                 <TouchableOpacity 
                                   key={key} 
@@ -383,8 +363,18 @@ const styles = StyleSheet.create({
   contentContainer: {
     margin: "5%",
   },
-
-
+  noMenuContainer:{
+    height: 500,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noMenuText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#f2aa83",
+    marginTop: 20,
+    fontFamily: 'MadimiOne',
+  },
 
 
 });

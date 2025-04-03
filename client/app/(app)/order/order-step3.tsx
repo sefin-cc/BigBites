@@ -8,11 +8,10 @@ import { router } from "expo-router";
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import Loading from "@/components/loading";
-
 import Constants from 'expo-constants';
 import { Snackbar } from "react-native-paper";
 import { useGetBranchesQuery } from "../../../redux/feature/apiSlice";
-import { Branch } from "@/types/clients";
+
 
 export default function MapLocationStep3() {
   const OPENCAGE_API_KEY = Constants.expoConfig?.extra?.OPENCAGE_API_KEY;

@@ -101,3 +101,44 @@ export interface Order {
     branch: Branch;
 }
 
+export interface AddOn {
+  id: number;
+  item_id: number;
+  label: string;
+  price: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Item {
+  id: number;
+  sub_category_id: number;
+  label: string;
+  full_label: string;
+  description: string;
+  price: number;
+  time: string;
+  image: string;
+  created_at: string;
+  updated_at: string;
+  add_ons: AddOn[];
+}
+
+interface SubCategory {
+  id: number;
+  category_id: number;
+  label: string;
+  created_at: string;
+  updated_at: string;
+  items: Item[];
+}
+
+export interface Category {
+  id: number;
+  category: string;
+  created_at: string;
+  updated_at: string;
+  sub_categories: SubCategory[];
+}
+
+
