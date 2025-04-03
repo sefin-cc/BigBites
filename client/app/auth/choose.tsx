@@ -4,23 +4,12 @@ import { useRouter } from "expo-router";
 import React, { useContext } from "react";
 import { useState } from "react";
 import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image } from "react-native";
-import { AppContext } from "../context/AppContext";
 import { Checkbox } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 
 
 export default function Choose() {
-  const context = useContext(AppContext);
   const router = useRouter();
-  if (!context) {
-    return <Text>Error: AppContext is not available</Text>;
-  }
-
-
-  const handleLogin = async () => {
-
-    };
-
 
   return (
     <View style={styles.container}>

@@ -41,6 +41,15 @@ export const clientApi = createApi({
         await AsyncStorage.removeItem("authToken"); // Clear AsyncStorage
       },
     }),
+
+    updateFavourites: builder.mutation<Client, { userId: number; favourites: any[] }>({
+      query: ({ userId, favourites }) => ({
+        url: `/client/update_favourites/${userId}`, 
+        method: "POST",
+        body: { favourites }, 
+      }),
+    }),
+
     getProfile: builder.query<Client, void>({
       query: () => ({
         url: '/client',
@@ -55,4 +64,5 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useGetProfileQuery,
+  useUpdateFavouritesMutation
 } = clientApi;

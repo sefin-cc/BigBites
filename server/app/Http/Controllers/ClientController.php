@@ -179,4 +179,32 @@ public function login(Request $request)
 
         return response()->json(['message' => 'Client deleted successfully']);
     }
+
+    
+    public function updateFavourites(Request $request, $id)
+    {
+        // Find the admin by ID
+        $admin = Client::find($id);
+    
+        // Ensure the admin exists
+        if (!$admin) {
+            return response()->json(['error' => 'Admin not found'], 404);
+        }
+    
+        // Check if the authenticated user is updating their own information
+        if ($admin->id !== Auth::user()->id) {
+            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
+        }
+    
+        // Validate the input fields
+        $request->validate([
+            'favourites' => 'nullable|array',
+        ]);
+    
+        // Update the admin's information
+        $admin->update($request->only(['favourites']));
+    
+        // Return the updated admin as a JSON response
+        return response()->json($admin);
+    }
 }

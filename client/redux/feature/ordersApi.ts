@@ -7,9 +7,6 @@ export const ordersApi = createApi({
     reducerPath: "ordersApi",
     baseQuery,
     endpoints: (builder) => ({
-      getOrders: builder.query<Order[], void>({
-        query: () => "/orders",
-      }),
   
       createOrder: builder.mutation<Order, Partial<Order>>({
         query: (orderData) => ({
@@ -18,9 +15,10 @@ export const ordersApi = createApi({
           body: orderData,
         }),
       }),
+
     }),
   });
   
 
 // Export Hooks
-export const { useGetOrdersQuery, useCreateOrderMutation } = ordersApi;
+export const { useCreateOrderMutation } = ordersApi;

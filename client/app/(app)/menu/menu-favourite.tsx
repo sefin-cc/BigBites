@@ -15,6 +15,7 @@ import SearchMenu from "@/components/SearchMenu";
 import { Item, AddOn} from "@/types/clients";
 import { Snackbar } from "react-native-paper";
 
+
 interface User {
   favourites: Item[];
 }
@@ -28,12 +29,11 @@ interface MenuData {
 
 
 export default function MenuFavourite() {
-
   const context = useContext(AppContext);
   if (!context) {
     return <Text>Error: AppContext is not available</Text>;
   }
-  const { order, setOrder, setUser, user} = context;
+  const { order, setOrder, setUser, user } = context;
   const [menu, setMenu] = useState<any[] | null>(null);
   const modalizeRef = useRef<Modalize>(null);
   const [itemId, setItemId] = useState<number | null>(null);
@@ -45,7 +45,9 @@ export default function MenuFavourite() {
   const [visible, setVisible] = useState<boolean>(false);
 
   const setMenuData = () => {
-    setMenu(user.favourites); 
+    if(user){
+      setMenu(user.favourites); 
+    }
   };
 
   const handleTapItem =()=>{
@@ -67,7 +69,7 @@ export default function MenuFavourite() {
   useEffect(() => {
     setMenuData();
     console.log(menu);
-  }, []); 
+  }, [user]); 
 
   useEffect(() => {
     console.log(order);
@@ -93,14 +95,17 @@ export default function MenuFavourite() {
 
 
   useEffect(() => {
-    if (selectedItem) {
-      const isFavourite = user.favourites.some(
-        (item: Item) => selectedItem.full_label === item.full_label
-      );
-      toggleFavourite(isFavourite);
-      console.log("user: ", user);
+    if(user && user.favourites){
+      if (selectedItem) {
+        const isFavourite = user.favourites.some(
+          (item: Item) => selectedItem.full_label === item.full_label
+        );
+        toggleFavourite(isFavourite);
+        console.log("user: ", user);
+      }
     }
-  }, [selectedItem, JSON.stringify(user.favourites)]); 
+
+  }, [selectedItem, user.favourites]); 
   
   useEffect(() => {
     if (visible) {
@@ -213,7 +218,7 @@ export default function MenuFavourite() {
               </View>
               {menu && (
                 <>
-                  {favMenu?.length ? ( // ✅ Safer check
+                  {favMenu?.length ? ( 
                     <View>
                       <MenuContainer
                         menuData={favMenu}

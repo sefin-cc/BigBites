@@ -4,18 +4,12 @@ import { useRouter } from "expo-router";
 import React, { useContext } from "react";
 import { useState } from "react";
 import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image } from "react-native";
-import { AppContext } from "../context/AppContext";
+
 import { Checkbox } from "react-native-paper";
 
 
 export default function Register() {
-  const context = useContext(AppContext);
   const router = useRouter();
-  if (!context) {
-    return <Text>Error: AppContext is not available</Text>;
-  }
-
-  // const {setToken} = context;
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({
     name: '',

@@ -8,7 +8,7 @@ import { Checkbox, Dialog, Portal, RadioButton, Snackbar, TextInput, Button as P
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { AddOn } from "@/types/clients";
 import { useGetProfileQuery } from "../../redux/feature/auth/clientApiSlice";
-
+import { useCreateOrderMutation } from "../../redux/feature/ordersApi"
 
 
 interface MenuItems {
@@ -40,8 +40,8 @@ export default function Checkout() {
     const [selectedValue, setSelectedValue] = useState("GCASH");
     const [errors, setErrors] = useState({ name: "", card: "" });
     const currentTimestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-   const [visible, setVisible] = useState<boolean>(false);
-
+    const [visible, setVisible] = useState<boolean>(false);
+    const [addOrder, {isLoading: orderLoading}] = useCreateOrderMutation();
    
 
    const validateForm = () => {
@@ -117,6 +117,7 @@ export default function Checkout() {
 
     // Function to handle confirmation
     const handleConfirm = () => {
+
       setVisible(true);
       hideDialog();
     };

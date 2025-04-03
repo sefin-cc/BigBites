@@ -37,12 +37,28 @@ export interface Client {
   }
 
 
-  interface OrderItem {
-    itemId: string;
-    label: string;
-    price: number;
-    qty: number;
+// export interface OrderItem {
+//     itemId: string;
+//     label: string;
+//     price: number;
+//     qty: number;
+//     addOns: AddOn[];
+// }
+export interface OrderItem {
+  qty: number;
+  subId: string;
+  itemId: string;
+  label: string;
+  full_label: string;
+  description: string;
+  price: number;
+  time: string;
+  image: string;
+  addOns: Array<AddOn>;
+  selectedAddOns: Array<AddOn> | [];  
 }
+
+
 
 interface DiscountCardDetails {
     name: string | null;
@@ -76,29 +92,30 @@ export interface Branch {
   acceptAdvancedOrder: boolean;
 }
 
-
-interface Location {
-    description: string;
+export interface Location {
+  description: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface Order {
     id: number;
     user_id: number;
     type: string;
-    pick_up_type: string;
+    pick_up_type: string | null;
     location: Location | null;
     branch_id: number;
     order_items: OrderItem[];
     base_price: number;
-    timestamp: string;
-    date_time_pickup: string;
+    timestamp: string | null;
+    date_time_pickup: string | null;
     status: string;
     discount_card_details: DiscountCardDetails;
     fees: Fees;
     created_at: string;
     updated_at: string;
-    user: User;
-    branch: Branch;
+    user: User | null;
+    branch: Branch | null;
 }
 
 export interface AddOn {

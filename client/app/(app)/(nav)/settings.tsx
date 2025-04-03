@@ -1,18 +1,11 @@
 import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import globalStyle from "../../../assets/styles/globalStyle";
-import { useContext, useEffect } from "react";
-import { AppContext } from "@/app/context/AppContext";
+import { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useLogoutMutation, useGetProfileQuery } from "../../../redux/feature/auth/clientApiSlice";
 
 
 export default function Login() {
-  const context = useContext(AppContext);
   const router = useRouter();
-  if (!context) {
-    return <Text>Error: AppContext is not available</Text>;
-  }
-  const {user, setUser, setToken} = context;
   const [logout, { isLoading }] = useLogoutMutation();
   const { data: profile } = useGetProfileQuery();
   const handleLogout = async () => {

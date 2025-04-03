@@ -1,6 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { useGetProfileQuery, useUpdateFavouritesMutation } from "@/redux/feature/auth/clientApiSlice";
 
 interface Location {
   description: string;
@@ -34,8 +33,6 @@ interface Order {
 
 // Define the context type
 interface AppContextType {
-  token: string | null;
-  setToken: React.Dispatch<React.SetStateAction<string | null>>;
   user: any | null; 
   setUser: React.Dispatch<React.SetStateAction<any>>;
   order: Order;
@@ -46,14 +43,15 @@ interface AppContextType {
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<any>({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    favourites: []
+  const { data: profile } = useGetProfileQuery();
+  const [updateFavourites, { isLoading, error }] = useUpdateFavouritesMutation();
+  
+  // Initialize user state with correct types
+  const [user, setUser] = useState<{ userId: number | null; favourites: any[] }>({
+    userId: null,
+    favourites: [],
   });
+
   const [order, setOrder] = useState<Order>({
     costumer: null,
     type: "",
@@ -63,53 +61,46 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     order: [],
     basePrice: 0,
     timestamp: null,
-    status: 'pending',
-    dateTimePickUp: null
+    status: "pending",
+    dateTimePickUp: null,
   });
 
-  // Load token from AsyncStorage
+  //Set userId and favourites when profile data is available
   useEffect(() => {
-    const loadToken = async () => {
-      const storedToken = await AsyncStorage.getItem("token");
-      if (storedToken) {
-        setToken(storedToken);
-      }
-    };
-    loadToken();
-  }, []);
+    if (profile) {
+      setUser({
+        userId: profile.id, 
+        favourites: profile.favourites || [], 
+      });
+    }
+  }, [profile]);
 
-  // Fetch user data when token changes
+  // Function to update favourites
+  const handleUpdateFavourites = async () => {
+    if (user.userId === null) {
+      console.error("User ID is not set.");
+      return;
+    }
+
+    try {
+      await updateFavourites({
+        userId: user.userId,
+        favourites: user.favourites,
+      }).unwrap();
+
+    } catch (err) {
+      console.error("Error updating favourites:", err);
+    }
+  };
+
+  //Debugging to verify user state updates
   useEffect(() => {
-    const getUser = async () => {
-      if (!token) return;
-
-      try {
-        const res = await fetch("http://127.0.0.1:8000/api/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-          setOrder(prev => ({
-            ...prev,
-            costumer: data
-          }));
-        } else {
-          console.error("Failed to fetch user:", res.status);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-
-    getUser();
-  }, [token]);
+    handleUpdateFavourites();
+    console.log("User state updated:", user);
+  }, [user]);
 
   return (
-    <AppContext.Provider value={{ token, setToken, user, setUser, order, setOrder}}>
+    <AppContext.Provider value={{ user, setUser, order, setOrder}}>
       {children}
     </AppContext.Provider>
   );
