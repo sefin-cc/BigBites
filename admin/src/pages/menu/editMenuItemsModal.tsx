@@ -122,7 +122,7 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
            }   
 
            if (imageFile && item) {
-             if (item.image !== "") {
+             if (item.image) {
                await deleteImage({ url: item.image }).unwrap();
              }
            

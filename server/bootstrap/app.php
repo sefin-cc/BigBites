@@ -24,9 +24,18 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class
         ]);
-        $middleware->web(prepend: [
-            EnsureFrontendRequestsAreStateful::class, 
-        ]);
+        // $middleware->api(prepend: [
+        //     EnsureFrontendRequestsAreStateful::class, 
+        // ]);
+
+    // Define custom middleware group for admin
+    $middleware->group('admin.api', [
+        \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    ]);
+
+        
 
         $middleware->statefulApi();
         // $middleware->redirectUsersTo(function (Request $request) {
