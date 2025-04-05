@@ -44,23 +44,15 @@ class OrderController extends Controller
             'status' => 'required|string',
             'discount_card_details' => 'nullable|array',
             'fees' => 'required|array',
+            'reference_number' => 'required'
         ]);
-    
-        // Enable foreign key constraints for SQLite
-       
-    
-        // // Ensure foreign keys exist
-        // $user = Client::find($validated['user_id']);
-        // if (!$user) {
-        //     return response()->json(['message' => 'User not found'], 404);
-        // }
+
     
         $branch = Branch::find($validated['branch_id']);
         if (!$branch) {
             return response()->json(['message' => 'Branch not found'], 404);
         }
     
-
     
         // Create the order
         $order = Order::create([
@@ -76,6 +68,7 @@ class OrderController extends Controller
             'status' => $validated['status'],
             'discount_card_details' => $validated['discount_card_details'],
             'fees' => $validated['fees'],
+            'reference_number' => $validated['reference_number']
         ]);
     
         // **Broadcast Order Created Event**

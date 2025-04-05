@@ -13,21 +13,22 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import { visuallyHidden } from '@mui/utils';
-import { TextField } from '@mui/material';
-import { useGetOrdersQuery, useUpdateOrderMutation } from '../../features/api/orderApi';
+import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
+import { useGetOrdersQuery, useUpdateOrderMutation} from '../../features/api/orderApi';
 import ReactLoading from 'react-loading';
 import { Slide, toast, ToastContainer } from 'react-toastify';
-import { useEffect } from 'react';
-
 
 // Data Types
 interface Data {
   id: number;
+  ref: string;
   datatime: string;
   name: string;
-  address: string;
+  branch: string;
+  location: string | null;
   phone: string;
   discountDeduction: number;
+  deliveryFee: number;
   subTotal: number;
   grandTotal: number;
   type: string;
@@ -40,26 +41,32 @@ interface Data {
 // Data Row Creation
 function createData(
   id: number,
+  ref: string,
   datatime: string,
   name: string,
-  address: string,
+  branch: string,
+  location: string | null,
   phone: string,
   discountDeduction: number,
+  deliveryFee: number,
   subTotal: number,
   grandTotal: number,
   type: string,
   pickUpType: string,
   order: Array<any>,
   status: string,
-  dateTimePickUp: any | null
+  dateTimePickUp: any | null,
 ): Data {
   return {
     id,
+    ref,
     datatime,
     name,
-    address,
+    branch,
+    location,
     phone,
     discountDeduction,
+    deliveryFee,
     subTotal,
     grandTotal,
     type,
@@ -69,6 +76,8 @@ function createData(
     dateTimePickUp
   };
 }
+
+
 
 
 // Sorting Functions
@@ -108,24 +117,27 @@ interface HeadCell {
 
 // Head Cells
 const headCells: readonly HeadCell[] = [
-    { id: 'dateTimePickUp', numeric: false, disablePadding: true, label: 'Expected Date and Time' },
-    { id: 'datatime', numeric: false, disablePadding: true, label: 'Timestamp' },
-    { id: 'name', numeric: true, disablePadding: false, label: 'Name' },
-    { id: 'address', numeric: true, disablePadding: false, label: 'Address' },
-    { id: 'phone', numeric: true, disablePadding: false, label: 'Phone' },
-    { id: 'grandTotal', numeric: true, disablePadding: false, label: 'Total Price' },
+  { id: 'id', numeric: true, disablePadding: false, label: 'Order#' },
+  { id: 'ref', numeric: true, disablePadding: false, label: 'REF#' },
+  { id: 'dateTimePickUp', numeric: false, disablePadding: false, label: 'Expected At' },
+  { id: 'branch', numeric: false, disablePadding: false, label: 'Branch' },
+  { id: 'name', numeric: false, disablePadding: false, label: 'Name' },
+  { id: 'phone', numeric: true, disablePadding: false, label: 'Phone' },
+  { id: 'grandTotal', numeric: true, disablePadding: false, label: 'Total Price' },
 ];
 
 // Table Header Component
 interface EnhancedTableProps {
+  numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
+  rowCount: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const {  order, orderBy, onRequestSort } = props;
+  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
   const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -133,11 +145,10 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox" />
+       
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -145,6 +156,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
+              sx={{fontWeight:"bolder"}}
             >
               {headCell.label}
               {orderBy === headCell.id ? (
@@ -160,79 +172,103 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   );
 }
 
+// Toolbar Component with Filter
 interface EnhancedTableToolbarProps {
+  numSelected: number;
+  onFilterChange: (event: SelectChangeEvent<string>) => void;
+  filterValue: string;
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-    const { onSearchChange } = props;
-    return (
-        <Toolbar>
-            <Typography sx={{ marginRight:2, fontFamily:"Madimi One"}} variant="h6" component="div">
-                PENDING ADVANCE ORDERS
-            </Typography>
-            <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
-                <TextField
-                    label="Search"
-                    variant="outlined"
-                    size="small"
-                    sx={{ flex: 1 }}
-                    onChange={onSearchChange}
-                    placeholder="Search..."
-                />
-            </Box>
-        </Toolbar>
-    );
+  const { onSearchChange, onFilterChange, filterValue } = props;
+
+  return (
+    <Toolbar>
+      <Typography sx={{ marginRight: 2, fontFamily:"Madimi One"}} variant="h6" component="div">
+        PENDING ADVANCED ORDERS
+      </Typography>
+      <Box sx={{ display: "flex", flex: 1, width: "100%", gap: 2 }}>
+        <TextField
+            label="Search"
+            variant="outlined"
+            size="small"
+            sx={{ flex: 1 }}
+            onChange={onSearchChange}
+            placeholder="Search..."
+        />
+        <FormControl>
+          <InputLabel id="type-filter-label">Type</InputLabel>
+          <Select
+            labelId="type-filter-label"
+            value={filterValue}
+            onChange={onFilterChange}
+            label="Type"
+            size="small"
+            sx={{ width: 110 }}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="PickUp">PickUp</MenuItem>
+            <MenuItem value="Delivery">Delivery</MenuItem>
+          </Select>
+        </FormControl>
+        </Box>
+    </Toolbar>
+  );
 }
 
 // Main Pending Orders Component
-export default function AdvanceOrders() {
+export default function Pending() {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('dateTimePickUp');
+  const [orderBy, setOrderBy] = React.useState<keyof Data>('datatime');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [filterType, setFilterType] = React.useState<string>('');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
-  const { data: orders, error, isLoading, refetch} = useGetOrdersQuery();
+  const { data: orders, error, isLoading, refetch } = useGetOrdersQuery();
   const [rows, setRows] = React.useState<any[]>([]); 
-  const [updateOrder, { isLoading: orderLoading }] = useUpdateOrderMutation();
+   const [updateOrder, { isLoading: orderLoading }] = useUpdateOrderMutation();
+    
+  React.useEffect(() => {
+    if (orders) {
 
-  useEffect(() => {
-   if (orders) {
-     setRows(orders.map((order, index) =>
-       createData(
-         index + 1,
-         order.timestamp,
-         order.user.name,
-         order.location?.description || order.branch.branchName +', '+ order.branch.fullAddress,
-         order.user.email,
-         order.fees.discountDeduction,
-         order.fees.subTotal,
-         order.fees.grandTotal,
-         order.type,
-         order.pick_up_type || '',
-         order.order_items,
-         order.status,
-         order.date_time_pickup
-       )
-     ));
-   }
-   if(error){
-       toast.error('Something went wrong!', {
-         position: "top-right",
-         autoClose: 5000,
-         hideProgressBar: false,
-         closeOnClick: true,
-         pauseOnHover: true,
-         draggable: true,
-         progress: undefined,
-         theme: "light",
-         transition: Slide,
-       });
-     }
- }, [orders]);  
-
+      setRows(orders.map((order, index) =>
+        createData(
+          index + 1,
+          order.reference_number || "",
+          order.timestamp,
+          order.user.name,
+          order.branch.branchName,
+          order.location?.description || null,
+          order.user.phone,
+          order.fees.discountDeduction,
+          order.fees.deliveryFee,
+          order.fees.subTotal,
+          order.fees.grandTotal,
+          order.type,
+          order.pick_up_type || '',
+          order.order_items,
+          order.status,
+          order.date_time_pickup
+        )
+      ));
+   
+    }
+    if(error){
+        toast.error('Something went wrong!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Slide,
+        });
+      }
+  }, [orders]);  
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -270,28 +306,35 @@ export default function AdvanceOrders() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    };
+  const handleFilterChange = (event: SelectChangeEvent<string>) => {
+    setFilterType(event.target.value);
+  };
+  
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
     const filteredRows = rows
-    .filter(row => row.status === 'pending')  // Apply filter for 'completed' status
+    .filter(row => !filterType || row.type === filterType)  // Apply filter for type
+    .filter(row => row.status === 'pending')  // Apply filter for 'pending' status
     .filter(row => row.dateTimePickUp)  
     .filter(row => {
       const searchTermLower = searchTerm.toLowerCase();
-      // Apply search term across multiple fields (name, phone, datatime)
       return (
-        row.name.toLowerCase().includes(searchTermLower) || 
-        row.phone.toLowerCase().includes(searchTermLower) || 
+        row.name.toLowerCase().includes(searchTermLower) ||
+        row.phone.toLowerCase().includes(searchTermLower) ||
+        row.dateTimePickUp?.toLowerCase().includes(searchTermLower) ||
+        row.branch.toLowerCase().includes(searchTermLower)||
+        row.id.toString().includes(searchTerm)  ||
+        row.ref.toLowerCase().includes(searchTermLower)||
         row.datatime.toLowerCase().includes(searchTermLower)
+
       );
     });
   
-     
 
   const visibleRows = React.useMemo(
     () =>
@@ -301,98 +344,104 @@ export default function AdvanceOrders() {
     [order, orderBy, page, rowsPerPage, filteredRows],
   );
 
-  const setOrderCompleted = async (orderId: number) => {
-    if (!confirm(`Are you sure you want to set this order to "Completed"`)) {
-      return;
-    }
-    try{
-      await updateOrder({
-        id: orderId,
-        data: { 
-          status: "completed"
-        },
-        
-      }).unwrap(); 
-
-      refetch();
-      toast.success(`Order updated successfully!`, {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "light",
-        transition: Slide,
-      });
-              
-    }catch(error){
-      console.error('Failed to set order:', error);
-        toast.error('Something went wrong!', {
+    const setOrderCompleted = async (orderId: number) => {
+      if (!confirm(`Are you sure you want to set this order to "Completed"`)) {
+        return;
+      }
+      try{
+        await updateOrder({
+          id: orderId,
+          data: { 
+            status: "completed"
+          },
+          
+        }).unwrap(); 
+  
+        refetch();
+        toast.success(`Order updated successfully!`, {
           position: "top-right",
           autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
           theme: "light",
           transition: Slide,
         });
+                
+      }catch(error){
+        console.error('Failed to set order:', error);
+          toast.error('Something went wrong!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+          });
+      }
     }
-  }
-  const setOrderCancel = async (orderId: number) => {
-    if (!confirm(`Are you sure you want to set this order to "Canceled"`)) {
-      return;
-    }
-    try{
-      await updateOrder({
-        id: orderId,
-        data: { 
-          status: "canceled"
-        },
-        
-      }).unwrap(); 
-
-      refetch();
-      toast.success(`Order canceled successfully!`, {
-        position: "top-right",
-        autoClose: 5000,
-        theme: "light",
-        transition: Slide,
-      });
-              
-    }catch(error){
-      console.error('Failed to cancel order:', error);
-        toast.error('Something went wrong!', {
+    const setOrderCancel = async (orderId: number) => {
+      if (!confirm(`Are you sure you want to set this order to "Canceled"`)) {
+        return;
+      }
+      try{
+        await updateOrder({
+          id: orderId,
+          data: { 
+            status: "canceled"
+          },
+          
+        }).unwrap(); 
+  
+        refetch();
+        toast.success(`Order canceled successfully!`, {
           position: "top-right",
           autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
           theme: "light",
           transition: Slide,
         });
+                
+      }catch(error){
+        console.error('Failed to cancel order:', error);
+          toast.error('Something went wrong!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+          });
+      }
     }
-  }
+
   return (
     <div style={{ display: 'flex', flexDirection: "row", gap: 20}}>
        <Box sx={{ width: '70%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar 
-            onSearchChange={handleSearchChange}
+          numSelected={selected.length} 
+          onFilterChange={handleFilterChange} 
+          filterValue={filterType} 
+          onSearchChange={handleSearchChange}
         />
           <TableContainer sx={{ width: '100%' }}>
             <Table aria-labelledby="tableTitle" size="small" sx={{ width: '100%' }}>
               <EnhancedTableHead
+                numSelected={selected.length}
                 order={order}
                 orderBy={orderBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
+                rowCount={filteredRows.length}
               />
               <TableBody>
                 {isLoading ? (
                   <TableRow>
                     <TableCell colSpan={7}>
-                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
+                      <Box sx={{ display: 'flex', width: "100%", justifyContent: 'center', alignItems: 'center', height: 100 }}>
                         <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
                       </Box>
                     </TableCell>
@@ -400,7 +449,7 @@ export default function AdvanceOrders() {
                 ) : visibleRows.length > 0 ? (
                   visibleRows.map((row, index) => {
                     const isItemSelected = selected.includes(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+               
 
                     return (
                       <TableRow
@@ -412,16 +461,26 @@ export default function AdvanceOrders() {
                         key={row.id}
                         selected={isItemSelected}
                         sx={{ cursor: 'pointer' }}
-                      >
-                        <TableCell padding="checkbox"></TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
-                          {row.dateTimePickUp}
+                      > 
+                        <TableCell  align="left" >
+                          {row.id}
                         </TableCell>
-                        <TableCell align="right">{row.datatime}</TableCell>
-                        <TableCell align="right">{row.name}</TableCell>
-                        <TableCell align="right">{row.address}</TableCell>
-                        <TableCell align="right">{row.phone}</TableCell>
-                        <TableCell align="right">{row.grandTotal}</TableCell>
+                        <TableCell align="left">{row.ref}</TableCell>
+                        <TableCell align="left">
+                          {new Date(row.dateTimePickUp).toLocaleString('en-GB', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false,
+                            timeZone: 'Asia/Manila', 
+                          }).replace(',', '')}
+                        </TableCell>
+                        <TableCell align="left">{row.branch}</TableCell>
+                        <TableCell align="left">{row.name}</TableCell>
+                        <TableCell align="left">{row.phone}</TableCell>
+                        <TableCell align="left">PHP {row.grandTotal.toFixed(2)}</TableCell>
                       </TableRow>
                     );
                   })
@@ -469,8 +528,10 @@ export default function AdvanceOrders() {
 
             return (
             <div className='p-2 '>
-      
-                <div className='flex flex-row gap-20 w-full'>
+                <p><b>ORDER#:</b> {selectedRow?.id}</p>
+                <p><b>REF#:</b> {selectedRow?.ref}</p>
+                <div className='flex flex-row gap-20 w-full pt-3 pb-3'>
+          
                   <div>
                     <div>
                       <p className='font-bold'>Name:</p>
@@ -480,7 +541,6 @@ export default function AdvanceOrders() {
                       <p className='font-bold'>Phone:</p>
                       <p>{selectedRow?.phone}</p>
                     </div>
-                    
                   </div>
 
                   <div>
@@ -489,9 +549,17 @@ export default function AdvanceOrders() {
                       <p> {selectedRow?.type + ", " + selectedRow?.pickUpType}</p>
                     </div>
                   <div>
-                      <p className='font-bold'>Location:</p>
-                      <p>{selectedRow?.address}</p>
+                      <p className='font-bold'>Branch:</p>
+                      <p>{selectedRow?.branch}</p>
                   </div>
+                  {
+                    selectedRow?.location &&
+                    <div>
+                      <p className='font-bold'>Location:</p>
+                      <p>{selectedRow?.location}</p>
+                   </div>
+                  }
+                  
                   </div>
 
                   </div>
@@ -502,7 +570,17 @@ export default function AdvanceOrders() {
                   </div>
                   <div>
                     <p className='font-bold'>Expected Date and Time:</p>
-                    <p>{selectedRow?.dateTimePickUp}</p>
+                    <p>
+                      {new Date(selectedRow?.dateTimePickUp).toLocaleString('en-GB', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false,
+                        timeZone: 'Asia/Manila', 
+                      }).replace(',', '')}
+                    </p>
                   </div>
                 </div>
                   <p className='font-bold'>Order List:</p>
@@ -532,6 +610,7 @@ export default function AdvanceOrders() {
                       <div className=' bg-white border-t-4 border-dashed flex flex-col text-end pr-3 p-2' style={{borderColor:"#FB7F3B"}}>
                           <p className='font-bold'>SubTotal: PHP {selectedRow?.subTotal}</p>
                           <p className='font-bold'>Discount: PHP {selectedRow?.discountDeduction}</p>
+                          <p className='font-bold'>Delivery Fee: PHP {selectedRow?.deliveryFee}</p>
                       </div>
                       <div className='text-white flex flex-row  justify-end items-center gap-3 pr-3 rounded-b-sm' style={{backgroundColor:"#FB7F3B"}}>
                         <p className=' font-bold text-lg'>Grand Total:  </p>

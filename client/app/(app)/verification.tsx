@@ -46,9 +46,7 @@ const VerificationScreen = () => {
   useEffect(() => {
     if (order?.reference_number) {
       console.log("Effect: Triggering refetch because reference_number is available.");
-      setTimeout(() => {
-          refetch();
-      }, 4000);
+      refetch();
     }
   }, [order?.reference_number]);
 
@@ -61,12 +59,9 @@ const VerificationScreen = () => {
         console.log("useFocusEffect: Refetching payment status...");
         hasCheckedRef.current = false;
         setIsLoading(true);
-
-        setTimeout(() => {
           if (isActive) {
             refetch();
           }
-        }, 4000);
       }
 
       return () => {
@@ -149,6 +144,8 @@ const VerificationScreen = () => {
         fees: order.fees,
         user,
         branch: order.branch?.[0] ?? null,
+        reference_number: order.reference_number
+
       }).unwrap();
 
       setOrder((prev) => ({
@@ -158,6 +155,7 @@ const VerificationScreen = () => {
       }));
 
       setIsSuccessful(true);
+      
 
       setTimeout(() => {
         router.replace("/(app)/receipt");
@@ -201,9 +199,7 @@ const VerificationScreen = () => {
           <TouchableOpacity
             onPress={() => {
               hasCheckedRef.current = false;
-              setTimeout(() => {
-                refetch();
-            }, 4000);
+              refetch();
             }}
             style={[globalStyle.button, { width: "90%", marginTop: 10 }]}
             disabled={isFetching}

@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import TitleDashed from "@/components/titledashed";
 import { format } from 'date-fns';
-import { Checkbox, Dialog, Snackbar, TextInput, Button as PaperButton } from "react-native-paper";
+import { Checkbox, Dialog, TextInput, Button as PaperButton } from "react-native-paper";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { AddOn } from "@/types/clients";
 import { useGetProfileQuery } from "../../redux/feature/auth/clientApiSlice";
@@ -41,7 +41,6 @@ export default function Checkout() {
     const [discountDeduction, setDiscountDeduction] = useState(0);
     const [errors, setErrors] = useState({ name: "", card: "" });
     const currentTimestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-    const [visible, setVisible] = useState<boolean>(false);
     const [createPaymentLink, { isLoading: generateLinkLoading }] = useCreatePaymentLinkMutation();
 
    const validateForm = () => {
@@ -135,25 +134,10 @@ export default function Checkout() {
       }
     };
     
-  
     // Function to handle cancellation
     const handleCancel = () => {
       hideDialog();
     };
-
-     // Function to hide the snackbar
-    const hideSnackbar = () => setVisible(false);
-
-    useEffect(() => {
-      if (visible) {
-        const timer = setTimeout(() => {
-          hideSnackbar(); // Hide snackbar after 3 seconds
-        }, 3000);
-  
-        // Cleanup timer on component unmount or when visible changes
-        return () => clearTimeout(timer);
-      }
-    }, [visible]); 
 
   return (
     <View style={[globalStyle.container, {padding: "5%"}]}>
@@ -365,22 +349,7 @@ export default function Checkout() {
 
         
       </ScrollView>
-        <View style={{flex: 1}}>
-          <Snackbar
-            visible={visible}
-            onDismiss={hideSnackbar}
-            duration={Snackbar.DURATION_LONG} 
-            style={{
-              bottom: 100,            
-              backgroundColor:"#2C2C2C",
-              borderRadius: 10,    
-              zIndex: 10000,     
-            }}
-          >
-            <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> <FontAwesome6 name="check" size={16} color="white" />   ORDER SUCCESSFUL!</Text>
-          </Snackbar>
-        </View>
-      
+
 
       <Dialog visible={modalVisible} onDismiss={hideDialog}>
           <Dialog.Title style={styles.dialogTitle}>Are you sure?</Dialog.Title>

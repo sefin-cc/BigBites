@@ -23,6 +23,7 @@ interface Fees {
 interface User {
     id: number;
     name: string;
+    phone: string;
     email: string;
     email_verified_at: string | null;
     created_at: string;
@@ -62,6 +63,7 @@ export interface Order {
     fees: Fees;
     user: User;
     branch: Branch;
+    reference_number: string | null;
 }
 
 // Example usage with an array of orders

@@ -104,6 +104,7 @@ export interface Order {
     updated_at: string;
     user: User | null;
     branch: Branch | null;
+    reference_number: string | null;
 }
 
 export interface AddOn {

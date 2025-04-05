@@ -27,6 +27,7 @@ return new class extends Migration
                 $table->json('discount_card_details')->nullable();
                 $table->json('fees');
                 $table->timestamps();
+                $table->string('reference_number');
             });
         });
     }

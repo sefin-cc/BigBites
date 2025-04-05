@@ -12,11 +12,6 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import orders from "../../data/orders.json";
-import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
 import { useGetOrdersQuery, useUpdateOrderMutation} from '../../features/api/orderApi';
@@ -25,11 +20,12 @@ import { Slide, toast, ToastContainer } from 'react-toastify';
 
 // Data Types
 interface Data {
-
   id: number;
+  ref: string;
   datatime: string;
   name: string;
-  address: string;
+  branch: string;
+  location: string | null;
   phone: string;
   discountDeduction: number;
   deliveryFee: number;
@@ -45,9 +41,11 @@ interface Data {
 // Data Row Creation
 function createData(
   id: number,
+  ref: string,
   datatime: string,
   name: string,
-  address: string,
+  branch: string,
+  location: string | null,
   phone: string,
   discountDeduction: number,
   deliveryFee: number,
@@ -61,9 +59,11 @@ function createData(
 ): Data {
   return {
     id,
+    ref,
     datatime,
     name,
-    address,
+    branch,
+    location,
     phone,
     discountDeduction,
     deliveryFee,
@@ -117,9 +117,11 @@ interface HeadCell {
 
 // Head Cells
 const headCells: readonly HeadCell[] = [
-  { id: 'datatime', numeric: false, disablePadding: true, label: 'Date and Time' },
-  { id: 'name', numeric: true, disablePadding: false, label: 'Name' },
-  { id: 'address', numeric: true, disablePadding: false, label: 'Address' },
+  { id: 'id', numeric: true, disablePadding: false, label: 'Order#' },
+  { id: 'ref', numeric: true, disablePadding: false, label: 'REF#' },
+  { id: 'datatime', numeric: false, disablePadding: false, label: 'Created At' },
+  { id: 'branch', numeric: false, disablePadding: false, label: 'Branch' },
+  { id: 'name', numeric: false, disablePadding: false, label: 'Name' },
   { id: 'phone', numeric: true, disablePadding: false, label: 'Phone' },
   { id: 'grandTotal', numeric: true, disablePadding: false, label: 'Total Price' },
 ];
@@ -143,11 +145,10 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox" />
+       
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -155,6 +156,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
+              sx={{fontWeight:"bolder"}}
             >
               {headCell.label}
               {orderBy === headCell.id ? (
@@ -234,10 +236,12 @@ export default function Pending() {
       setRows(orders.map((order, index) =>
         createData(
           index + 1,
+          order.reference_number || "",
           order.timestamp,
           order.user.name,
-          order.location?.description || order.branch.branchName +', '+ order.branch.fullAddress,
-          order.user.email,
+          order.branch.branchName,
+          order.location?.description || null,
+          order.user.phone,
           order.fees.discountDeduction,
           order.fees.deliveryFee,
           order.fees.subTotal,
@@ -319,10 +323,13 @@ export default function Pending() {
     .filter(row => !row.dateTimePickUp)  // Apply filter for no dateTimePickUp
     .filter(row => {
       const searchTermLower = searchTerm.toLowerCase();
-      // Apply search term across multiple fields (name, phone, datatime)
       return (
         row.name.toLowerCase().includes(searchTermLower) ||
         row.phone.toLowerCase().includes(searchTermLower) ||
+        row.dateTimePickUp?.toLowerCase().includes(searchTermLower) ||
+        row.branch.toLowerCase().includes(searchTermLower)||
+        row.id.toString().includes(searchTerm)  ||
+        row.ref.toLowerCase().includes(searchTermLower)||
         row.datatime.toLowerCase().includes(searchTermLower)
       );
     });
@@ -432,7 +439,7 @@ export default function Pending() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6}>
+                    <TableCell colSpan={7}>
                       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 100 }}>
                         <ReactLoading type="spinningBubbles" color="#FB7F3B" height={30} width={30} />
                       </Box>
@@ -441,7 +448,7 @@ export default function Pending() {
                 ) : visibleRows.length > 0 ? (
                   visibleRows.map((row, index) => {
                     const isItemSelected = selected.includes(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+               
 
                     return (
                       <TableRow
@@ -453,21 +460,32 @@ export default function Pending() {
                         key={row.id}
                         selected={isItemSelected}
                         sx={{ cursor: 'pointer' }}
-                      >
-                        <TableCell padding="checkbox"></TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
-                          {row.datatime}
+                      > 
+                        <TableCell  align="left" >
+                          {row.id}
                         </TableCell>
-                        <TableCell align="right">{row.name}</TableCell>
-                        <TableCell align="right">{row.address}</TableCell>
-                        <TableCell align="right">{row.phone}</TableCell>
-                        <TableCell align="right">{row.grandTotal}</TableCell>
+                        <TableCell align="left">{row.ref}</TableCell>
+                        <TableCell align="left">
+                          {new Date(row.datatime).toLocaleString('en-GB', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false,
+                            timeZone: 'Asia/Manila', 
+                          }).replace(',', '')}
+                        </TableCell>
+                        <TableCell align="left">{row.branch}</TableCell>
+                        <TableCell align="left">{row.name}</TableCell>
+                        <TableCell align="left">{row.phone}</TableCell>
+                        <TableCell align="left">PHP {row.grandTotal.toFixed(2)}</TableCell>
                       </TableRow>
                     );
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ color: 'gray', fontStyle: 'italic', py: 4 }}>
+                    <TableCell colSpan={7} align="center" sx={{ color: 'gray', fontStyle: 'italic', py: 4 }}>
                       No Data Available
                     </TableCell>
                   </TableRow>
@@ -475,7 +493,7 @@ export default function Pending() {
 
                 {emptyRows > 0 && !isLoading && visibleRows.length > 0 && (
                   <TableRow style={{ height: 33 }}>
-                    <TableCell colSpan={6} />
+                    <TableCell colSpan={7} />
                   </TableRow>
                 )}
               </TableBody>
@@ -509,7 +527,10 @@ export default function Pending() {
 
             return (
             <div className='p-2 '>
-                <div className='flex flex-row gap-20 w-full'>
+                <p><b>ORDER#:</b> {selectedRow?.id}</p>
+                <p><b>REF#:</b> {selectedRow?.ref}</p>
+                <div className='flex flex-row gap-20 w-full pt-3 pb-3'>
+          
                   <div>
                     <div>
                       <p className='font-bold'>Name:</p>
@@ -519,7 +540,6 @@ export default function Pending() {
                       <p className='font-bold'>Phone:</p>
                       <p>{selectedRow?.phone}</p>
                     </div>
-                    
                   </div>
 
                   <div>
@@ -528,9 +548,17 @@ export default function Pending() {
                       <p> {selectedRow?.type + ", " + selectedRow?.pickUpType}</p>
                     </div>
                   <div>
-                      <p className='font-bold'>Location:</p>
-                      <p>{selectedRow?.address}</p>
+                      <p className='font-bold'>Branch:</p>
+                      <p>{selectedRow?.branch}</p>
                   </div>
+                  {
+                    selectedRow?.location &&
+                    <div>
+                      <p className='font-bold'>Location:</p>
+                      <p>{selectedRow?.location}</p>
+                   </div>
+                  }
+                  
                   </div>
 
                   </div>
