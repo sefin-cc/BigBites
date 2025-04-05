@@ -259,7 +259,12 @@ export default function MenuFavourite() {
        
 
         {/* Modal */}
-        <Modalize ref={modalizeRef} snapPoint={630} modalHeight={630}>
+        <Modalize 
+          ref={modalizeRef} 
+          snapPoint={630} 
+          adjustToContentHeight
+          childrenStyle={{ height: 630 }}
+        >
           {selectedItem &&
             <View>
                   <Image 
@@ -314,7 +319,10 @@ export default function MenuFavourite() {
                         <TouchableOpacity onPress={() => {setQty(qtyCount + 1)}} style={[globalStyle.qtyCardBtns]}><FontAwesome6 name="plus" size={16} color="white" /></TouchableOpacity>
                       </View>
                       <TouchableOpacity
-                        onPress={() =>{handleAddToCart(selectedItem)}}
+                        onPress={(e) =>{
+                          e.persist?.();
+                          handleAddToCart(selectedItem)}
+                        }
                         style ={globalStyle.btnCart}
                       >
                         <FontAwesome6 name="cart-shopping" size={16} color="white" />

@@ -104,15 +104,6 @@ export default function AppLayout() {
             <BackButton />
           ),
             }}/>
-        <Stack.Screen name="menu/menu-featured" options={{
-          headerShown: true,
-          headerTitle: "MENU - FEATURED",
-          headerStyle: globalStyle.headerStyle,
-          headerTitleStyle: globalStyle.headerTitleStyle,
-          headerLeft: () => (
-            <BackButton />
-          ),
-            }}/>
 
           <Stack.Screen name="menu/menu-favourite" options={{
           headerShown: true,

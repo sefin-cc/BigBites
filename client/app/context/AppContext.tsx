@@ -151,7 +151,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   //Debugging to verify user state updates
   useEffect(() => {
     handleUpdateFavourites();
-    console.log("User state updated:", user);
   }, [user]);
 
   return (
