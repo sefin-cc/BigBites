@@ -86,6 +86,7 @@ export interface Location {
 }
 
 export interface Order {
+    order: any;
     id: number;
     user_id: number;
     type: string;

@@ -41,7 +41,11 @@ interface Order {
   status: string;
   dateTimePickUp: any | null;
   discountCardDetails: discountCardDetails | undefined,
-  fees: Fees
+  fees: Fees;
+  paymentUrl: string | null;
+  reference_number: string | null;
+  orderNumber: number;
+  orderCreated: string ;
 }
 
 // Define the context type
@@ -83,7 +87,11 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       discountDeduction: 0, 
       deliveryFee: 0, 
       grandTotal: 0
-    }
+    },
+    paymentUrl: null,
+    reference_number: null,
+    orderNumber: 0,
+    orderCreated: "",
   });
 
   const resetOrder = () => {
@@ -105,6 +113,10 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         deliveryFee: 0,
         grandTotal: 0,
       },
+      paymentUrl: null,
+      reference_number: null,
+      orderNumber: 0,
+      orderCreated: ""
     });
   };
   

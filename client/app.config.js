@@ -42,5 +42,7 @@ export default {
     // You can now access environment variables in app.config.js
     OPENCAGE_API_KEY: process.env.OPENCAGE_API_KEY,  // From your .env file
     BACKEND_URL: process.env.BACKEND_URL, 
+    PAYMONGO_SECRET_KEY: process.env.PAYMONGO_SECRET_KEY, 
+    PAYMONGO_LINK: process.env.PAYMONGO_LINK, 
   },
 };

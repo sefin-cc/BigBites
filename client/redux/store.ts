@@ -4,18 +4,22 @@ import { clientApi } from "../redux/feature/auth/clientApiSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { apiSlice } from '../redux/feature/apiSlice'
 import { ordersApi } from "../redux/feature/ordersApi"
+import { paymentApi } from './feature/paymentSlice';
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     [clientApi.reducerPath]: clientApi.reducer,
     [apiSlice.reducerPath]: apiSlice.reducer,
     [ordersApi.reducerPath]: ordersApi.reducer,
+    [paymentApi.reducerPath]: paymentApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       clientApi.middleware,
       apiSlice.middleware,
-      ordersApi.middleware
+      ordersApi.middleware,
+      paymentApi.middleware
     ),
 });
 

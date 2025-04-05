@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { AppContext } from "../context/AppContext";
 import globalStyle from "../../assets/styles/globalStyle";
 import { BackButton } from "@/components/BackButton";
+import { VerifyButton } from "@/components/VerifyButton";
 
 export default function AppLayout() {
     // const context = useContext(AppContext);
@@ -143,6 +144,25 @@ export default function AppLayout() {
             <BackButton />
           ),
             }}/>
+
+        <Stack.Screen name="payment" options={{
+          headerShown: true,
+          headerBackVisible: false, 
+          headerTitle: "PROCESS PAYMENT",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerRight: () => (
+            <VerifyButton />
+          ),
+          }}/>
+
+        <Stack.Screen name="verification" options={{
+          headerShown: false,
+          }}/>
+
+        <Stack.Screen name="receipt" options={{
+          headerShown: false,
+          }}/>
       </Stack>
   );
 }

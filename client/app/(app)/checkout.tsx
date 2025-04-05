@@ -4,13 +4,13 @@ import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import TitleDashed from "@/components/titledashed";
 import { format } from 'date-fns';
-import { Checkbox, Dialog, Portal, RadioButton, Snackbar, TextInput, Button as PaperButton } from "react-native-paper";
+import { Checkbox, Dialog, Snackbar, TextInput, Button as PaperButton } from "react-native-paper";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { AddOn } from "@/types/clients";
 import { useGetProfileQuery } from "../../redux/feature/auth/clientApiSlice";
-import { useCreateOrderMutation } from "../../redux/feature/ordersApi"
 import Loading from "@/components/loading";
 import { useRouter } from "expo-router";
+import { useCreatePaymentLinkMutation } from "@/redux/feature/paymentSlice";
 
 interface MenuItems {
   qty: number;
@@ -34,16 +34,15 @@ export default function Checkout() {
     if (!context) {
       return <Text>Error: AppContext is not available</Text>;
     }
-    const { order, setOrder, resetOrder } = context;
+    const { order, setOrder } = context;
     const [name, setName] = useState(""); 
     const [discountCard, setDiscountCard] = useState(""); 
     const [discount, toggleDiscount] = useState(false);
     const [discountDeduction, setDiscountDeduction] = useState(0);
-    const [selectedValue, setSelectedValue] = useState("GCASH");
     const [errors, setErrors] = useState({ name: "", card: "" });
     const currentTimestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
     const [visible, setVisible] = useState<boolean>(false);
-    const [createOrder,  {isLoading: orderLoading}] = useCreateOrderMutation();
+    const [createPaymentLink, { isLoading: generateLinkLoading }] = useCreatePaymentLinkMutation();
 
    const validateForm = () => {
     if(discount){
@@ -115,42 +114,27 @@ export default function Checkout() {
     // Function to handle confirmation
     const handleConfirm = async () => {
       try {
-
-        if(!user){
-          return;
-        }
+        const totalInCents = Math.round(order.fees.grandTotal * 100); // Ensures no floating point weirdness
+        const response = await createPaymentLink({ amount: totalInCents }).unwrap(); 
     
-        const response = await createOrder({
-          user_id: user.id,
-          type: order.type,
-          pick_up_type: order.pickUpType,
-          location: order.location,
-          branch_id :order.branch && order.branch.length > 0 ? Number(order.branch[0].id) : undefined, 
-          order_items: order.order,
-          base_price: order.basePrice,
-          timestamp: order.timestamp,
-          date_time_pickup: order.dateTimePickUp,
-          status: "pending",
-          discount_card_details: order.discountCardDetails,
-          fees: order.fees,
-          user: user,
-          branch: order.branch && order.branch.length > 0 ? order.branch[0] : null,
-        }).unwrap();
-        
-
-        console.log("Order created:", response);
-        setVisible(true);
-        resetOrder();
-        setTimeout(() => {
-          router.replace(`/(app)/(nav)`); 
-        }, 500);
-
-      } catch (err) {
-        console.error("Error creating order:", err);
+        const url = response?.data?.attributes?.checkout_url;
+        const ref = response?.data?.attributes?.reference_number;
+    
+        if (!url) throw new Error('No payment URL returned');
+    
+        setOrder(prev => ({
+          ...prev,
+          paymentUrl: url,
+          reference_number: ref,
+        }));
+    
+        router.replace("/(app)/payment"); // Navigating to payment screen
+        hideDialog();
+      } catch (error) {
+        console.log('Payment link creation failed:', error);
       }
-
-      hideDialog();
     };
+    
   
     // Function to handle cancellation
     const handleCancel = () => {
@@ -173,7 +157,7 @@ export default function Checkout() {
 
   return (
     <View style={[globalStyle.container, {padding: "5%"}]}>
-     <Loading isLoading={orderLoading} />
+     <Loading isLoading={generateLinkLoading} />
       <ScrollView>
         <View style={{marginBottom: 10}}>
           <TitleDashed title="ORDER DETAIL" />
@@ -350,46 +334,7 @@ export default function Checkout() {
           }
         </View>
 
-        <View style={{marginBottom: 10}}>
-          <TitleDashed title="PAYMENT METHOD" />
-        </View>
-        
-          <View style={{marginBottom: 10}}>
-            <View>
-              <TouchableOpacity
-                style={styles.radioContainer}
-                onPress={() => setSelectedValue("GCASH")}
-              >
-                <RadioButton
-                  value="GCASH"
-                  status={selectedValue === "GCASH" ? "checked" : "unchecked"}
-                  onPress={() => setSelectedValue("GCASH")}
-                  color="#C1272D"
-                />
-                <Text style={styles.radioBtnLabel}>GCASH</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.radioContainer}
-                onPress={() => setSelectedValue("CARD")}
-              >
-                <RadioButton
-                  value="CARD"
-                  status={selectedValue === "CARD" ? "checked" : "unchecked"}
-                  onPress={() => setSelectedValue("CARD")}
-                  color="#C1272D"
-                />
-                <Text style={styles.radioBtnLabel}>CREDIT / DEBIT CARD</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* {
-              selectedValue == "GCASH" &&
-              (
-
-              )
-            } */}
-          </View>
+      
 
           <View style={{marginBottom: 10}}>
             <TitleDashed title="TOTAL" />

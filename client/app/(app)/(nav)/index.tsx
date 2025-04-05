@@ -3,10 +3,33 @@ import globalStyle from "../../../assets/styles/globalStyle";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from "expo-router";
 import Slideshow from "@/components/slideShow";
+import { useCallback, useContext, useEffect } from "react";
+import { AppContext } from "@/app/context/AppContext";
+import { useFocusEffect } from '@react-navigation/native';
+import { BackHandler } from 'react-native';
+
 
 export default function Index() {
-
+  const context = useContext(AppContext);
+  if (!context) {
+      return <Text>Error: AppContext is not available</Text>;
+  }
+  const { resetOrder } = context;
   const router = useRouter();
+
+  useEffect(() => {
+    resetOrder();
+  },[]);
+
+  useFocusEffect(
+    useCallback(() => {
+        const onBackPress = () => true; 
+    
+        BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    
+        return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );
 
   return (
     
