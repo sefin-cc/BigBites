@@ -13,6 +13,10 @@ export interface Client {
     client: Client;
   }
   
+  export interface RegisterResponse {
+    token: string; 
+    client: Client;
+  }
   
   export interface RegisterRequest {
     name: string;

@@ -6,11 +6,13 @@ import { useState } from "react";
 import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image, ActivityIndicator } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { useLoginMutation } from "../../redux/feature/auth/clientApiSlice";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 
 
 export default function Login() {
   const [login, { isLoading, error }] = useLoginMutation();
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   const [formData, setFormData] = useState({
@@ -57,15 +59,27 @@ export default function Login() {
                 </View>
               )}
           </View>
+          
           <View>
           <Text style={styles.label}>PASSWORD</Text>
-          <TextInput style={styles.input} placeholder="●●●●●●●●●●"  placeholderTextColor="#888"  value={formData.password} onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))} />
+          <TextInput
+              style={styles.input}
+              placeholder="●●●●●●●●●●"
+              placeholderTextColor="#888"
+              secureTextEntry={!passwordVisible}
+              value={formData.password}
+              onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))}
+            />
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+              <Text style={styles.eyeIcon}>{passwordVisible ? <Ionicons name="eye-off" size={24} color="#C1272D" /> : <Ionicons name="eye" size={24} color="#C1272D" /> }</Text>
+            </TouchableOpacity>
               {errors.password && errors.password[0] && (
                 <View>
                   <Text style={styles.errorText}>{errors.password[0]}</Text>
                 </View>
               )}
           </View>
+
       </SafeAreaView>
             
 
@@ -140,5 +154,12 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginBottom: 10 ,
     alignSelf: "center"
-  }
+  },
+  eyeIcon: {
+    fontSize: 24,
+    color: "#C1272D",
+    bottom: 47,
+    alignSelf: "flex-end",
+    right: 15
+  },
 });

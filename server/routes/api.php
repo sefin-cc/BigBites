@@ -47,6 +47,7 @@ Route::middleware(['auth:sanctum', 'api'])->group(function () {
     Route::get('/client', function (Request $request) {
         return $request->user();
     });
+    Route::post('client/logout', [ClientController::class, 'logout']);
     Route::post('client/update_favourites/{id}', [ClientController::class, 'updateFavourites']); 
     Route::get('client/index', [ClientController::class, 'index']);
     // CRUD operations for clients

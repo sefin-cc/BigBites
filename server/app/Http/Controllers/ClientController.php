@@ -61,7 +61,6 @@ class ClientController extends Controller
     }
 
     // Login an existing client
-   // Login an existing client
 public function login(Request $request)
 {
     try {

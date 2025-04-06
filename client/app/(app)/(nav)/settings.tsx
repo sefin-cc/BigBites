@@ -1,26 +1,65 @@
 import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useEffect } from "react";
-import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { useNavigationContainerRef, useRouter } from "expo-router";
 import { useLogoutMutation, useGetProfileQuery } from "../../../redux/feature/auth/clientApiSlice";
-
+import { useSelector } from "react-redux";
+import type { RootState } from '@/redux/store'; 
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useDispatch } from 'react-redux'; 
+import { CommonActions } from '@react-navigation/native';
+import { clientApi } from '@/redux/feature/auth/clientApiSlice'; 
 
 export default function Login() {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const rootNavigation = useNavigationContainerRef();
   const [logout, { isLoading }] = useLogoutMutation();
-  const { data: profile } = useGetProfileQuery();
+  const token = useSelector((state: RootState) => state.auth.token);
+  const { data: profile } = useGetProfileQuery(token ? undefined : skipToken);
+  const [userInfo, setUserInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: ""
+  });
+
+
   const handleLogout = async () => {
     try {
 
-    // await logout().unwrap();
-      router.replace("/auth/choose");
+      await logout().unwrap();
+      setUserInfo({
+        name:  "",
+        email: "" ,
+        phone:  "",
+        address: "" 
+      });
+      // router.replace('/auth/choose'); 
+      // 🔄 Reset RTK Query cache (important!)
+    dispatch(clientApi.util.resetApiState());
+
+    // 🧹 Reset navigation
+    rootNavigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'auth/choose' }],
+      })
+    );
     } catch (error) {
       console.log(error);
     }
   };
   
   useEffect(()=>{
-    console.log("profile: "+ profile);
-  },[]);
+    console.log("profile: ", profile);
+    setUserInfo({
+      name: profile?.name || "",
+      email: profile?.email || "" ,
+      phone:  profile?.phone || "",
+      address: profile?.address || "" 
+    });
+
+  },[profile]);
   
   return (
     <View style={styles.container}>
@@ -29,8 +68,12 @@ export default function Login() {
           style={styles.img}
         />
         
-      <Text style={styles.userInfoTextTitle} >{profile?.email}</Text>
-      <Text style={styles.userInfoText} >{profile?.name}</Text>
+      <Text style={styles.userInfoTextTitle} >{userInfo.name}</Text>
+      <Text style={styles.userInfoText} >{userInfo.address}</Text>
+      <Text style={styles.userInfoText} >{userInfo.email}</Text>
+      <Text style={styles.userInfoText} >{userInfo.phone}</Text>
+      
+
       <TouchableOpacity
         onPress={handleLogout}
         style={styles.button}

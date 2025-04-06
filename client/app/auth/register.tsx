@@ -3,126 +3,196 @@
 import { useRouter } from "expo-router";
 import React, { useContext } from "react";
 import { useState } from "react";
-import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image } from "react-native";
-
-import { Checkbox } from "react-native-paper";
+import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image, ScrollView } from "react-native";
+import { useRegisterMutation } from '@/redux/feature/auth/clientApiSlice'; 
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 
 export default function Register() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [register] = useRegisterMutation();
   const [errors, setErrors] = useState({
     name: '',
     phone: '',
+    address: '',
     email: '',
     password: '',
+    general: ''
 });
   const [formData, setFormData] = useState({
     name: '',
-    phone: '',
     email: '',
     password: '',
-    password_confirmation: ''
+    password_confirmation: '',
+    phone: '',
+    address: ''
 });
-  const [rememberMe, toggleRememberMe] = useState(false);
 
 
-  const handleLogin = async () => {
-      // setIsLoading(true);
-    
-      // try {
-      //   const res = await API.post("/login", formData);
-      //   const data = res.data;
-    
-      //   if (data.errors) {
-      //     // Set form errors if they exist in the response
-      //     setErrors(data.errors);
-      //   } else {
-      //     // Store token in AsyncStorage for persistence in React Native
-      //     await AsyncStorage.setItem("token", data.token);
-      //     setToken(data.token);
-      //   }
-    
-      //   // Navigate to the homepage after successful login
-      //   router.replace("/");
-    
-      // } catch (error) {
-      //   // Handle Axios errors
-      //   if (axios.isAxiosError(error)) {
-      //     console.error("Axios error:", error.response?.data || error.message);
-      //     // Setting error messages from the response or a general error message
-      //     setErrors(error.response?.data?.errors || { general: "Something went wrong" });
-      //   } else {
-      //     // Handle other unexpected errors
-      //     console.error("Unexpected error:", error);
+  const handleRegister = async () => {
+    // Basic validation
+    const validationErrors: any = {};
 
-      //   }
-      // } finally {
-      //   // Ensure loading state is reset whether successful or failed
-      //   setIsLoading(false);
-      // }
-    };
+    // General field checks
+    if (!formData.name) validationErrors.name = "* Name is required";
+    if (!formData.address) validationErrors.address = "* Address is required";
+    if (!formData.phone) validationErrors.phone = "* Phone number is required";
+    if (!formData.email) validationErrors.email = "* Email is required";
+    if (!formData.password) validationErrors.password = "* Password is required";
 
+    // Password specific checks
+    if (formData.password !== formData.password_confirmation) {
+      validationErrors.password_confirmation = "* Passwords do not match";
+    }
+    
+    // Password length check (minimum 8 characters)
+    if (formData.password && formData.password.length < 8) {
+      validationErrors.password = "* Password must be at least 8 characters long";
+    }
+
+    // Password complexity check (at least one lowercase, one uppercase, one number, and one special character)
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (formData.password && !passwordPattern.test(formData.password)) {
+      validationErrors.password = "* Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character.";
+    }
+
+    setErrors(validationErrors);
+
+    // If there are validation errors, don't proceed
+    if (Object.keys(validationErrors).length > 0) return;
+
+    try {
+      setIsLoading(true);  // Set loading state to true while the request is in progress
+      const response = await register(formData).unwrap();  // Perform the register mutation
+      setIsLoading(false);  // Set loading state to false when the request finishes
+
+      if (response) { 
+        router.replace("/(app)/(nav)"); 
+      }
+    } catch (err) {
+      setIsLoading(false);  // Set loading state to false on error
+    
+      console.error(err);  // Log the error for debugging purposes
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView >
-            <Image
-            style={styles.logo}
-            source={require('../../assets/images/logo.png')}
-            />
-            <View>
-          <Text style={styles.label}>FULL NAME</Text>
-          <TextInput style={styles.input} placeholder="John Doe"  placeholderTextColor="#888"  value={formData.name} onChangeText={(text) => setFormData((prev) => ({ ...prev, name: text }))} />
-              {errors.name && errors.name[0] && (
-                <View>
-                  <Text style={styles.errorText}>{errors.name[0]}</Text>
-                </View>
-              )}
-          </View>
-          <View>
-          <Text style={styles.label}>PHONE</Text>
-          <TextInput style={styles.input} placeholder="+63"  placeholderTextColor="#888"  value={formData.phone} onChangeText={(text) => setFormData((prev) => ({ ...prev, phone: text }))} />
-              {errors.phone && errors.phone[0] && (
-                <View>
-                  <Text style={styles.errorText}>{errors.phone[0]}</Text>
-                </View>
-              )}
-          </View>
-          <View>
-          <Text style={styles.label}>EMAIL</Text>
-          <TextInput style={styles.input} placeholder="example@email.com"  placeholderTextColor="#888"  value={formData.email} onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))} />
-              {errors.email && errors.email[0] && (
-                <View>
-                  <Text style={styles.errorText}>{errors.email[0]}</Text>
-                </View>
-              )}
-          </View>
-          <View>
+
+<ScrollView >
+<View style={styles.container}>
+  <SafeAreaView>
+    <Image
+      style={styles.logo}
+      source={require('../../assets/images/logo.png')}
+    />
+    {/* Global error message */}
+    {errors.general && (
+      <Text style={styles.errorText}>{errors.general}</Text>
+    )}
+
+    {/* Full Name */}
+    <View>
+      <Text style={styles.label}>FULL NAME</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="John Doe"
+        placeholderTextColor="#888"
+        value={formData.name}
+        onChangeText={(text) => setFormData((prev) => ({ ...prev, name: text }))}
+      />
+      {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+    </View>
+
+    {/* Phone */}
+    <View>
+      <Text style={styles.label}>PHONE</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="0987654321"
+        placeholderTextColor="#888"
+        value={formData.phone}
+        onChangeText={(text) => setFormData((prev) => ({ ...prev, phone: text }))}
+      />
+      {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
+    </View>
+
+    {/* Email */}
+    <View>
+      <Text style={styles.label}>EMAIL</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="example@email.com"
+        placeholderTextColor="#888"
+        value={formData.email}
+        onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))}
+      />
+      {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+    </View>
+
+    {/* Address */}
+    <View>
+      <Text style={styles.label}>ADDRESS</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Sampaloc, Manila 1008 Metro Manila"
+        multiline
+        numberOfLines={2}
+        placeholderTextColor="#888"
+        value={formData.address}
+        onChangeText={(text) => setFormData((prev) => ({ ...prev, address: text }))}
+      />
+      {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
+    </View>
+
+    {/* Password */}
+    <View>
           <Text style={styles.label}>PASSWORD</Text>
-          <TextInput style={styles.input} placeholder="●●●●●●●●●●"  placeholderTextColor="#888"  value={formData.password} onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))} />
-              {errors.password && errors.password[0] && (
-                <View>
-                  <Text style={styles.errorText}>{errors.password[0]}</Text>
-                </View>
-              )}
-          </View>
           <View>
-          <Text style={styles.label}>CONFIRM PASSWORD</Text>
-          <TextInput style={styles.input} placeholder="●●●●●●●●●●"  placeholderTextColor="#888"  value={formData.password_confirmation} onChangeText={(text) => setFormData((prev) => ({ ...prev, password_confirmation: text }))} />
-
-          </View>
-      </SafeAreaView>
-            
-
-          <View style={{marginTop:20}}>
-            <TouchableOpacity onPress={() =>{}} style={styles.loginBtn}>
-              <Text style={styles.loginBtnText}>REGISTER</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="●●●●●●●●●●"
+              placeholderTextColor="#888"
+              secureTextEntry={!passwordVisible}
+              value={formData.password}
+              onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))}
+            />
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+              <Text style={styles.eyeIcon}>{passwordVisible ? <Ionicons name="eye-off" size={24} color="#C1272D" /> : <Ionicons name="eye" size={24} color="#C1272D" /> }</Text>
             </TouchableOpacity>
           </View>
+          {errors.password && <Text style={[styles.errorText, {bottom: 25}]}>{errors.password}</Text>}
+        </View>
+
+    {/* Confirm Password */}
+    <View>
+      <Text style={styles.label}>CONFIRM PASSWORD</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="●●●●●●●●●●"
+        placeholderTextColor="#888"
+        secureTextEntry
+        value={formData.password_confirmation}
+        onChangeText={(text) => setFormData((prev) => ({ ...prev, password_confirmation: text }))}
+      />
     </View>
-    
-    
+  
+
+  {/* Register Button */}
+  <View style={{ marginTop: 20 }}>
+    <TouchableOpacity onPress={handleRegister} style={styles.loginBtn} disabled={isLoading}>
+      <Text style={styles.loginBtnText}>
+        {isLoading ? "REGISTERING..." : "REGISTER"}
+      </Text>
+    </TouchableOpacity>
+  </View>
+
+  </SafeAreaView>
+  </View>
+  </ScrollView>
+
+
   );
 }
 
@@ -133,6 +203,7 @@ const styles = StyleSheet.create({
     padding: "5%",
     backgroundColor: "#FB7F3B",
     textAlign: "center",
+    paddingVertical: 70
   },
   input: {
     marginBottom: 10,
@@ -145,11 +216,10 @@ const styles = StyleSheet.create({
     borderColor: "#C1272D"
   },
   errorText:{
-    color: "#C1272D", marginBottom: 5, fontFamily: "MadimiOne"
+    color: "#FFEEE5", marginBottom: 5, fontFamily: "MadimiOne", alignSelf: "flex-end"
   },
   label: {
     color: "white", 
-    marginBottom: 5, 
     fontFamily: "MadimiOne",
   },
   loginBtnText: {
@@ -174,10 +244,17 @@ const styles = StyleSheet.create({
   },
   logo:{
     width: "auto", 
-    height: 150,
+    height: 100,
     aspectRatio: 1,
     resizeMode: 'contain',
     marginBottom: 10 ,
     alignSelf: "center"
-  }
+  },
+  eyeIcon: {
+    fontSize: 24,
+    color: "#C1272D",
+    bottom: 47,
+    alignSelf: "flex-end",
+    right: 15
+  },
 });
