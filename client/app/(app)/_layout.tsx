@@ -154,6 +154,16 @@ export default function AppLayout() {
         <Stack.Screen name="receipt" options={{
           headerShown: false,
           }}/>
+
+        <Stack.Screen name="edituser" options={{
+          headerShown: true,
+          headerTitle: "EDIT YOUR INFORMATION",
+          headerStyle: globalStyle.headerStyle,
+          headerTitleStyle: globalStyle.headerTitleStyle,
+          headerLeft: () => (
+            <BackButton />
+          ),
+        }}/>
       </Stack>
   );
 }

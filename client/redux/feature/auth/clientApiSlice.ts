@@ -75,6 +75,15 @@ export const clientApi = createApi({
       }),
     }),
 
+    updateClient: builder.mutation<Client, { id: number; data: {name:  string, email: string, phone: string, address: string} }>({
+      query: ({ id, data }) => ({
+        url: `/client/update/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+    }),
+    
+
   }),
 });
 
@@ -83,5 +92,6 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useGetProfileQuery,
-  useUpdateFavouritesMutation
+  useUpdateFavouritesMutation,
+  useUpdateClientMutation,
 } = clientApi;

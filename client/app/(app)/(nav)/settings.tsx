@@ -1,4 +1,4 @@
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 import { useNavigationContainerRef, useRouter } from "expo-router";
 import { useLogoutMutation, useGetProfileQuery } from "../../../redux/feature/auth/clientApiSlice";
@@ -8,6 +8,10 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import { useDispatch } from 'react-redux'; 
 import { CommonActions } from '@react-navigation/native';
 import { clientApi } from '@/redux/feature/auth/clientApiSlice'; 
+import { LinearGradient } from 'expo-linear-gradient';
+import globalStyles from "@/assets/styles/globalStyle";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Loading from "@/components/loading";
 
 export default function Login() {
   const router = useRouter();
@@ -15,7 +19,7 @@ export default function Login() {
   const rootNavigation = useNavigationContainerRef();
   const [logout, { isLoading }] = useLogoutMutation();
   const token = useSelector((state: RootState) => state.auth.token);
-  const { data: profile } = useGetProfileQuery(token ? undefined : skipToken);
+  const { data: profile, refetch, isLoading: profileLoading } = useGetProfileQuery(token ? undefined : skipToken);
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
@@ -34,11 +38,11 @@ export default function Login() {
         phone:  "",
         address: "" 
       });
-      // router.replace('/auth/choose'); 
-      // 🔄 Reset RTK Query cache (important!)
+    
+      //Reset RTK Query cache 
     dispatch(clientApi.util.resetApiState());
 
-    // 🧹 Reset navigation
+    //Reset navigation
     rootNavigation.dispatch(
       CommonActions.reset({
         index: 0,
@@ -52,6 +56,7 @@ export default function Login() {
   
   useEffect(()=>{
     console.log("profile: ", profile);
+    refetch();
     setUserInfo({
       name: profile?.name || "",
       email: profile?.email || "" ,
@@ -62,32 +67,61 @@ export default function Login() {
   },[profile]);
   
   return (
-    <View style={styles.container}>
-    <Image
-          source={{ uri: 'https://res.cloudinary.com/dqp0ejscz/image/upload/v1735899431/blank-profile-picture-973460_1280_idgyn3.png' }} 
-          style={styles.img}
-        />
-        
-      <Text style={styles.userInfoTextTitle} >{userInfo.name}</Text>
-      <Text style={styles.userInfoText} >{userInfo.address}</Text>
-      <Text style={styles.userInfoText} >{userInfo.email}</Text>
-      <Text style={styles.userInfoText} >{userInfo.phone}</Text>
-      
 
+    <View style={styles.container}>
+        <Loading isLoading={isLoading} />
+        <LinearGradient
+          colors={['#f2aa83', '#C1272D']}
+          style={styles.mainContainer}>
+          
+
+          <TouchableOpacity
+            onPress={() =>{router.push("/edituser");}}
+            style={{backgroundColor: "#2C2C2C", padding: 10, borderRadius: 100, borderWidth: 4, borderColor: "white"}}
+            >
+              <MaterialIcons name="edit" size={20} color="white" />
+          </TouchableOpacity>
+
+
+        </LinearGradient>
+
+
+
+        <View style={{alignItems: "center", top: -130}}>
+          <Image
+            source={{ uri: 'https://res.cloudinary.com/dqp0ejscz/image/upload/v1735899431/blank-profile-picture-973460_1280_idgyn3.png' }} 
+            style={styles.img}
+          />
+
+          {
+          !profileLoading ?
+          <View style={{alignItems: "center"}}>
+            <Text style={styles.userInfoTextTitle} >{userInfo.name}</Text>
+            <Text style={styles.userInfoText} >{userInfo.address}</Text>
+            <Text style={styles.userInfoText} >{userInfo.email}</Text>
+            <Text style={styles.userInfoText} >{userInfo.phone}</Text>
+          </View>   :
+          <ActivityIndicator animating={profileLoading} color={"#FB7F3B"}  size="large" hidesWhenStopped={true}/>
+          }
+        </View>
+    
+
+    
       <TouchableOpacity
         onPress={handleLogout}
-        style={styles.button}
+        style={[globalStyles.button,  {marginHorizontal: 20}]}
         disabled={isLoading}
         >
         { 
           isLoading ?
           <ActivityIndicator animating={isLoading} color={"#FFEEE5"}  size="large" hidesWhenStopped={true}/>:
         
-          <Text style={styles.buttonText}>
+          <Text style={globalStyles.buttonText}>
             LOGOUT 
           </Text>
         } 
       </TouchableOpacity>
+  
     </View>
   );
 }
@@ -95,15 +129,14 @@ export default function Login() {
 const styles = StyleSheet.create({
   container:{
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
   },
   img:{
     width: 200, 
     height: 200, 
     borderRadius: 100, 
-    margin: 20
+    margin: 20,
+    borderWidth: 6,
+    borderColor: "#fff"
   },
   userInfoTextTitle :{
     fontSize: 24,
@@ -126,5 +159,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontFamily: 'MadimiOne'
+  },
+  mainContainer: {
+    // justifyContent: "flex-end",
+    alignItems: "flex-end",
+    borderBottomLeftRadius: 60,
+    borderBottomRightRadius: 60,
+    height: 250,
+    padding: "5%",
+    // width: "100%"
   },
 });
