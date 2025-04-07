@@ -1,17 +1,17 @@
 
 
-import { router, useRouter } from "expo-router";
-import React, { useContext } from "react";
+import { router } from "expo-router";
+import React from "react";
 import { useState } from "react";
-import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image, ActivityIndicator } from "react-native";
-import { Checkbox } from "react-native-paper";
+import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity,TextInput, Image, ActivityIndicator } from "react-native";
 import { useLoginMutation } from "../../redux/feature/auth/clientApiSlice";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Loading from "@/components/loading";
 
 
 
 export default function Login() {
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
@@ -45,59 +45,56 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <SafeAreaView >
-            <Image
-            style={styles.logo}
-            source={require('../../assets/images/logo.png')}
-            />
-          <View>
-          <Text style={styles.label}>EMAIL</Text>
-          <TextInput style={styles.input} placeholder="example@email.com"  placeholderTextColor="#888"  value={formData.email} onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))} />
-              {errors.email && errors.email[0] && (
-                <View>
-                  <Text style={styles.errorText}>{errors.email[0]}</Text>
-                </View>
-              )}
-          </View>
-          
-          <View>
-          <Text style={styles.label}>PASSWORD</Text>
-          <TextInput
-              style={styles.input}
-              placeholder="●●●●●●●●●●"
-              placeholderTextColor="#888"
-              secureTextEntry={!passwordVisible}
-              value={formData.password}
-              onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))}
-            />
-            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-              <Text style={styles.eyeIcon}>{passwordVisible ? <Ionicons name="eye-off" size={24} color="#C1272D" /> : <Ionicons name="eye" size={24} color="#C1272D" /> }</Text>
-            </TouchableOpacity>
-              {errors.password && errors.password[0] && (
-                <View>
-                  <Text style={styles.errorText}>{errors.password[0]}</Text>
-                </View>
-              )}
-          </View>
-
-      </SafeAreaView>
+      <Loading isLoading={isLoading} />
+        <SafeAreaView >
+              <Image
+              style={styles.logo}
+              source={require('../../assets/images/logo.png')}
+              />
+            <View>
+            <Text style={styles.label}>EMAIL</Text>
+            <TextInput style={styles.input} placeholder="example@email.com"  placeholderTextColor="#888"  value={formData.email} onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))} />
+                {errors.email && errors.email[0] && (
+                  <View>
+                    <Text style={styles.errorText}>{errors.email[0]}</Text>
+                  </View>
+                )}
+            </View>
             
-
-          <View style={{marginTop:20}}>
-            <TouchableOpacity onPress={() =>{handleLogin()}} style={styles.loginBtn} disabled={isLoading}>
-                { 
-                  isLoading ?
-                  <ActivityIndicator animating={isLoading} color={"#FFEEE5"}  size="large" hidesWhenStopped={true}/>:
-                
-                  <Text style={styles.loginBtnText}>
-                    LOGIN 
-                  </Text>
-                } 
-            </TouchableOpacity>
+          <View>
+            <Text style={styles.label}>PASSWORD</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="●●●●●●●●●●"
+                placeholderTextColor="#888"
+                secureTextEntry={!passwordVisible}
+                value={formData.password}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))}
+              />
+              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                <Text style={styles.eyeIcon}>{passwordVisible ? <Ionicons name="eye-off" size={24} color="#C1272D" /> : <Ionicons name="eye" size={24} color="#C1272D" /> }</Text>
+              </TouchableOpacity>
+                {errors.password && errors.password[0] && (
+                  <View>
+                    <Text style={styles.errorText}>{errors.password[0]}</Text>
+                  </View>
+                )}
           </View>
+        </SafeAreaView>
+            
+        <View style={{marginTop:20}}>
+          <TouchableOpacity onPress={() =>{handleLogin()}} style={styles.loginBtn} disabled={isLoading}>
+              { 
+                isLoading ?
+                <ActivityIndicator animating={isLoading} color={"#FFEEE5"}  size="large" hidesWhenStopped={true}/>:
+              
+                <Text style={styles.loginBtnText}>
+                  LOGIN 
+                </Text>
+              } 
+          </TouchableOpacity>
+        </View>
     </View>
-    
-    
   );
 }
 

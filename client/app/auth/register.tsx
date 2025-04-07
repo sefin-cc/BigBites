@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image, ScrollView } from "react-native";
 import { useRegisterMutation } from '@/redux/feature/auth/clientApiSlice'; 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Loading from "@/components/loading";
 
 
 export default function Register() {
@@ -81,6 +82,7 @@ export default function Register() {
   return (
 
 <ScrollView >
+<Loading isLoading={isLoading} />
 <View style={styles.container}>
   <SafeAreaView>
     <Image
