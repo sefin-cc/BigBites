@@ -3,10 +3,11 @@
 import { useRouter } from "expo-router";
 import React, { useContext } from "react";
 import { useState } from "react";
-import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image, ScrollView } from "react-native";
+import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image, ScrollView, ImageBackground } from "react-native";
 import { useRegisterMutation } from '@/redux/feature/auth/clientApiSlice'; 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Loading from "@/components/loading";
+import { Portal } from "react-native-paper";
 
 
 export default function Register() {
@@ -81,14 +82,18 @@ export default function Register() {
 
   return (
 
-<ScrollView >
-<Loading isLoading={isLoading} />
-<View style={styles.container}>
-  <SafeAreaView>
-    <Image
-      style={styles.logo}
-      source={require('../../assets/images/logo.png')}
+<ScrollView style={{flexGrow: 1}}>
+  <Portal>
+    <Loading isLoading={isLoading} />
+  </Portal>
+
+<ImageBackground source={require('../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
+  <Image
+    style={styles.logo}
+    source={require('../../assets/images/logo.png')}
     />
+  <SafeAreaView style={{backgroundColor: "white",  padding: 20, borderRadius: 10, justifyContent: "center"}} >  
+    
     {/* Global error message */}
     {errors.general && (
       <Text style={styles.errorText}>{errors.general}</Text>
@@ -168,7 +173,7 @@ export default function Register() {
         </View>
 
     {/* Confirm Password */}
-    <View>
+    <View style={{bottom: 25}}>
       <Text style={styles.label}>CONFIRM PASSWORD</Text>
       <TextInput
         style={styles.input}
@@ -191,7 +196,7 @@ export default function Register() {
   </View>
 
   </SafeAreaView>
-  </View>
+  </ImageBackground>
   </ScrollView>
 
 
@@ -200,28 +205,29 @@ export default function Register() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     padding: "5%",
     backgroundColor: "#FB7F3B",
     textAlign: "center",
-    paddingVertical: 70
+    paddingBottom: 70,
+    paddingTop: (StatusBar?.currentHeight || 30) * 2 
   },
   input: {
     marginBottom: 10,
-    backgroundColor: "#FCE8E8", 
+    backgroundColor: "#FFEEE5", 
     fontSize: 16,
     fontFamily: "MadimiOne",  
     borderWidth: 3,
     paddingLeft: 10,
     borderRadius: 5,
-    borderColor: "#C1272D"
+    borderColor: "#FB7F3B"
   },
   errorText:{
-    color: "#FFEEE5", marginBottom: 5, fontFamily: "MadimiOne", alignSelf: "flex-end"
+    color: "#C1272D", marginBottom: 5, fontFamily: "MadimiOne", alignSelf: "flex-end"
   },
   label: {
-    color: "white", 
+    color: "#2C2C2C", 
     fontFamily: "MadimiOne",
   },
   loginBtnText: {
@@ -249,8 +255,8 @@ const styles = StyleSheet.create({
     height: 100,
     aspectRatio: 1,
     resizeMode: 'contain',
-    marginBottom: 10 ,
-    alignSelf: "center"
+    alignSelf: "center",
+    top: 10
   },
   eyeIcon: {
     fontSize: 24,

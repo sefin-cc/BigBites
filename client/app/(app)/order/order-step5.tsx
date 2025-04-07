@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
@@ -13,7 +13,7 @@ export default function ChooseOrderType() {
   const { order, setOrder} = context;
   
   return (
-    <View style={styles.container}>
+  <ImageBackground source={require('../../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
       <Image style={styles.logo} source={require('../../../assets/images/logo.png')} />
   
       
@@ -31,7 +31,7 @@ export default function ChooseOrderType() {
           </TouchableOpacity>
         </View>
 
-    </View>
+    </ImageBackground>
   );
 }
 

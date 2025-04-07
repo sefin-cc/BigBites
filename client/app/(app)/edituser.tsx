@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { skipToken } from "@reduxjs/toolkit/query";
 import type { RootState } from '@/redux/store'; 
 import Loading from "@/components/loading";
+import { Portal } from "react-native-paper";
 
 export default function EditUser() {
   const router = useRouter();
@@ -68,7 +69,11 @@ export default function EditUser() {
 
   return (
     <SafeAreaView style={{ flex: 1}}>
-      <Loading isLoading={isLoading} />
+      
+      <Portal>
+        <Loading isLoading={isLoading} />
+      </Portal>
+     
         <ScrollView>
           <View style={styles.container}>
 

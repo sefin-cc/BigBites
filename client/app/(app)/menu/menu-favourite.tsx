@@ -238,13 +238,13 @@ export default function MenuFavourite() {
 
             </View>
 
-             <Snackbar
+            <Snackbar
               visible={visible}
               onDismiss={() =>setVisible(false)}
               duration={Snackbar.DURATION_LONG} 
               style={{
                 position: 'absolute',  
-                bottom: -320,          
+                bottom: -130,          
                 left: 60,             
                 right: 60,           
                 backgroundColor: '#2C2C2C', 

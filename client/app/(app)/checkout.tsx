@@ -1,4 +1,4 @@
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "../../assets/styles/globalStyle";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
@@ -11,6 +11,8 @@ import { useGetProfileQuery } from "../../redux/feature/auth/clientApiSlice";
 import Loading from "@/components/loading";
 import { useRouter } from "expo-router";
 import { useCreatePaymentLinkMutation } from "@/redux/feature/paymentSlice";
+import { Portal } from "react-native-paper";
+
 
 interface MenuItems {
   qty: number;
@@ -140,8 +142,8 @@ export default function Checkout() {
     };
 
   return (
-    <View style={[globalStyle.container, {padding: "5%"}]}>
-     <Loading isLoading={generateLinkLoading} />
+    <View style={[{padding: "5%", backgroundColor: "#FFEEE5"}]}>
+     
       <ScrollView>
         <View style={{marginBottom: 10}}>
           <TitleDashed title="ORDER DETAIL" />
@@ -350,8 +352,8 @@ export default function Checkout() {
         
       </ScrollView>
 
-
-      <Dialog visible={modalVisible} onDismiss={hideDialog}>
+      <Portal>
+        <Dialog visible={modalVisible} onDismiss={hideDialog}>
           <Dialog.Title style={styles.dialogTitle}>Are you sure?</Dialog.Title>
           <Dialog.Content>
             <Text style={styles.dialogContent}>Do you want to proceed with this order?</Text>
@@ -361,6 +363,10 @@ export default function Checkout() {
             <PaperButton onPress={handleConfirm} ><Text style={styles.dialogText}>CONFIRM</Text></PaperButton>
           </Dialog.Actions>
         </Dialog>
+        <Loading isLoading={generateLinkLoading} />
+      </Portal>
+     
+      
 
 
     </View>

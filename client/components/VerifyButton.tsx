@@ -13,7 +13,7 @@ export const  VerifyButton = () => {
 
   return (
         <Pressable style={{ marginHorizontal: 15 , flexDirection: "row", alignItems: "center"}} onPress={handleVerifykPress} >
-            <Text style={{fontFamily: 'MadimiOne', color: "#fff"}}>NEXT</Text>  
+            <Text style={{fontFamily: 'MadimiOne', color: "#fff"}}>FINISH</Text>  
             <Ionicons size={28} name="chevron-forward"  color= "#FFEEE5" />
         </Pressable>
     );

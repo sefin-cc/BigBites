@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Image} from 'react-native';
 import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
 import { AppContext } from "@/app/context/AppContext"; 
 import globalStyle from "../../../assets/styles/globalStyle"; 
@@ -147,7 +147,8 @@ export default function AdvanceOrder() {
 
 
   return (
-    <View style={styles.container}>
+  <ImageBackground source={require('../../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
+         <Image style={styles.logo} source={require('../../../assets/images/logo.png')} />
       <View style={styles.containerButton}>
         {/* Display Selected Date & Time */}
         {date && (
@@ -218,7 +219,7 @@ export default function AdvanceOrder() {
           </Dialog.Actions>
         </Dialog>
 
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FB7F3B",
+
   },
   containerButton: {
     backgroundColor: "#FFEEE5",
@@ -261,4 +262,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FB7F3B',  // Customize button text color
   },
+  logo:{
+    width: "auto", 
+    height: 120,
+    aspectRatio: 1, 
+    resizeMode: 'contain',
+  }
 });

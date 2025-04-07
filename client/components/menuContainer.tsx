@@ -31,7 +31,7 @@ export default function MenuContainer({ menuData, handleTapItem, setItemId, setS
             resizeMode="cover"
           >
             <LinearGradient
-              colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0)']}
+              colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0)']}
               start={{ x: 0, y: 1 }}
               end={{ x: 0, y: 0 }}
               style={styles.gradient} 
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 20,
     justifyContent: 'flex-end',
+    backgroundColor: "#C1272D"
   },
   imageStyle: {
     borderRadius: 20,

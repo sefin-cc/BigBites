@@ -1,14 +1,17 @@
 import { Stack } from "expo-router";
 import AppProvider from "./context/AppContext";
-import { Text } from "react-native";
-import { useFonts } from 'expo-font';
+import { Text, View } from "react-native";
+import * as Font from 'expo-font';
 import { Provider } from "react-redux";
 import {store} from "../redux/store";
+import { StatusBar } from 'react-native';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    'MadimiOne': require('../assets/fonts/MadimiOne-Regular.ttf'), // Make sure the path is correct
+  const [fontsLoaded] = Font.useFonts({
+    'MadimiOne': require('../assets/fonts/MadimiOne-Regular.ttf'),
   });
+
 
   if (!fontsLoaded) {
     return <Text></Text>;
@@ -16,19 +19,30 @@ export default function RootLayout() {
 
   return (  
   <Provider store={store}>
+    <PaperProvider>
      <AppProvider>
-      <Stack>
-        <Stack.Screen name="(app)" options={{ headerShown: false }} />
+        <StatusBar
+          backgroundColor="transparent" 
+          translucent={true} 
+          barStyle="light-content"
+        />
 
-        {/* Authentication Screens */}
-        <Stack.Screen name="auth/choose" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/login" options={{ headerShown: false }} />
-        <Stack.Screen name="auth/register" options={{ headerShown: false }} />
+        <Stack
+          screenOptions={{
+            animation: 'fade_from_bottom', 
+          }}>
+          <Stack.Screen name="(app)" options={{ headerShown: false }} />
 
-        {/* Not Found Screen */}
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </AppProvider>
+          {/* Authentication Screens */}
+          <Stack.Screen name="auth/choose" options={{ headerShown: false }} />
+          <Stack.Screen name="auth/login" options={{ headerShown: false }} />
+          <Stack.Screen name="auth/register" options={{ headerShown: false }} />
+
+          {/* Not Found Screen */}
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </AppProvider>
+    </PaperProvider>
   </Provider>
    
   );

@@ -15,7 +15,7 @@ import { AppContext } from "@/app/context/AppContext";
 import ViewCartContainer from "@/components/ViewCartContainer";
 import SearchMenu from "@/components/SearchMenu";
 import Loading from "@/components/loading";
-import { Snackbar } from "react-native-paper";
+import { Portal, Snackbar } from "react-native-paper";
 import { useGetMenuQuery } from "../../../redux/feature/apiSlice";
 import { Category, Item} from "@/types/clients";
 
@@ -201,7 +201,10 @@ export default function Menu() {
   return (
 
     <View style={[globalStyle.container]}>
-      <Loading isLoading={menuLoading} />
+      <Portal>
+        <Loading isLoading={menuLoading} />
+      </Portal>
+   
       <BottomSheetModalProvider >
       <GestureHandlerRootView >
       

@@ -34,6 +34,14 @@ export default {
         backgroundColor: "#ffffff",
       },
     ],
+    [
+      "expo-font",
+      {
+        "fonts": [
+          "./assets/fonts/MadimiOne-Regular.ttf",
+        ]
+      }
+    ]
   ],
   experiments: {
     typedRoutes: true,

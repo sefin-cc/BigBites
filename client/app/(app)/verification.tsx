@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFocusEffect } from '@react-navigation/native';
@@ -225,9 +225,10 @@ const VerificationScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground source={require('../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
       {renderContent()}
-    </View>
+    </ImageBackground>
+
   );
 };
 

@@ -3,10 +3,11 @@
 import { router } from "expo-router";
 import React from "react";
 import { useState } from "react";
-import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity,TextInput, Image, ActivityIndicator } from "react-native";
+import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity,TextInput, Image, ActivityIndicator, ImageBackground } from "react-native";
 import { useLoginMutation } from "../../redux/feature/auth/clientApiSlice";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Loading from "@/components/loading";
+import { Portal } from "react-native-paper";
 
 
 
@@ -44,13 +45,17 @@ export default function Login() {
   
 
   return (
-    <View style={styles.container}>
-      <Loading isLoading={isLoading} />
-        <SafeAreaView >
-              <Image
-              style={styles.logo}
-              source={require('../../assets/images/logo.png')}
-              />
+    <ImageBackground source={require('../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
+      <Portal>
+        <Loading isLoading={isLoading} /> 
+      </Portal>
+
+        <Image
+          style={styles.logo}
+          source={require('../../assets/images/logo.png')}
+          />
+         <SafeAreaView style={{backgroundColor: "white",  padding: 20, borderRadius: 10, justifyContent: "center"}} >  
+              
             <View>
             <Text style={styles.label}>EMAIL</Text>
             <TextInput style={styles.input} placeholder="example@email.com"  placeholderTextColor="#888"  value={formData.email} onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))} />
@@ -76,25 +81,28 @@ export default function Login() {
               </TouchableOpacity>
                 {errors.password && errors.password[0] && (
                   <View>
-                    <Text style={styles.errorText}>{errors.password[0]}</Text>
+                    <Text style={[styles.errorText, {top: -25}]}>{errors.password[0]}</Text>
                   </View>
                 )}
           </View>
-        </SafeAreaView>
-            
-        <View style={{marginTop:20}}>
+      
           <TouchableOpacity onPress={() =>{handleLogin()}} style={styles.loginBtn} disabled={isLoading}>
               { 
                 isLoading ?
-                <ActivityIndicator animating={isLoading} color={"#FFEEE5"}  size="large" hidesWhenStopped={true}/>:
+                <Text style={styles.loginBtnText}>
+               LOGGING IN...
+                </Text>:
               
                 <Text style={styles.loginBtnText}>
                   LOGIN 
                 </Text>
               } 
           </TouchableOpacity>
-        </View>
-    </View>
+
+        </SafeAreaView>
+            
+       
+    </ImageBackground>
   );
 }
 
@@ -108,19 +116,19 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
-    backgroundColor: "#FCE8E8", 
+    backgroundColor: "#FFEEE5", 
     fontSize: 16,
     fontFamily: "MadimiOne",  
     borderWidth: 3,
     paddingLeft: 10,
     borderRadius: 5,
-    borderColor: "#C1272D"
+    borderColor: "#FB7F3B"
   },
   errorText:{
-    color: "#C1272D", marginBottom: 5, fontFamily: "MadimiOne"
+    color: "#C1272D", marginBottom: 5, fontFamily: "MadimiOne", alignSelf: "flex-end"
   },
   label: {
-    color: "white", 
+    color: "#2C2C2C", 
     marginBottom: 5, 
     fontFamily: "MadimiOne",
   },
@@ -150,7 +158,8 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     resizeMode: 'contain',
     marginBottom: 10 ,
-    alignSelf: "center"
+    alignSelf: "center",
+    bottom: -25
   },
   eyeIcon: {
     fontSize: 24,

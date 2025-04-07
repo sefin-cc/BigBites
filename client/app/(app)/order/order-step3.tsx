@@ -9,7 +9,7 @@ import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import Loading from "@/components/loading";
 import Constants from 'expo-constants';
-import { Snackbar } from "react-native-paper";
+import { Portal, Snackbar } from "react-native-paper";
 import { useGetBranchesQuery } from "../../../redux/feature/apiSlice";
 
 
@@ -206,7 +206,10 @@ export default function MapLocationStep3() {
  
   return (
     <View style={{ flex: 1, position: "relative" }}>
-      <Loading isLoading={isLoading} />
+      <Portal>
+        <Loading isLoading={isLoading} />
+      </Portal>
+
       {/* Search Input */}
       <View style={{ flexDirection: "row", margin: 10 }}>
         <TextInput

@@ -7,7 +7,8 @@ import { useCallback, useContext, useEffect } from "react";
 import { AppContext } from "@/app/context/AppContext";
 import { useFocusEffect } from '@react-navigation/native';
 import { BackHandler } from 'react-native';
-
+import TitleDashed from "@/components/titledashed";
+import * as Animatable from 'react-native-animatable';
 
 export default function Index() {
   const context = useContext(AppContext);
@@ -24,7 +25,6 @@ export default function Index() {
   useFocusEffect(
     useCallback(() => {
         const onBackPress = () => true; 
-    
         BackHandler.addEventListener('hardwareBackPress', onBackPress);
     
         return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
@@ -35,32 +35,38 @@ export default function Index() {
     
     <View style={globalStyle.container}>
       <ScrollView>
-        <LinearGradient
-          colors={['transparent', '#C1272D']}
-          style={styles.mainContainer}>
-            
-          <Image
-          style={[styles.image]}
-          source={require('../../../assets/images/home.png')}
-          />
-
-          <View style={{justifyContent: "center", alignItems: "center"}}>
-            <Image
-            style={styles.logo}
-            source={require('../../../assets/images/logo.png')}
+        <Animatable.View animation="slideInDown" easing="ease-in-out">
+          <LinearGradient
+            colors={['#f2aa83', '#C1272D']}
+            style={styles.mainContainer}>
+              
+            <Animatable.Image
+              animation="tada" 
+              easing="ease-in-out"
+              style={[styles.image]}
+              source={require('../../../assets/images/home.png')}
             />
-            <TouchableOpacity
-              onPress={() =>{router.push(`/order/order-type`);}}
-              // disabled={isPosting}
-              style={[globalStyle.button]}>
-                <Text style={globalStyle.buttonText}>
-                    ORDER NOW!
-                </Text>
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
+
+            <View style={{justifyContent: "center", alignItems: "center"}}>
+              <Image
+                style={styles.logo}
+                source={require('../../../assets/images/logo.png')}
+              />
+              <TouchableOpacity
+                onPress={() =>{router.push(`/order/order-type`);}}
+                // disabled={isPosting}
+                style={[globalStyle.button]}>
+                  <Text style={globalStyle.buttonText}>
+                      ORDER NOW!
+                  </Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+        </Animatable.View>
+        
         
       <View style={styles.contentContainer}>
+        <TitleDashed title={"PROMOS"} />
         <Slideshow />
       </View>
      
@@ -74,7 +80,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomLeftRadius: 60,
     borderBottomRightRadius: 60,
-    height: 520,
+    height: 500,
     padding: "5%"
   },
   contentContainer: {

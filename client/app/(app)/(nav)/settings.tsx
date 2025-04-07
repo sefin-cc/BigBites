@@ -1,4 +1,4 @@
-import { ActivityIndicator, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useEffect, useState } from "react";
 import { useNavigationContainerRef, useRouter } from "expo-router";
 import { useLogoutMutation, useGetProfileQuery } from "../../../redux/feature/auth/clientApiSlice";
@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import globalStyles from "@/assets/styles/globalStyle";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Loading from "@/components/loading";
+import { Portal } from "react-native-paper";
 
 export default function Login() {
   const router = useRouter();
@@ -69,7 +70,10 @@ export default function Login() {
   return (
 
     <View style={styles.container}>
+      <Portal>
         <Loading isLoading={isLoading} />
+      </Portal>
+        
         <LinearGradient
           colors={['#f2aa83', '#C1272D']}
           style={styles.mainContainer}>
@@ -114,7 +118,9 @@ export default function Login() {
         >
         { 
           isLoading ?
-          <ActivityIndicator animating={isLoading} color={"#FFEEE5"}  size="large" hidesWhenStopped={true}/>:
+          <Text style={globalStyles.buttonText}>
+            LOGGING OUT...
+          </Text>:
         
           <Text style={globalStyles.buttonText}>
             LOGOUT 
@@ -161,12 +167,11 @@ const styles = StyleSheet.create({
     fontFamily: 'MadimiOne'
   },
   mainContainer: {
-    // justifyContent: "flex-end",
     alignItems: "flex-end",
     borderBottomLeftRadius: 60,
     borderBottomRightRadius: 60,
-    height: 250,
+    height: 350,
     padding: "5%",
-    // width: "100%"
+    paddingTop: StatusBar.currentHeight
   },
 });

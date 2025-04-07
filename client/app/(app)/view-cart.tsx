@@ -1,4 +1,4 @@
-import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "../../assets/styles/globalStyle";
 import TitleDashed from "@/components/titledashed";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -183,7 +183,7 @@ export default function ViewCart() {
    
     <BottomSheetModalProvider >
     <GestureHandlerRootView  >
-    <View style={[globalStyle.container]} >
+    <View style={[globalStyle.container, {paddingBottom: StatusBar.currentHeight}]} >
 
       <View style ={{padding: "5%", flexGrow: 1}}>
         <View style={{ flexDirection: "row", paddingBottom: 10 }}>
