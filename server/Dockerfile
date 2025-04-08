@@ -1,6 +1,6 @@
 FROM php:8.2-cli
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     unzip zip curl git libzip-dev libonig-dev && \
     docker-php-ext-install zip pdo pdo_mysql mbstring
@@ -11,14 +11,17 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Set working directory
 WORKDIR /var/www
 
-# Copy app files
+# Copy everything
 COPY . .
 
-# Install dependencies
+# Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
-RUN php artisan config:cache
-RUN php artisan key:generate
+
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Start Laravel via entrypoint
+CMD ["/entrypoint.sh"]
