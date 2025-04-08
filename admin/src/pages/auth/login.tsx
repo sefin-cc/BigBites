@@ -67,7 +67,7 @@ export default function Login() {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center w-full h-screen" style={{  backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover',}}>
+        <div className="flex flex-col justify-center items-center w-full h-screen" style={{  backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover'}}>
             <img
                 src={logo}
                 style={{
