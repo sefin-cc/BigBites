@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, styled, Checkbox } from '@mui/material';
+import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, Checkbox } from '@mui/material';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import { useUpdateBranchMutation, useGetBranchByIdQuery } from '../../features/api/branchApi';
 import ReactLoading from 'react-loading';
