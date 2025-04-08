@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Box, Typography, FormHelperText } from '@mui/material';
 import AssessmentRoundedIcon from '@mui/icons-material/AssessmentRounded';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -10,19 +10,19 @@ import { autoTable } from 'jspdf-autotable';
 import { logo } from '../../assets/logo64';
 import { useGetBranchesQuery } from '../../features/api/branchApi';
 import { useGetOrdersQuery } from '../../features/api/orderApi';
-
+import isBetween from 'dayjs/plugin/isBetween';
 
 function OverviewModal() {
   // State to control the opening and closing of the modal
   const [open, setOpen] = useState(false);
-
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, 'day'));
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
   const [error, setError] = useState<string | null>(null);
   const { data: branches, isLoading: branchesLoading } = useGetBranchesQuery();
   const { data: orders, isLoading: ordersLoading } = useGetOrdersQuery();
   const [isReady, setIsReady] = useState(false);
-
+  dayjs.extend(isBetween);
+  
   useEffect(() => {
     if (!branchesLoading && !ordersLoading && branches && orders) {
       setIsReady(true);

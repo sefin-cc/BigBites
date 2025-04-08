@@ -29,7 +29,7 @@ export const branchApi = createApi({
     //  Get branch by ID
     getBranchById: builder.query<Branch, string>({
       query: (id) => `/branches/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Branch', id }],
+      providesTags: (...[, , id]) => [{ type: 'Branch', id }],
     }),
 
     //  Add a new branch

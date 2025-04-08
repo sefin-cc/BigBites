@@ -84,7 +84,7 @@ export const orderApi = createApi({
     // Get order by ID
     getOrderById: builder.query<Order, number>({
       query: (id) => `/orders/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Order', id }],
+      providesTags: (...[, , id]) => [{ type: 'Order', id }],
     }),
 
     // Add a new order

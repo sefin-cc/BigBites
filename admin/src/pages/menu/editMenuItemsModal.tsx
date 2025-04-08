@@ -36,7 +36,6 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [time, setTime] = useState(0);
-  const [image, setImage] = useState('');
   const [addOns, setAddOns] = useState<{ id?: number; label: string; price: number }[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { refetch } = useGetMenuQuery(); 
@@ -224,7 +223,6 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
       setDescription(item.description);
       setPrice(item.price);
       setTime(parseInt(item.time));
-      setImage(item.image);
        // Set add-ons correctly
       setAddOns(
         Array.isArray(item.add_ons)

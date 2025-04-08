@@ -5,7 +5,7 @@ import { RootState } from '../store';
 import { useGetOrdersQuery, Order} from '../features/api/orderApi';
 import { useEffect, useMemo, useState } from 'react';
 import { setLoading } from '../features/loadingSlice';
-
+import isBetween from 'dayjs/plugin/isBetween';
 
 export default function Dashboard() {
   const now: Dayjs = dayjs();
@@ -14,7 +14,7 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const { data: ordersData, isLoading: ordersLoading } = useGetOrdersQuery();
   const [orders, setOrders] = useState<Order[]>([]);
-
+  dayjs.extend(isBetween);
 
 
   // Get month and year

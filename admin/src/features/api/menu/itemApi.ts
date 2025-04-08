@@ -44,7 +44,7 @@ export const itemApi = createApi({
     // Get item by ID
     getItemById: builder.query<Item, number>({
       query: (id) => `/items/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Item', id }],
+      providesTags: (...[, , id]) => [{ type: 'Item', id }],
     }),
 
     // Add a new item

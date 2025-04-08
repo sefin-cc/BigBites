@@ -294,13 +294,13 @@ export default function MenuItems() {
 
   }, [menu]);
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
+  const handleRequestSort = (_event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
     setMenuCategory(isAsc ? 'desc' : 'asc');
     setSortBy(property);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, uniqueId: string) => {
+  const handleClick = (_event: React.MouseEvent<unknown>, uniqueId: string) => {
     const selectedIndex = selected.indexOf(uniqueId);
     let newSelected: readonly string[] = [];
 
@@ -315,7 +315,7 @@ export default function MenuItems() {
     setSelected(newSelected);
 };
   
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 

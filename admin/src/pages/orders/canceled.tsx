@@ -135,7 +135,7 @@ interface EnhancedTableProps {
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -285,7 +285,7 @@ export default function Canceled() {
       }
    }, [orders]);  
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
+  const handleRequestSort = (_event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -300,7 +300,7 @@ export default function Canceled() {
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const handleClick = (_event: React.MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: readonly number[] = [];
   
@@ -313,7 +313,7 @@ export default function Canceled() {
     setSelected(newSelected);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -404,9 +404,9 @@ export default function Canceled() {
                     </TableCell>
                   </TableRow>
                 ) : visibleRows.length > 0 ? (
-                  visibleRows.map((row, index) => {
+                  visibleRows.map((row, _index) => {
                     const isItemSelected = selected.includes(row.id);
-                    const labelId = `enhanced-table-checkbox-${index}`;
+      
 
                     return (
                       <TableRow
