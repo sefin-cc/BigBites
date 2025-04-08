@@ -14,5 +14,8 @@ php artisan config:cache
 # Run database migrations 
 php artisan migrate --force
 
+# Seed the database
+php artisan db:seed --force
+
 # Start Laravel's dev server
 php artisan serve --host=0.0.0.0 --port=8000
