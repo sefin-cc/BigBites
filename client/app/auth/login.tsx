@@ -1,108 +1,108 @@
 
 
-import { useRouter } from "expo-router";
-import React, { useContext } from "react";
+import { router } from "expo-router";
+import React from "react";
 import { useState } from "react";
-import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar,TextInput, Image } from "react-native";
-import { AppContext } from "../context/AppContext";
-import { Checkbox } from "react-native-paper";
+import { Text, View, StyleSheet, SafeAreaView, TouchableOpacity,TextInput, Image, ActivityIndicator, ImageBackground } from "react-native";
+import { useLoginMutation } from "../../redux/feature/auth/clientApiSlice";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import Loading from "@/components/loading";
+import { Portal } from "react-native-paper";
+
 
 
 export default function Login() {
-  const context = useContext(AppContext);
-  const router = useRouter();
-  if (!context) {
-    return <Text>Error: AppContext is not available</Text>;
-  }
+  const [login, { isLoading }] = useLoginMutation();
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
 
-  // const {setToken} = context;
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string[]; password?: string[] }>({});
   const [formData, setFormData] = useState({
       email: '',
       password: '',
   });
-  const [rememberMe, toggleRememberMe] = useState(false);
 
 
   const handleLogin = async () => {
-      // setIsLoading(true);
-    
-      // try {
-      //   const res = await API.post("/login", formData);
-      //   const data = res.data;
-    
-      //   if (data.errors) {
-      //     // Set form errors if they exist in the response
-      //     setErrors(data.errors);
-      //   } else {
-      //     // Store token in AsyncStorage for persistence in React Native
-      //     await AsyncStorage.setItem("token", data.token);
-      //     setToken(data.token);
-      //   }
-    
-      //   // Navigate to the homepage after successful login
-      //   router.replace("/");
-    
-      // } catch (error) {
-      //   // Handle Axios errors
-      //   if (axios.isAxiosError(error)) {
-      //     console.error("Axios error:", error.response?.data || error.message);
-      //     // Setting error messages from the response or a general error message
-      //     setErrors(error.response?.data?.errors || { general: "Something went wrong" });
-      //   } else {
-      //     // Handle other unexpected errors
-      //     console.error("Unexpected error:", error);
-
-      //   }
-      // } finally {
-      //   // Ensure loading state is reset whether successful or failed
-      //   setIsLoading(false);
-      // }
-    };
-
+    try {
+      await login(formData).unwrap();
+      router.replace("/"); // Redirect after successful login
+    } catch (err: any) {
+      console.log("Error Response:", JSON.stringify(err, null, 2));
+  
+      // Extract error response
+      const errorData = err.response?.data || err.data || err;
+  
+      if (errorData?.errors) {
+        setErrors(errorData.errors); // Handles Laravel validation errors
+      } else if (errorData?.email) {
+        setErrors({ email: errorData.email }); // Handles direct error response
+      } else {
+        setErrors({ general: ["An unexpected error occurred."] });
+      }
+    }
+  };
+  
+  
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView >
-            <Image
-            style={styles.logo}
-            source={require('../../assets/images/logo.png')}
-            />
-          <View>
-          <Text style={styles.label}>EMAIL</Text>
-          <TextInput style={styles.input} placeholder="example@email.com"  placeholderTextColor="#888"  value={formData.email} onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))} />
-              {errors.email && errors.email[0] && (
-                <View>
-                  <Text style={styles.errorText}>{errors.email[0]}</Text>
-                </View>
-              )}
-          </View>
-          <View>
-          <Text style={styles.label}>PASSWORD</Text>
-          <TextInput style={styles.input} placeholder="●●●●●●●●●●"  placeholderTextColor="#888"  value={formData.password} onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))} />
-              {errors.password && errors.password[0] && (
-                <View>
-                  <Text style={styles.errorText}>{errors.password[0]}</Text>
-                </View>
-              )}
-          </View>
-      </SafeAreaView>
-            
-      <View style={styles.forgotPasswordCard}>
-            <TouchableOpacity onPress={() =>{}} >
-              <Text style={[styles.label, {fontSize: 16}]}>Forgot Password?</Text>
-            </TouchableOpacity>
-          </View>
+    <ImageBackground source={require('../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
+      <Portal>
+        <Loading isLoading={isLoading} /> 
+      </Portal>
 
-          <View style={{marginTop:20}}>
-            <TouchableOpacity onPress={() =>{}} style={styles.loginBtn}>
-              <Text style={styles.loginBtnText}>LOGIN</Text>
-            </TouchableOpacity>
+        <Image
+          style={styles.logo}
+          source={require('../../assets/images/logo.png')}
+          />
+         <SafeAreaView style={{backgroundColor: "white",  padding: 20, borderRadius: 10, justifyContent: "center"}} >  
+              
+            <View>
+            <Text style={styles.label}>EMAIL</Text>
+            <TextInput style={styles.input} placeholder="example@email.com"  placeholderTextColor="#888"  value={formData.email} onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))} />
+                {errors.email && errors.email[0] && (
+                  <View>
+                    <Text style={styles.errorText}>{errors.email[0]}</Text>
+                  </View>
+                )}
+            </View>
+            
+          <View>
+            <Text style={styles.label}>PASSWORD</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="●●●●●●●●●●"
+                placeholderTextColor="#888"
+                secureTextEntry={!passwordVisible}
+                value={formData.password}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))}
+              />
+              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                <Text style={styles.eyeIcon}>{passwordVisible ? <Ionicons name="eye-off" size={24} color="#C1272D" /> : <Ionicons name="eye" size={24} color="#C1272D" /> }</Text>
+              </TouchableOpacity>
+                {errors.password && errors.password[0] && (
+                  <View>
+                    <Text style={[styles.errorText, {top: -25}]}>{errors.password[0]}</Text>
+                  </View>
+                )}
           </View>
-    </View>
-    
-    
+      
+          <TouchableOpacity onPress={() =>{handleLogin()}} style={styles.loginBtn} disabled={isLoading}>
+              { 
+                isLoading ?
+                <Text style={styles.loginBtnText}>
+               LOGGING IN...
+                </Text>:
+              
+                <Text style={styles.loginBtnText}>
+                  LOGIN 
+                </Text>
+              } 
+          </TouchableOpacity>
+
+        </SafeAreaView>
+            
+       
+    </ImageBackground>
   );
 }
 
@@ -116,19 +116,19 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
-    backgroundColor: "#FCE8E8", 
+    backgroundColor: "#FFEEE5", 
     fontSize: 16,
     fontFamily: "MadimiOne",  
     borderWidth: 3,
     paddingLeft: 10,
     borderRadius: 5,
-    borderColor: "#C1272D"
+    borderColor: "#FB7F3B"
   },
   errorText:{
-    color: "#C1272D", marginBottom: 5, fontFamily: "MadimiOne"
+    color: "#C1272D", marginBottom: 5, fontFamily: "MadimiOne", alignSelf: "flex-end"
   },
   label: {
-    color: "white", 
+    color: "#2C2C2C", 
     marginBottom: 5, 
     fontFamily: "MadimiOne",
   },
@@ -158,6 +158,14 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     resizeMode: 'contain',
     marginBottom: 10 ,
-    alignSelf: "center"
-  }
+    alignSelf: "center",
+    bottom: -25
+  },
+  eyeIcon: {
+    fontSize: 24,
+    color: "#C1272D",
+    bottom: 47,
+    alignSelf: "flex-end",
+    right: 15
+  },
 });

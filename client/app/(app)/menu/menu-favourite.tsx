@@ -1,8 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
-import menuData from "../../../data/menu.json";
-import Feather from "@expo/vector-icons/Feather";
 import { useState, useEffect, useRef, useMemo, useCallback, useContext } from "react";
 import TitleDashed from "@/components/titledashed";
 import MenuContainer from "@/components/menuContainer";
@@ -14,34 +12,19 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { AppContext } from "@/app/context/AppContext";
 import ViewCartContainer from "@/components/ViewCartContainer";
 import SearchMenu from "@/components/SearchMenu";
+import { Item, AddOn} from "@/types/clients";
+import { Snackbar } from "react-native-paper";
 
-interface AddOns {
-  label: string;
-  price: number;
-}
 
-interface MenuItems {
-  [x: string]: any;
-  subId: string;
-  itemId: string;
-  label: string;
-  fullLabel: string;
-  description: string;
-  price: number;
-  time: string;
-  image: string;
-  addOns: Array<AddOns>;
+interface User {
+  favourites: Item[];
 }
 
 interface MenuData {
-  id: string;
-  subId: string;
+  id: number;
+  sub_category_id: number;
   name: string;
-  image: string;
-}
-
-interface User {
-  favourites: MenuItems[];
+  image: string; 
 }
 
 
@@ -50,19 +33,21 @@ export default function MenuFavourite() {
   if (!context) {
     return <Text>Error: AppContext is not available</Text>;
   }
-  const { order, setOrder, setUser, user} = context;
+  const { order, setOrder, setUser, user } = context;
   const [menu, setMenu] = useState<any[] | null>(null);
   const modalizeRef = useRef<Modalize>(null);
-  const [itemId, setItemId] = useState<string | null>(null);
-  const [subCategoryId, setSubCategoryId] = useState<string | null>(null);
+  const [itemId, setItemId] = useState<number | null>(null);
+  const [subCategoryId, setSubCategoryId] = useState<number | null>(null);
   const [favourite, toggleFavourite] = useState(false);
   const [qtyCount, setQtyCount] = useState(1);
   const [tappedItems, setTappedItems] = useState<{ [key: number]: boolean }>({}); 
-  const [favMenu, setfavMenu] = useState<MenuData[]>();
-
+  const [favMenu, setfavMenu] = useState<MenuData[]>([]);
+  const [visible, setVisible] = useState<boolean>(false);
 
   const setMenuData = () => {
-    setMenu(user.favourites); 
+    if(user){
+      setMenu(user.favourites); 
+    }
   };
 
   const handleTapItem =()=>{
@@ -73,8 +58,8 @@ export default function MenuFavourite() {
 
 
   const getSelectedItem = () => {
-    if (menu){
-      return menu.find(item => item.itemId === itemId);
+    if (menu) {
+      return menu.find((item) => item.id === itemId); 
     }
     return null;
   }
@@ -84,7 +69,7 @@ export default function MenuFavourite() {
   useEffect(() => {
     setMenuData();
     console.log(menu);
-  }, [setMenuData]);
+  }, [user]); 
 
   useEffect(() => {
     console.log(order);
@@ -93,9 +78,9 @@ export default function MenuFavourite() {
   
   useEffect(() => {
     if (menu) {
-      const favourites = menu.map((item: MenuItems) => ({
-        id: item.itemId,
-        subId: item.subId,
+      const favourites = menu.map((item: Item) => ({
+        id: item.id,
+        sub_category_id: item.sub_category_id,
         name: item.label,
         image: item.image
       }));
@@ -110,18 +95,28 @@ export default function MenuFavourite() {
 
 
   useEffect(() => {
-    if (selectedItem) {
-      // Check if the selected item is in the user's favourites
-      const isFavourite = user.favourites.some(
-        (item: { fullLabel: string; }) => selectedItem.fullLabel === item.fullLabel
-      );
-      
-      // Update the favourite state accordingly
-      toggleFavourite(isFavourite);
-      console.log("user: "+  user);
+    if(user && user.favourites){
+      if (selectedItem) {
+        const isFavourite = user.favourites.some(
+          (item: Item) => selectedItem.full_label === item.full_label
+        );
+        toggleFavourite(isFavourite);
+        console.log("user: ", user);
+      }
     }
+
   }, [selectedItem, user.favourites]); 
   
+  useEffect(() => {
+    if (visible) {
+      const timer = setTimeout(() => {
+        setVisible(false);// Hide snackbar after 3 seconds
+      }, 3000);
+
+      // Cleanup timer on component unmount or when visible changes
+      return () => clearTimeout(timer);
+    }
+  }, [visible]); 
 
   const setQty = (count: number) => {
     if (count <= 1){
@@ -138,7 +133,7 @@ export default function MenuFavourite() {
     }));
   };
 
-  const setFavourite = (itemMenu: MenuItems) => {
+  const setFavourite = (itemMenu: Item) => {
     // Toggle the favourite state
     toggleFavourite(prevState => {
       const newFavouriteState = !prevState;
@@ -147,7 +142,7 @@ export default function MenuFavourite() {
       setUser((prev: User) => {
         const updatedFavourites = newFavouriteState
           ? [...prev.favourites, itemMenu] // Add the item if it's being set as favourite
-          : prev.favourites.filter((fav) => fav.fullLabel !== itemMenu.fullLabel); // Remove the item if it's being unfavoured
+          : prev.favourites.filter((fav) => fav.full_label !== itemMenu.full_label); // Remove the item if it's being unfavoured
   
         return {
           ...prev,
@@ -160,10 +155,10 @@ export default function MenuFavourite() {
   };
 
 
-  const handleAddToCart = (itemMenu: MenuItems) => {
+  const handleAddToCart = (itemMenu: Item) => {
     // Check if a similar item already exists in the order
     const existingItem = Object.entries(order.order).find(
-      ([key, item]) => itemMenu.fullLabel === item.fullLabel
+      ([key, item]) => itemMenu.full_label === item.full_label
     );
   
     // If the item exists, update the quantity instead of adding a new item
@@ -188,7 +183,7 @@ export default function MenuFavourite() {
         .filter(([key, item]) => item === true) // keep only the items that are true
         .map(([key, item]) => Number(key)); // map to get the keys (which are the selected add-ons)
   
-      const newSelectedItem = selectedAddOns.map((key) => itemMenu.addOns[key]);
+      const newSelectedItem = selectedAddOns.map((key) => itemMenu.add_ons[key]);
   
       // Add the new item to the order
       const newItemMenu = { ...itemMenu, selectedAddOns: newSelectedItem, qty: qtyCount };
@@ -198,10 +193,11 @@ export default function MenuFavourite() {
         order: [...prev.order, newItemMenu], // Add the new item to the order
       }));
     }
-  
+    setVisible(true);
     // Reset the tappedItems and quantity count after adding/updating the cart
     setTappedItems({});
     setQtyCount(1);
+    modalizeRef.current?.close();
   };
   
   
@@ -220,38 +216,64 @@ export default function MenuFavourite() {
               <View style={{ marginBottom: 10 }}>
                 <TitleDashed title="MY FAVOURITES" />
               </View>
-                {menu && (
-                  <>
-                          {favMenu && (
-                     <>
-                      <View>
-                        <MenuContainer
-                          menuData={favMenu}
-                          handleTapItem={handleTapItem}
-                          setItemId={setItemId}
-                          setSubCategoryId={setSubCategoryId}
-                        />
-                      </View>  
+              {menu && (
+                <>
+                  {favMenu?.length ? ( 
+                    <View>
+                      <MenuContainer
+                        menuData={favMenu}
+                        handleTapItem={handleTapItem}
+                        setItemId={setItemId}
+                        setSubCategoryId={setSubCategoryId}
+                      />
+                    </View>
+                  ) : (
+                    <View style={styles.noFavouritesContainer}>
+                      <AntDesign name="star" size={100} color="#f2aa83" />
+                      <Text style={styles.noFavouritesText}>NO ADDED FAVOURITES</Text>
+                    </View>
+                  )}
                 </>
               )}
-                </>
-              )}
+
             </View>
+
+            <Snackbar
+              visible={visible}
+              onDismiss={() =>setVisible(false)}
+              duration={Snackbar.DURATION_LONG} 
+              style={{
+                position: 'absolute',  
+                bottom: -130,          
+                left: 60,             
+                right: 60,           
+                backgroundColor: '#2C2C2C', 
+                borderRadius: 10,     
+                zIndex: 10000,          
+              }}
+            >
+              <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> <FontAwesome6 name="check" size={16} color="white" />  SUCCESSFULLY ADDED!</Text>
+            </Snackbar>
           </ScrollView>
         </View>
        
 
         {/* Modal */}
-        <Modalize ref={modalizeRef} snapPoint={600} modalHeight={600}>
+        <Modalize 
+          ref={modalizeRef} 
+          snapPoint={630} 
+          adjustToContentHeight
+          childrenStyle={{ height: 630 }}
+        >
           {selectedItem &&
             <View>
                   <Image 
                     source={{ uri: selectedItem.image }}  
-                    style={styles.image}
+                    style={globalStyle.image}
                   />
-                  <View style={styles.modalContainer}>
+                  <View style={globalStyle.modalContainer}>
                     <View style={{flexDirection: "row"}}>
-                      <Text style={styles.modalLabel}>{selectedItem.fullLabel}</Text>
+                      <Text style={globalStyle.modalLabel}>{selectedItem.full_label}</Text>
                       <TouchableOpacity
                         onPress={() => {setFavourite(selectedItem)}}
                       >
@@ -262,27 +284,27 @@ export default function MenuFavourite() {
                         }
                       </TouchableOpacity>
                     </View>
-                    <View style={styles.dashedLine}/>
+                    <View style={globalStyle.dashedLine}/>
                     <View style={{flexDirection: "row", gap: 10}}>
-                      <Text style={styles.modalPrice}>PHP {selectedItem.price}</Text>
-                      <View style={styles.timeCard}>
+                      <Text style={globalStyle.modalPrice}>PHP {selectedItem.price}</Text>
+                      <View style={globalStyle.timeCard}>
                         <AntDesign name="clockcircle" size={16} color="white" />
-                        <Text style={styles.timeText}>{selectedItem.time}</Text>
+                        <Text style={globalStyle.timeText}>{selectedItem.time}</Text>
                       </View>
                     </View>
-                    <Text style={styles.descriptionText}>{selectedItem.description}</Text>
-                    <Text style={styles.addOnsText}>ADD ONS</Text>
-                    <View style={styles.addOnsContainer}>
+                    <Text style={globalStyle.descriptionText}>{selectedItem.description}</Text>
+                    <Text style={globalStyle.addOnsText}>ADD ONS</Text>
+                    <View style={globalStyle.addOnsContainer}>
                       {
 
-                            selectedItem.addOns.map((item: AddOns, key: number) => {
+                            selectedItem.add_ons.map((item: AddOn , key: number) => {
                               return (
                                 <TouchableOpacity 
                                   key={key} 
                                   onPress={() => toggleAddOnTapped(key)} 
-                                  style={[styles.addOnsItemCard, tappedItems[key] && { backgroundColor: "#FB7F3B" }]} // Conditional background color
+                                  style={[globalStyle.addOnsItemCard, tappedItems[key] && { backgroundColor: "#FB7F3B" }]} // Conditional background color
                                 >
-                                  <Text style={[styles.addOnsItemText, tappedItems[key] && { color: "white" }]}>
+                                  <Text style={[globalStyle.addOnsItemText, tappedItems[key] && { color: "white" }]}>
                                     {item.label} + P {item.price}
                                   </Text>
                                 </TouchableOpacity>
@@ -291,24 +313,27 @@ export default function MenuFavourite() {
                       }
                     </View>
                     <View style={{flexDirection: "row", gap: 10}}>
-                      <View style={styles.qtyCard}>
-                        <TouchableOpacity onPress={() => {setQty(qtyCount - 1)}} style={[styles.qtyCardBtns]}><FontAwesome6 name="minus" size={16} color="white" /></TouchableOpacity>
-                        <View style={styles.qtyCardView}><Text style={styles.qtyCardViewText}>{qtyCount}</Text></View>
-                        <TouchableOpacity onPress={() => {setQty(qtyCount + 1)}} style={[styles.qtyCardBtns]}><FontAwesome6 name="plus" size={16} color="white" /></TouchableOpacity>
+                      <View style={globalStyle.qtyCard}>
+                        <TouchableOpacity onPress={() => {setQty(qtyCount - 1)}} style={[globalStyle.qtyCardBtns]}><FontAwesome6 name="minus" size={16} color="white" /></TouchableOpacity>
+                        <View style={globalStyle.qtyCardView}><Text style={globalStyle.qtyCardViewText}>{qtyCount}</Text></View>
+                        <TouchableOpacity onPress={() => {setQty(qtyCount + 1)}} style={[globalStyle.qtyCardBtns]}><FontAwesome6 name="plus" size={16} color="white" /></TouchableOpacity>
                       </View>
                       <TouchableOpacity
-                        onPress={() =>{handleAddToCart(selectedItem)}}
-                        style ={styles.btnCart}
+                        onPress={(e) =>{
+                          e.persist?.();
+                          handleAddToCart(selectedItem)}
+                        }
+                        style ={globalStyle.btnCart}
                       >
                         <FontAwesome6 name="cart-shopping" size={16} color="white" />
-                        <Text style={styles.cartText}>ADD TO CART</Text>
+                        <Text style={globalStyle.cartText}>ADD TO CART</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
             </View>
           }
-
         </Modalize>
+    
 
        <ViewCartContainer />
           
@@ -323,6 +348,20 @@ export default function MenuFavourite() {
 }
 
 const styles = StyleSheet.create({
+
+  noFavouritesContainer:{
+    height: 500,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noFavouritesText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#f2aa83",
+    marginTop: 20,
+    fontFamily: 'MadimiOne',
+  },
+
   contentContainer: {
     margin: "5%",
   },

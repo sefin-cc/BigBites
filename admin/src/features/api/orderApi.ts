@@ -23,6 +23,7 @@ interface Fees {
 interface User {
     id: number;
     name: string;
+    phone: string;
     email: string;
     email_verified_at: string | null;
     created_at: string;
@@ -56,14 +57,13 @@ export interface Order {
     order_items: OrderItem[];
     base_price: number;
     timestamp: string;
-    date_time_pickup: string;
+    date_time_pickup: string  | null;
     status: string;
     discount_card_details: DiscountCardDetails;
     fees: Fees;
-    created_at: string;
-    updated_at: string;
     user: User;
     branch: Branch;
+    reference_number: string | null;
 }
 
 // Example usage with an array of orders

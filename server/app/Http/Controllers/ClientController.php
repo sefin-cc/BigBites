@@ -46,10 +46,9 @@ class ClientController extends Controller
 
 
             return response()->json([
-                'client' => $client
-            ])->cookie(
-                'token', $token, 60 * 24, '/', null, true, true // HttpOnly & Secure
-            );
+                'client' => $client,
+                'token' => $token
+            ]);
 
             // Return the created client and token as a JSON response
            
@@ -62,7 +61,6 @@ class ClientController extends Controller
     }
 
     // Login an existing client
-   // Login an existing client
 public function login(Request $request)
 {
     try {
@@ -90,10 +88,9 @@ public function login(Request $request)
     // Store token in an HTTP-only cookie
     return response()->json([
         'message' => 'Login successful',
+        'token' => $token,
         'client' => $client
-    ])->cookie(
-        'token', $token, 60 * 24, '/', null, true, true // HttpOnly & Secure
-    );
+    ]);
 }
 
 
@@ -105,7 +102,7 @@ public function login(Request $request)
     
         return response()->json([
             'message' => 'You have been logged out successfully.',
-        ])->cookie('token', '', -1); // Remove the cookie
+        ]);
     }
     
 
@@ -180,5 +177,33 @@ public function login(Request $request)
         $client->delete();
 
         return response()->json(['message' => 'Client deleted successfully']);
+    }
+
+    
+    public function updateFavourites(Request $request, $id)
+    {
+        // Find the admin by ID
+        $admin = Client::find($id);
+    
+        // Ensure the admin exists
+        if (!$admin) {
+            return response()->json(['error' => 'Admin not found'], 404);
+        }
+    
+        // Check if the authenticated user is updating their own information
+        if ($admin->id !== Auth::user()->id) {
+            abort(403, 'USER DOES NOT HAVE THE RIGHT PERMISSIONS');
+        }
+    
+        // Validate the input fields
+        $request->validate([
+            'favourites' => 'nullable|array',
+        ]);
+    
+        // Update the admin's information
+        $admin->update($request->only(['favourites']));
+    
+        // Return the updated admin as a JSON response
+        return response()->json($admin);
     }
 }

@@ -16,11 +16,11 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ImageController;
 
 //Admin User Routes
-Route::post('admin/login', [AdminController::class, 'login'])->middleware(['web']);
+Route::post('admin/login', [AdminController::class, 'login'])->middleware(['admin.api']);
 
 
 // Protect these routes with authentication middleware
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['admin.api', 'auth:sanctum'])->group(function () {
     Route::get('/admin', function (Request $request) {
         return $request->user();
     });
@@ -39,17 +39,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 //Client User Routes
-Route::post('client/login', [ClientController::class, 'login']);
-Route::post('client/register', [ClientController::class, 'register']);
+Route::post('client/login', [ClientController::class, 'login'])->middleware(['api']);
+Route::post('client/register', [ClientController::class, 'register'])->middleware(['api']);
 
 // Protect client routes that require authentication
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'api'])->group(function () {
     Route::get('/client', function (Request $request) {
         return $request->user();
     });
-
-    Route::post('client/logout', [ClientController::class, 'logout']);  // Logout route
-
+    Route::post('client/logout', [ClientController::class, 'logout']);
+    Route::post('client/update_favourites/{id}', [ClientController::class, 'updateFavourites']); 
+    Route::get('client/index', [ClientController::class, 'index']);
     // CRUD operations for clients
     Route::get('client/index', [ClientController::class, 'index']);
     Route::get('client/show/{id}', [ClientController::class, 'show']);
@@ -57,11 +57,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('client/destroy/{id}', [ClientController::class, 'destroy']);
 });
 
+
+// Routes that are accesible for both admin and client
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::apiResource('branches', BranchController::class);
         Route::apiResource('promos', PromoController::class);
         Route::apiResource('role', RolesController::class);
- 
+        Route::apiResource('branches', BranchController::class);
         Route::apiResource('categories', CategoryController::class);
   
         Route::apiResource('items', ItemController::class);

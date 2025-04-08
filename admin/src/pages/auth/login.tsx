@@ -7,7 +7,7 @@ import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress"; // ✅ Loading spinner
+import backgroundImage from '../../assets/BG.png';
 import { useState } from "react";
 import logo from '../../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
@@ -67,7 +67,7 @@ export default function Login() {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center w-full h-screen" style={{ backgroundColor: "#FB7F3B" }}>
+        <div className="flex flex-col justify-center items-center w-full h-screen" style={{  backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover'}}>
             <img
                 src={logo}
                 style={{

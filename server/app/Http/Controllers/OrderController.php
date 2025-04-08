@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Branch;
-use App\Models\User;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use App\Events\OrderUpdated;
 use App\Events\OrderCreated;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -31,59 +32,52 @@ class OrderController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'costumer' => 'nullable|array',
+            'user_id' => 'required', 
             'type' => 'required|string',
-            'pickUpType' => 'nullable|string',
+            'pick_up_type' => 'nullable|string',
             'location' => 'nullable|array',
-            'branch' => 'required|array',
-            'order' => 'required|array',
-            'basePrice' => 'required|numeric',
+            'branch_id' => 'required|exists:branches,id', 
+            'order_items' => 'required|array',
+            'base_price' => 'required|numeric',
             'timestamp' => 'required|date',
-            'dateTimePickUp' => 'nullable|date',
+            'date_time_pickup' => 'nullable|date',
             'status' => 'required|string',
-            'discountCardDetails' => 'nullable|array',
+            'discount_card_details' => 'nullable|array',
             'fees' => 'required|array',
+            'reference_number' => 'required'
         ]);
+
     
-        // If customer exists, find or create a user
-        $user = null;
-        if (!empty($validated['costumer']) && !empty($validated['costumer']['email'])) {
-            $user = User::firstOrCreate(
-                ['email' => $validated['costumer']['email']],
-                [
-                    'name' => $validated['costumer']['name'],
-                    'phone' => $validated['costumer']['phone'],
-                    'address' => $validated['costumer']['address'],
-                    'password' => bcrypt('default_password') // Change this for security
-                ]
-            );
+        $branch = Branch::find($validated['branch_id']);
+        if (!$branch) {
+            return response()->json(['message' => 'Branch not found'], 404);
         }
     
-        // Get branch
-        $branch = Branch::findOrFail($validated['branch'][0]['id']);
     
-        // Create order
+        // Create the order
         $order = Order::create([
-            'user_id' => $user?->id,
+            'user_id' => $validated['user_id'],
             'type' => $validated['type'],
-            'pick_up_type' => $validated['pickUpType'],
+            'pick_up_type' => $validated['pick_up_type'],
             'location' => $validated['location'],
             'branch_id' => $branch->id,
-            'order_items' => $validated['order'],
-            'base_price' => $validated['basePrice'],
+            'order_items' =>$validated['order_items'], // Ensure order_items is in JSON format
+            'base_price' => $validated['base_price'],
             'timestamp' => $validated['timestamp'],
-            'date_time_pickup' => $validated['dateTimePickUp'],
+            'date_time_pickup' => $validated['date_time_pickup'],
             'status' => $validated['status'],
-            'discount_card_details' => $validated['discountCardDetails'],
+            'discount_card_details' => $validated['discount_card_details'],
             'fees' => $validated['fees'],
+            'reference_number' => $validated['reference_number']
         ]);
     
         // **Broadcast Order Created Event**
         broadcast(new OrderCreated($order))->toOthers();
-    
+        
         return response()->json(['message' => 'Order created successfully', 'order' => $order], 201);
     }
-
+    
+    
     public function show($id): JsonResponse
     {
         $order = Order::with(['user', 'branch'])->findOrFail($id);

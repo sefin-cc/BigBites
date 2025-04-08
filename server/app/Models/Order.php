@@ -12,7 +12,7 @@ class Order extends Model
     protected $fillable = [
         'user_id', 'type', 'pick_up_type', 'location',
         'branch_id', 'order_items', 'base_price', 'timestamp',
-        'date_time_pickup', 'status', 'discount_card_details', 'fees'
+        'date_time_pickup', 'status', 'discount_card_details', 'fees', 'reference_number'
     ];
 
     protected $casts = [
@@ -26,7 +26,7 @@ class Order extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Client::class);
     }
 
     public function branch()

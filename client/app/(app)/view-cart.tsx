@@ -1,4 +1,4 @@
-import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "../../assets/styles/globalStyle";
 import TitleDashed from "@/components/titledashed";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -12,6 +12,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Modalize } from "react-native-modalize";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { Snackbar } from "react-native-paper";
 
 interface AddOns {
   label: string;
@@ -23,12 +24,12 @@ interface MenuItems {
   subId: string;
   itemId: string;
   label: string;
-  fullLabel: string;
+  full_label: string;
   description: string;
   price: number;
   time: string;
   image: string;
-  addOns: Array<AddOns>;
+  add_ons: Array<AddOns>;
   selectedAddOns: Array<AddOns> | [];  
 }
 
@@ -45,13 +46,13 @@ export default function ViewCart() {
   const [selectedItem, setSelectedItem] = useState<MenuItems>();
   const [qtyCount, setQtyCount] = useState(1);
   const [tappedItems, setTappedItems] = useState<{ [key: string]: boolean}>({}); 
+  const [visible, setVisible] = useState<boolean>(false);
 
   const openEditModal =()=>{
     setQtyCount(1);
     setTappedItems({});
     modalizeRef.current?.open();
   }
-
 
   useEffect(() => {
     if (order) {
@@ -71,7 +72,7 @@ export default function ViewCart() {
       const initialTappedState: { [key: string]: boolean } = {};
   
       // Loop through the addOns of the menu item
-      menuitem.addOns.forEach((addOn) => {
+      menuitem.add_ons?.forEach((addOn) => {
         // Check if the addOn's label is in selectedAddOns, if so set it as true in tappedItems
         const isSelected = menuitem.selectedAddOns.some((selected) => selected.label === addOn.label);
         initialTappedState[addOn.label] = isSelected; // Set tappedItems to true if the add-on is selected
@@ -100,7 +101,7 @@ export default function ViewCart() {
   const EditItem = (itemMenu: MenuItems) => {
     // Check if a similar item already exists in the order
     const existingItem = Object.entries(order.order).find(
-      ([key, item]) => itemMenu.fullLabel === item.fullLabel
+      ([key, item]) => itemMenu.full_label === item.full_label
     );
   
     // If the item exists, update
@@ -110,7 +111,7 @@ export default function ViewCart() {
         .filter(([key, value]) => value === true) // Keep only the items that are true
         .map(([key, value]) => {
           // Find the corresponding addOn by matching the label
-          const selectedAddOn = itemMenu.addOns.find(addOn => addOn.label === key);
+          const selectedAddOn = itemMenu.add_ons?.find(addOn => addOn.label === key);
           return selectedAddOn; // Return the matched addOn object
         }).filter(Boolean); // Filter out any undefined values (in case no match is found)
   
@@ -139,7 +140,7 @@ export default function ViewCart() {
 
   const deleteItem = (itemMenu: MenuItems) => {
     // Remove the item from the order by filtering out the item based on fullLabel (or itemId)
-    const updatedOrder = order.order.filter(item => item.fullLabel !== itemMenu.fullLabel);
+    const updatedOrder = order.order.filter(item => item.full_label !== itemMenu.full_label);
   
     // Update the order state with the new list (after removal)
     setOrder(prev => ({
@@ -157,18 +158,32 @@ export default function ViewCart() {
   }, [tappedItems]);
 
   const handleCheckOut = () => {
-    setOrder(prev => ({
-      ...prev,
-      basePrice: orderTotal,
-    }));
-    router.push(`/(app)/checkout`); 
+    if(orderItems.length > 0 ){
+      setOrder(prev => ({
+        ...prev,
+        basePrice: orderTotal,
+      }));
+      router.push(`/(app)/checkout`); 
+    }else{
+      setVisible(true);
+    }
+   
   }
+  useEffect(() => {
+    if (visible) {
+      const timer = setTimeout(() => {
+        setVisible(false);
+      }, 3000);
 
+      // Cleanup timer on component unmount or when visible changes
+      return () => clearTimeout(timer);
+    }
+  }, [visible]); 
   return (
    
     <BottomSheetModalProvider >
     <GestureHandlerRootView  >
-    <View style={[globalStyle.container]}>
+    <View style={[globalStyle.container, {paddingBottom: StatusBar.currentHeight}]} >
 
       <View style ={{padding: "5%", flexGrow: 1}}>
         <View style={{ flexDirection: "row", paddingBottom: 10 }}>
@@ -189,7 +204,7 @@ export default function ViewCart() {
                 <View style={{ flexGrow: 1 }}>
                   <Text style={styles.textCartItem}>{item.qty}x {item.label} - P{item.price} </Text>
                   {
-                    item.selectedAddOns.map((addOn: AddOns) => {
+                    item.selectedAddOns?.map((addOn: AddOns) => {
                       return (
                         addOn && addOn.label && addOn.price && (
                           <Text style={[styles.textCartItem, { fontSize: 16 }]} key={addOn.label}>
@@ -207,7 +222,9 @@ export default function ViewCart() {
                       <MaterialIcons name="mode-edit" size={20} color="#C1272D" />
                       <Text style={styles.editBtnText}>Edit</Text>
                     </TouchableOpacity>
-                    <Text style={[styles.textCartItem, { fontSize: 24 }]}>PHP {item.qty * item.price + item.selectedAddOns.reduce((sum, addOn) => sum + addOn.price, 0)}</Text> {/* Calculate item total with add-ons */}
+                    <View>
+                      <Text style={[styles.textCartItem, { fontSize: 24 }]}>PHP {item.qty * item.price + item.selectedAddOns.reduce((sum, addOn) => sum + addOn.price, 0)}</Text> 
+                    </View>
                   </View>
                 </View>
               </View>
@@ -218,15 +235,42 @@ export default function ViewCart() {
               <View style={{ borderBottomWidth: 4, borderColor: "#FB7F3B" }}></View>
             );
           }}
-          
+          ListEmptyComponent={() => (
+            <View style={styles.emptyCartContainer}>
+              <FontAwesome6 name="cart-plus" size={60} color="#f2aa83" />
+              <Text style={styles.emptyCartText}>CART IS EMPTY</Text>
+            </View>
+          )}
         />
-
-
+        <View style={{alignItems: "center"}}>
+        <Snackbar
+            visible={visible}
+            onDismiss={() => setVisible(false)}
+            duration={Snackbar.DURATION_LONG} 
+            style={{
+              position: 'absolute',  
+              left: 0,             
+              right: 0, 
+              bottom: 0,
+              backgroundColor: '#2C2C2C', 
+              borderRadius: 10,     
+              zIndex: 10000,      
+            }}
+          >
+            <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> THE CART IS EMPTY!</Text>
+          </Snackbar>
+        </View>
+          
 
       </View>
 
-              {/* Modal */}
-              <Modalize ref={modalizeRef} snapPoint={630} modalHeight={630}>
+        {/* Modal */}
+        <Modalize 
+          ref={modalizeRef} 
+          snapPoint={630} 
+          adjustToContentHeight
+          childrenStyle={{ height: 630 }}
+        >
           {selectedItem &&
             <View>
                   <Image 
@@ -235,7 +279,7 @@ export default function ViewCart() {
                   />
                   <View style={globalStyle.modalContainer}>
                     <View style={{flexDirection: "row"}}>
-                      <Text style={globalStyle.modalLabel}>{selectedItem.fullLabel}</Text>
+                      <Text style={globalStyle.modalLabel}>{selectedItem.full_label}</Text>
                       <TouchableOpacity
                         onPress={() => {deleteItem(selectedItem)}}
                       >
@@ -263,7 +307,7 @@ export default function ViewCart() {
                     <View style={globalStyle.addOnsContainer}>
                       {
 
-                        selectedItem.addOns.map((item) => {
+                        selectedItem.add_ons?.map((item) => {
                           return (
                             <TouchableOpacity
                               key={item.label}  // Use label as key for uniqueness
@@ -328,6 +372,18 @@ export default function ViewCart() {
 }
 
 const styles = StyleSheet.create({
+  emptyCartContainer: {
+    flex: 1,
+    height: 500,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  emptyCartText: {
+    fontSize: 20,
+    color: "#f2aa83", 
+    fontFamily: 'MadimiOne',
+  },
   cartItemContainer: {
     borderBottomWidth: 4,
     borderColor: "#FB7F3B",

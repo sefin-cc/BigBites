@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
@@ -46,6 +46,8 @@ export default function OrderType() {
   }, [order]);
   
   return (
+  <ImageBackground source={require('../../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
+    
     <View style={styles.container}>
       <Image style={styles.logo} source={require('../../../assets/images/logo.png')} />
   
@@ -79,6 +81,7 @@ export default function OrderType() {
         </View>
       }
     </View>
+  </ImageBackground>
   );
 }
 
@@ -87,7 +90,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FB7F3B"
+    width: "100%"
   },
   containerButton: {
     backgroundColor: "#FFEEE5",

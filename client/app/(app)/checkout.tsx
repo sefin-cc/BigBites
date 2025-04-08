@@ -1,16 +1,18 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "../../assets/styles/globalStyle";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import TitleDashed from "@/components/titledashed";
 import { format } from 'date-fns';
-import { Checkbox, Dialog, Portal, RadioButton, Snackbar, TextInput, Button as PaperButton } from "react-native-paper";
+import { Checkbox, Dialog, TextInput, Button as PaperButton } from "react-native-paper";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { AddOn } from "@/types/clients";
+import { useGetProfileQuery } from "../../redux/feature/auth/clientApiSlice";
+import Loading from "@/components/loading";
+import { useRouter } from "expo-router";
+import { useCreatePaymentLinkMutation } from "@/redux/feature/paymentSlice";
+import { Portal } from "react-native-paper";
 
-interface AddOns {
-  label: string;
-  price: number;
-}
 
 interface MenuItems {
   qty: number;
@@ -22,27 +24,26 @@ interface MenuItems {
   price: number;
   time: string;
   image: string;
-  addOns: Array<AddOns>;
-  selectedAddOns: Array<AddOns> | [];  
+  addOns: Array<AddOn>;
+  selectedAddOns: Array<AddOn> | [];  
 }
 
 
 export default function Checkout() {
+    const router = useRouter();
+    const { data: user, isLoading } = useGetProfileQuery();
     const context = useContext(AppContext);
     if (!context) {
       return <Text>Error: AppContext is not available</Text>;
     }
-    const { order, setOrder, setUser, user} = context;
+    const { order, setOrder } = context;
     const [name, setName] = useState(""); 
     const [discountCard, setDiscountCard] = useState(""); 
     const [discount, toggleDiscount] = useState(false);
     const [discountDeduction, setDiscountDeduction] = useState(0);
-    const [selectedValue, setSelectedValue] = useState("GCASH");
     const [errors, setErrors] = useState({ name: "", card: "" });
     const currentTimestamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-   const [visible, setVisible] = useState<boolean>(false);
-
-   
+    const [createPaymentLink, { isLoading: generateLinkLoading }] = useCreatePaymentLinkMutation();
 
    const validateForm = () => {
     if(discount){
@@ -101,10 +102,6 @@ export default function Checkout() {
       showDialog();
 
     }
-
-   
-
-    //post to server
   }
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -116,32 +113,36 @@ export default function Checkout() {
   const hideDialog = () => setModalVisible(false);
 
     // Function to handle confirmation
-    const handleConfirm = () => {
-      setVisible(true);
-      hideDialog();
+    const handleConfirm = async () => {
+      try {
+        const totalInCents = Math.round(order.fees.grandTotal * 100); // Ensures no floating point weirdness
+        const response = await createPaymentLink({ amount: totalInCents }).unwrap(); 
+    
+        const url = response?.data?.attributes?.checkout_url;
+        const ref = response?.data?.attributes?.reference_number;
+    
+        if (!url) throw new Error('No payment URL returned');
+    
+        setOrder(prev => ({
+          ...prev,
+          paymentUrl: url,
+          reference_number: ref,
+        }));
+    
+        router.replace("/(app)/payment"); // Navigating to payment screen
+        hideDialog();
+      } catch (error) {
+        console.log('Payment link creation failed:', error);
+      }
     };
-  
+    
     // Function to handle cancellation
     const handleCancel = () => {
       hideDialog();
     };
 
-     // Function to hide the snackbar
-    const hideSnackbar = () => setVisible(false);
-
-    useEffect(() => {
-      if (visible) {
-        const timer = setTimeout(() => {
-          hideSnackbar(); // Hide snackbar after 3 seconds
-        }, 3000);
-  
-        // Cleanup timer on component unmount or when visible changes
-        return () => clearTimeout(timer);
-      }
-    }, [visible]); 
-
   return (
-    <View style={[globalStyle.container, {padding: "5%"}]}>
+    <View style={[{padding: "5%", backgroundColor: "#FFEEE5"}]}>
      
       <ScrollView>
         <View style={{marginBottom: 10}}>
@@ -153,8 +154,18 @@ export default function Checkout() {
               <Text style={styles.text}>YOUR INFORMATION:</Text>
             </View>
             <View style={{flex: 1}}>
-              <Text style={styles.collapsibleText}>Rogena Sefin Tibegar </Text>
-              <Text style={styles.collapsibleText}>09212121212 </Text>
+              {
+                user && !isLoading ? 
+                <View>
+                  <Text style={styles.collapsibleText}>{user.name}</Text>
+                  <Text style={styles.collapsibleText}>{user.phone} </Text>
+                </View> :
+                <View>
+                  <ActivityIndicator animating={isLoading} color={"#FB7F3B"}  size="large" hidesWhenStopped={true}/>:
+                </View>
+              }
+              
+              
             </View>
           </View>
 
@@ -309,46 +320,7 @@ export default function Checkout() {
           }
         </View>
 
-        <View style={{marginBottom: 10}}>
-          <TitleDashed title="PAYMENT METHOD" />
-        </View>
-        
-          <View style={{marginBottom: 10}}>
-            <View>
-              <TouchableOpacity
-                style={styles.radioContainer}
-                onPress={() => setSelectedValue("GCASH")}
-              >
-                <RadioButton
-                  value="GCASH"
-                  status={selectedValue === "GCASH" ? "checked" : "unchecked"}
-                  onPress={() => setSelectedValue("GCASH")}
-                  color="#C1272D"
-                />
-                <Text style={styles.radioBtnLabel}>GCASH</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.radioContainer}
-                onPress={() => setSelectedValue("CARD")}
-              >
-                <RadioButton
-                  value="CARD"
-                  status={selectedValue === "CARD" ? "checked" : "unchecked"}
-                  onPress={() => setSelectedValue("CARD")}
-                  color="#C1272D"
-                />
-                <Text style={styles.radioBtnLabel}>CREDIT / DEBIT CARD</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* {
-              selectedValue == "GCASH" &&
-              (
-
-              )
-            } */}
-          </View>
+      
 
           <View style={{marginBottom: 10}}>
             <TitleDashed title="TOTAL" />
@@ -379,24 +351,9 @@ export default function Checkout() {
 
         
       </ScrollView>
-        <View style={{flex: 1}}>
-          <Snackbar
-            visible={visible}
-            onDismiss={hideSnackbar}
-            duration={Snackbar.DURATION_LONG} 
-            style={{
-              bottom: 100,            
-              backgroundColor:"#2C2C2C",
-              borderRadius: 10,    
-              zIndex: 10000,     
-            }}
-          >
-            <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> <FontAwesome6 name="check" size={16} color="white" />   ORDER SUCCESSFUL!</Text>
-          </Snackbar>
-        </View>
-      
 
-      <Dialog visible={modalVisible} onDismiss={hideDialog}>
+      <Portal>
+        <Dialog visible={modalVisible} onDismiss={hideDialog}>
           <Dialog.Title style={styles.dialogTitle}>Are you sure?</Dialog.Title>
           <Dialog.Content>
             <Text style={styles.dialogContent}>Do you want to proceed with this order?</Text>
@@ -406,6 +363,10 @@ export default function Checkout() {
             <PaperButton onPress={handleConfirm} ><Text style={styles.dialogText}>CONFIRM</Text></PaperButton>
           </Dialog.Actions>
         </Dialog>
+        <Loading isLoading={generateLinkLoading} />
+      </Portal>
+     
+      
 
 
     </View>

@@ -6,24 +6,24 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 
 interface MenuData {
-  id: string;
-  subId: string;
+  id: number;
+  sub_category_id: number;
   name: string;
-  image: string;  // Now using a string for URL
+  image: string; 
 }
 
 interface Props {
   menuData: MenuData[];  // Array of MenuData
   handleTapItem: () => void;
-  setItemId: React.Dispatch<React.SetStateAction<string | null>>;
-  setSubCategoryId: React.Dispatch<React.SetStateAction<string | null>>;
+  setItemId: React.Dispatch<React.SetStateAction<number | null>>;
+  setSubCategoryId: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 export default function MenuContainer({ menuData, handleTapItem, setItemId, setSubCategoryId }: Props) {
   return (
     <View style={styles.grid} >
       {menuData.map((item) => (
-        <TouchableOpacity key={item.id} style={styles.card} onPress={() =>{handleTapItem(); setItemId(item.id); setSubCategoryId(item.subId)}}>
+        <TouchableOpacity key={item.id} style={styles.card} onPress={() =>{handleTapItem(); setItemId(item.id); setSubCategoryId(item.sub_category_id)}}>
           <ImageBackground 
             source={{ uri: item.image }}  // Update to handle URL images
             style={styles.image} 
@@ -31,7 +31,7 @@ export default function MenuContainer({ menuData, handleTapItem, setItemId, setS
             resizeMode="cover"
           >
             <LinearGradient
-              colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0)']}
+              colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0)']}
               start={{ x: 0, y: 1 }}
               end={{ x: 0, y: 0 }}
               style={styles.gradient} 
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 20,
     justifyContent: 'flex-end',
+    backgroundColor: "#C1272D"
   },
   imageStyle: {
     borderRadius: 20,
@@ -96,4 +97,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
+
+
 });
