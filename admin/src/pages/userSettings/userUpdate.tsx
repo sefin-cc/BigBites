@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Button, styled, Checkbox } from '@mui/material';
-import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
+import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, Button, styled } from '@mui/material';
 import { useGetLoggedInAdminQuery, useUpdateAccountMutation } from '../../features/auth/authApi';
 import ReactLoading from 'react-loading';
 import { Slide, ToastContainer, toast } from 'react-toastify';

@@ -1,6 +1,6 @@
 import ChangePasswordModal from "./changePasswordModal";
 import { useGetLoggedInAdminQuery } from '../../features/auth/authApi';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setLoading } from '../../features/loadingSlice';
 import { useEffect } from "react";
 import UpdateUserModal from "./userUpdate";

@@ -9,7 +9,6 @@ import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { logo } from '../../assets/logo64';
 
-import isBetween from 'dayjs/plugin/isBetween';
 import { useGetBranchesQuery } from '../../features/api/branchApi';
 import { useGetOrdersQuery } from '../../features/api/orderApi';
 
@@ -47,7 +46,7 @@ function BranchEarningModal() {
     if (!isReady) return; 
     if (!orders) return;
 
-    let validationErrors: { branch?: string } = {};
+    const validationErrors: { branch?: string } = {};
 
     if (!startDate || !endDate) {
       setError('Both dates are required.');

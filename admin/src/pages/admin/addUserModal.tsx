@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Button, styled, Checkbox } from '@mui/material';
+import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { useRegisterAdminMutation } from '../../features/api/adminUsersApi';
 import ReactLoading from 'react-loading';
