@@ -24,7 +24,7 @@ export const promoApi = createApi({
     // Get promo by ID
     getPromoById: builder.query<Promo, number>({
       query: (id) => `/promos/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Promo', id }],
+      providesTags: (...[, , id]) => [{ type: 'Promo', id }],
     }),
 
     // Add a new promo

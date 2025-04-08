@@ -22,7 +22,7 @@ export const addOnApi = createApi({
   endpoints: (builder) => ({
     getAddOnsByItem: builder.query<AddOns, number>({
       query: (itemId) => `/items/${itemId}/addons`,
-      providesTags: (result, error, itemId) => [{ type: 'AddOn', id: itemId }],
+      providesTags: (...[, , itemId]) => [{ type: 'AddOn', id: itemId }],
     }),
 
     addAddOnToItem: builder.mutation<AddOn, { item_id: number; label: string; price: number }>({

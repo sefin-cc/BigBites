@@ -2,11 +2,6 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';
 import { setAdmin, clearAdmin, logoutRequest } from './authSlice';
 
-// Define the types
-interface LoginRequest {
-  email: string;
-  password: string;
-}
 
 export interface Admin {
   id: number;
@@ -20,13 +15,6 @@ export interface Admin {
   updated_at: string;
 }
 
-interface LoginResponse {
-  admin: Admin;
-}
-
-interface LogoutResponse {
-  message: string;
-}
 
 // Function to fetch CSRF token
 export const fetchCsrfToken = async () => {
@@ -78,7 +66,7 @@ export const authApi = createApi({
         method: 'POST',
         body: credentials,
       }),
-      async onQueryStarted(credentials, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_credentials, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           dispatch(setAdmin(data.admin)); // Store user session

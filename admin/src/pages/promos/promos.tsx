@@ -11,7 +11,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import { SelectChangeEvent, Checkbox, TextField } from '@mui/material';
+import { Checkbox, TextField } from '@mui/material';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddPromoModal from './addPromos';
@@ -96,7 +96,7 @@ interface EnhancedTableProps {
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, menuCategory, sortBy, numSelected, rowCount, onRequestSort, isAllSelected } = props;
+  const { onSelectAllClick, menuCategory, sortBy, onRequestSort, isAllSelected } = props;
   const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -181,7 +181,6 @@ export default function Promos() {
   const [selected, setSelected] = React.useState<Set<string>>(new Set()); // Tracks selected categories
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [filterType, setFilterType] = React.useState<string>('');
   const [searchTerm, setSearchTerm] = React.useState<string>('');
   const { data: promos, error, isLoading: promoLoading } = useGetPromosQuery();
   const [rows, setRows] = React.useState<any[]>([]); 
@@ -213,7 +212,7 @@ export default function Promos() {
     }
   }, [promos]);  
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
+  const handleRequestSort = (_event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
     setMenuCategory(isAsc ? 'desc' : 'asc');
     setSortBy(property);
@@ -239,7 +238,7 @@ export default function Promos() {
     setSelected(newSelected);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -247,9 +246,6 @@ export default function Promos() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterChange = (event: SelectChangeEvent<string>) => {
-    setFilterType(event.target.value);
-  };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -259,7 +255,6 @@ export default function Promos() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const filteredRows = rows
-    .filter(row => !filterType || row.label === filterType) // Apply filter
     .filter(row => row.label.toLowerCase().includes(searchTerm.toLowerCase())); // Apply search
 
   const visibleRows = React.useMemo(

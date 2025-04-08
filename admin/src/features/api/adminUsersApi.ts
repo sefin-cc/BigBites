@@ -46,7 +46,7 @@ export const adminUserApi = createApi({
     // Get admin by ID
     getAdminById: builder.query<Admin, number>({
       query: (id) => `/admin/show/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Admin', id }],
+      providesTags: (...[, , id]) => [{ type: 'Admin', id }],
     }),
 
     // Register a new admin

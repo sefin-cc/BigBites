@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Box, Typography, FormHelperText, InputLabel, FormControl, Select, MenuItem } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -8,9 +8,9 @@ import PaymentsRoundedIcon from '@mui/icons-material/PaymentsRounded';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { logo } from '../../assets/logo64';
-
 import { useGetBranchesQuery } from '../../features/api/branchApi';
 import { useGetOrdersQuery } from '../../features/api/orderApi';
+import isBetween from 'dayjs/plugin/isBetween';
 
 function BranchEarningModal() {
   // State to control the opening and closing of the modal
@@ -24,7 +24,7 @@ function BranchEarningModal() {
   const { data: branches, isLoading: branchesLoading } = useGetBranchesQuery();
   const { data: orders, isLoading: ordersLoading } = useGetOrdersQuery();
   const [isReady, setIsReady] = useState(false);
-
+  dayjs.extend(isBetween);
 
   useEffect(() => {
     if (!branchesLoading && !ordersLoading && branches && orders) {

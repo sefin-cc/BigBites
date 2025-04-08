@@ -135,7 +135,7 @@ interface EnhancedTableProps {
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, menuCategory, sortBy, numSelected, rowCount, onRequestSort, isAllSelected } = props;
+  const { onSelectAllClick, menuCategory, sortBy, onRequestSort, isAllSelected } = props;
   const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -319,7 +319,7 @@ export default function ManageAdmin() {
     }
   }, [users]);  
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
+  const handleRequestSort = (_event: React.MouseEvent<unknown>, property: keyof Data) => {
     const isAsc = sortBy === property && menuCategory === 'asc';
     setMenuCategory(isAsc ? 'desc' : 'asc');
     setSortBy(property);
@@ -345,7 +345,7 @@ export default function ManageAdmin() {
     setSelected(newSelected);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
