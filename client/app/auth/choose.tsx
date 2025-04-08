@@ -10,8 +10,8 @@ export default function Choose() {
   const router = useRouter();
 
   return (
-  
-  <ImageBackground source={require('../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
+  <Animatable.View animation="fadeIn" style={styles.container} >
+    <ImageBackground source={require('../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
     <LinearGradient
       colors={['transparent', '#C1272D']}
       style={{flex: 1, justifyContent: "flex-end", padding: 20}}>
@@ -47,6 +47,8 @@ export default function Choose() {
 
       </LinearGradient>
     </ImageBackground>
+  </Animatable.View>
+  
     
     
   );
@@ -56,7 +58,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
- 
     backgroundColor: "#FB7F3B",
     textAlign: "center",
   },

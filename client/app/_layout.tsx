@@ -6,16 +6,23 @@ import { Provider } from "react-redux";
 import {store} from "../redux/store";
 import { StatusBar } from 'react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
+import SplashScreen from "@/components/SplashScreen";
+import { useState } from "react";
 
 export default function RootLayout() {
+  const [isSplashVisible, setSplashVisible] = useState(true);
   const [fontsLoaded] = Font.useFonts({
     'MadimiOne': require('../assets/fonts/MadimiOne-Regular.ttf'),
   });
 
-
   if (!fontsLoaded) {
     return <Text></Text>;
   }
+
+  if (isSplashVisible) {
+    return <SplashScreen onFinish={() => setSplashVisible(false)} />;
+  }
+
 
   return (  
   <Provider store={store}>

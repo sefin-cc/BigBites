@@ -33,7 +33,7 @@ export default function Index() {
 
   return (
     
-    <View style={globalStyle.container}>
+    <Animatable.View animation="fadeIn" style={globalStyle.container}>
       <ScrollView>
         <Animatable.View animation="slideInDown" easing="ease-in-out">
           <LinearGradient
@@ -71,7 +71,7 @@ export default function Index() {
       </View>
      
       </ScrollView>
-    </View>
+    </Animatable.View>
   );
 }
 const styles = StyleSheet.create({
