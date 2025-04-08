@@ -1,7 +1,6 @@
 
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Layout from './pages/layout'
 import Dashboard from './pages/dashboard'
 import Navigation from './pages/navigation'
 import Orders from './pages/orders/orders'

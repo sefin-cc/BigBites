@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -14,8 +13,6 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, Checkbox, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AddSubCategoryModal from './addSubcategoryModal';
 import EditSubCategoryModal from './editSubcategoryModal';
 import { useGetMenuQuery } from '../../features/api/menu/menu';

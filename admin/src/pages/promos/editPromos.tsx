@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Box, Button, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, styled } from '@mui/material';
+import { Modal, Box, Button, Typography, TextField, styled } from '@mui/material';
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useUpdatePromoMutation, useGetPromoByIdQuery } from '../../features/api/promoApi';

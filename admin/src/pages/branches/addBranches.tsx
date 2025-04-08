@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Button, styled, Checkbox } from '@mui/material';
+import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, styled, Checkbox } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import { inputBaseClasses } from '@mui/material/InputBase';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
-import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import { useAddBranchMutation } from '../../features/api/branchApi';
 import ReactLoading from 'react-loading';
 import { Slide, ToastContainer, toast } from 'react-toastify';
