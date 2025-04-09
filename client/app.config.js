@@ -43,5 +43,8 @@ export default {
     BACKEND_URL: process.env.BACKEND_URL, 
     PAYMONGO_SECRET_KEY: process.env.PAYMONGO_SECRET_KEY, 
     PAYMONGO_LINK: process.env.PAYMONGO_LINK, 
+    eas: {
+      projectId: "6848b1a3-1e16-4094-80e8-36a17b150413",
+    },
   },
 };

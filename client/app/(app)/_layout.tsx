@@ -6,10 +6,19 @@ import { BackButton } from "@/components/BackButton";
 import { VerifyButton } from "@/components/VerifyButton";
 import { useSelector } from "react-redux";
 import type { RootState } from '@/redux/store'; 
+import { useGetProfileQuery } from "@/redux/feature/auth/clientApiSlice";
 
 export default function AppLayout() {
   const token = useSelector((state: RootState) => state.auth.token);
   const [isLayoutReady, setIsLayoutReady] = useState(false);
+
+  const {
+    data: profile,
+    error: profileError,
+    isFetching: isProfileLoading,
+  } = useGetProfileQuery(undefined, {
+    skip: !token,
+  });
 
   useEffect(() => {
     setIsLayoutReady(true);
@@ -19,16 +28,19 @@ export default function AppLayout() {
     if (isLayoutReady && !token) {
       router.replace("/auth/choose");
     }
+    if (!isProfileLoading && !profile) {
+      router.replace("/auth/choose");
+    }
+
   }, [isLayoutReady, token]);
 
-  if (!token) {
+  if (!isLayoutReady) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
       </View>
     );
   }
-
   return (
       <Stack
         screenOptions={{
