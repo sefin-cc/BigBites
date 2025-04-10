@@ -34,6 +34,12 @@ return Application::configure(basePath: dirname(__DIR__))
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
     ]);
     
+    //For local development:
+    // $middleware->group('admin.api', [
+    //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+    //     \Illuminate\Session\Middleware\StartSession::class,
+    //     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    // ]);
 
         $middleware->statefulApi();
 
