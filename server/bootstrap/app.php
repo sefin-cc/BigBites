@@ -24,31 +24,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class
         ]);
-        // $middleware->api(prepend: [
-        //     EnsureFrontendRequestsAreStateful::class, 
-        // ]);
 
     // Define custom middleware group for admin
     $middleware->group('admin.api', [
-        \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        \App\Http\Middleware\CustomEnsureFrontendRequestsAreStateful::class,
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
     ]);
 
-        
-
         $middleware->statefulApi();
-        // $middleware->redirectUsersTo(function (Request $request) {
-        //     if ($request->expectsJson()) {
-        //         throw new AlreadyAuthenticatedException();
-        //     }
 
-        //     return '/';
-        // });
-
-        // $middleware->prepend(EncryptCookies::class);
-        // $middleware->prepend(AddQueuedCookiesToResponse::class);
-        // $middleware->prepend(StartSession::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
