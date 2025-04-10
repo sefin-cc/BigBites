@@ -4,7 +4,7 @@ import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useUpdatePromoMutation, useGetPromoByIdQuery } from '../../features/api/promoApi';
 import ReactLoading from 'react-loading';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide   , toast } from 'react-toastify';
 import { useDeleteImageMutation, useUploadImageMutation } from '../../features/api/imageApi';
 
 
@@ -216,7 +216,7 @@ function EditPromoModal({id}: {id: Set<string>}) {
           
         </Box>
       </Modal>
-      <ToastContainer/>
+       
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { Modal, Box, Typography, FormControl, InputLabel, OutlinedInput, InputAd
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useUpdatePasswordMutation  } from '../../features/auth/authApi';
-import { Slide, toast, ToastContainer } from 'react-toastify';
+import { Slide, toast } from 'react-toastify';
 import ReactLoading from 'react-loading';
 
 
@@ -248,7 +248,6 @@ function ChangePasswordModal({id}: {id: number}) {
           </div>
         </Box>
       </Modal>
-      <ToastContainer />
     </div>
   );
 }

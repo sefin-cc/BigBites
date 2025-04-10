@@ -4,7 +4,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { inputBaseClasses } from '@mui/material/InputBase';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
-import { Slide, toast, ToastContainer } from 'react-toastify';
+import { Slide, toast    } from 'react-toastify';
 import { useUpdateItemMutation, useGetItemByIdQuery } from '../../features/api/menu/itemApi';
 import { useEffect } from 'react';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
@@ -487,7 +487,7 @@ function EditMenuItemsModal({menu, itemId, categoryId}  :  {menu: any[]| undefin
           }
           </Box>
       </Modal>
-      <ToastContainer/>
+       
     </div>
   );
 }

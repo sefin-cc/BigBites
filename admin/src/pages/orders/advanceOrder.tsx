@@ -15,7 +15,7 @@ import { visuallyHidden } from '@mui/utils';
 import { Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, TextField } from '@mui/material';
 import { useGetOrdersQuery, useUpdateOrderMutation} from '../../features/api/orderApi';
 import ReactLoading from 'react-loading';
-import { Slide, toast, ToastContainer } from 'react-toastify';
+import { Slide, toast    } from 'react-toastify';
 
 // Data Types
 interface Data {
@@ -629,7 +629,7 @@ export default function Pending() {
             );
           })()) : <div className="w-full h-full flex justify-center items-center text-center"><p className='text text-gray-800'>Click a row to see the details.</p></div>}
       </Box>  
-      <ToastContainer/>
+       
     </div>
   );
 }

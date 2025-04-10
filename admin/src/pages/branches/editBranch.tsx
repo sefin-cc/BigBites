@@ -3,7 +3,7 @@ import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormCo
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import { useUpdateBranchMutation, useGetBranchByIdQuery } from '../../features/api/branchApi';
 import ReactLoading from 'react-loading';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide   , toast } from 'react-toastify';
 
 interface Province {
   name: string;
@@ -427,7 +427,7 @@ function EditBranches({ location, id }: { location: Location, id: Set<string>}) 
 
       </Box>
       </Modal>
-      <ToastContainer/>
+       
     </div>
   );
 }

@@ -16,7 +16,7 @@ import AddMenuItemsModal from './addMenuItemsModal';
 import EditMenuItemsModal from './editMenuItemsModal';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
 import ReactLoading from 'react-loading';
-import { Slide, toast, ToastContainer } from 'react-toastify';
+import { Slide, toast    } from 'react-toastify';
 import { useDeleteItemMutation } from '../../features/api/menu/itemApi';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -555,7 +555,7 @@ export default function MenuItems() {
             );
           })()) : <div className="w-full h-full flex justify-center items-center text-center"><p className='text text-gray-800'>Click a row to see the details.</p></div>}
       </Box>
-      <ToastContainer/>
+       
     </div>
   );
 }

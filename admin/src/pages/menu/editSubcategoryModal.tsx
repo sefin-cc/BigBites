@@ -3,7 +3,7 @@ import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormCo
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import { useUpdateSubCategoryMutation, useGetSubCategoryByIdQuery } from '../../features/api/menu/subCategoryApi';
 import ReactLoading from 'react-loading';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide   , toast } from 'react-toastify';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
 
 
@@ -202,7 +202,7 @@ function EditSubCategoryModal({menu, id} : {menu: any[]| undefined, id: Set<stri
           
         </Box>
       </Modal>
-      <ToastContainer/>
+       
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormCo
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { useAddSubCategoryMutation } from '../../features/api/menu/subCategoryApi';
 import ReactLoading from 'react-loading';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide   , toast } from 'react-toastify';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
 
 
@@ -184,7 +184,7 @@ function AddSubCategoryModal({menu} : {menu: any[]| undefined;}) {
           
         </Box>
       </Modal>
-      <ToastContainer/>
+       
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormCo
 import ModeEditRoundedIcon from '@mui/icons-material/ModeEditRounded';
 import { useGetAdminByIdQuery, useUpdateAdminMutation } from '../../features/api/adminUsersApi';
 import ReactLoading from 'react-loading';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide, toast } from 'react-toastify';
 
 
 
@@ -356,7 +356,7 @@ function EditUserModal({ branches, id }: { branches: any[], id: Set<string> }) {
           </div>
         </Box>
       </Modal>
-      <ToastContainer />
+
     </div>
   );
 }

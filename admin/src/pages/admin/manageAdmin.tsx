@@ -18,7 +18,7 @@ import EditUserModal from './editUserModal';
 import { useGetAdminsQuery, useDeleteAdminMutation } from '../../features/api/adminUsersApi';
 import { useGetBranchesQuery } from '../../features/api/branchApi';
 import ReactLoading from 'react-loading';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide   , toast } from 'react-toastify';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../../features/loadingSlice';
@@ -521,7 +521,7 @@ export default function ManageAdmin() {
           />
         </Paper>
       </Box>
-      <ToastContainer/>
+       
     </div>
   );
 }
