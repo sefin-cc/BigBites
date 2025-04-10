@@ -28,7 +28,10 @@ RUN chown -R laraveluser:laraveluser /var/www
 RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Ensure correct permissions for the log files
-RUN chmod -R 775 /var/log
+RUN chmod -R 777 /var/log
+
+# Grant execute permissions to artisan command
+RUN chmod +x /var/www/artisan
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
