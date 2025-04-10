@@ -2,7 +2,7 @@ FROM php:8.2-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    unzip zip curl git libzip-dev libonig-dev && \
+    unzip zip curl git libzip-dev libonig-dev postgresql-client && \
     docker-php-ext-install zip pdo pdo_mysql mbstring
 
 # Install Composer
