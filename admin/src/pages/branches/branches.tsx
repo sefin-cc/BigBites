@@ -19,7 +19,7 @@ import AddBranches from './addBranches';
 import EditBranches from './editBranch';
 import { useGetBranchesQuery, useDeleteBranchMutation } from '../../features/api/branchApi';
 import ReactLoading from 'react-loading';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide   , toast } from 'react-toastify';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../../features/loadingSlice';
@@ -521,7 +521,7 @@ export default function Branches() {
           />
         </Paper>
       </Box>
-      <ToastContainer/>
+       
     </div>
   );
 }

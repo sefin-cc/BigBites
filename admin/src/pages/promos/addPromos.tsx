@@ -4,7 +4,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useAddPromoMutation } from '../../features/api/promoApi';
 import ReactLoading from 'react-loading';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide   , toast } from 'react-toastify';
 import { useUploadImageMutation } from '../../features/api/imageApi';
 
 
@@ -197,7 +197,7 @@ function AddPromoModal() {
           
         </Box>
       </Modal>
-      <ToastContainer/>
+       
     </div>
   );
 }

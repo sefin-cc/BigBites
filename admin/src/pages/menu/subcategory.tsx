@@ -17,7 +17,7 @@ import AddSubCategoryModal from './addSubcategoryModal';
 import EditSubCategoryModal from './editSubcategoryModal';
 import { useGetMenuQuery } from '../../features/api/menu/menu';
 import ReactLoading from 'react-loading';
-import { Slide, toast, ToastContainer } from 'react-toastify';
+import { Slide, toast    } from 'react-toastify';
 import { useDeleteSubCategoryMutation } from '../../features/api/menu/subCategoryApi';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -469,7 +469,7 @@ export default function SubCategory() {
           />
         </Paper>
       </Box>
-      <ToastContainer/>
+       
     </div>
   );
 }

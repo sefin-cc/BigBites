@@ -3,7 +3,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Modal, Box, Typography, TextField, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent, Button, styled } from '@mui/material';
 import { useGetLoggedInAdminQuery, useUpdateAccountMutation } from '../../features/auth/authApi';
 import ReactLoading from 'react-loading';
-import { Slide, ToastContainer, toast } from 'react-toastify';
+import { Slide, toast } from 'react-toastify';
 import { useGetBranchesQuery } from '../../features/api/branchApi';
 import { useDeleteImageMutation, useUploadImageMutation } from '../../features/api/imageApi';
 
@@ -375,7 +375,6 @@ function UpdateUserModal() {
 
         </Box>
       </Modal>
-      <ToastContainer />
     </div>
   );
 }

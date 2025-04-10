@@ -39,7 +39,7 @@ import { setLoading } from '../features/loadingSlice';
 import { RootState } from '../store'
 import { useGetOrdersQuery } from '../features/api/orderApi';
 import useOrderCreated from '../hooks/useOrderCreated';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify'
 
 const drawerWidth = 240;
 
@@ -344,9 +344,9 @@ export default function Navigation() {
       </Drawer>
 
       <Main open={open}>
+        <ToastContainer />
         <DrawerHeader />
         <Outlet />
-        <ToastContainer/>
       </Main>
           
     </Box>
