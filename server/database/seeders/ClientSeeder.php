@@ -17,8 +17,8 @@ class ClientSeeder extends Seeder
         // Client::factory()->count(10)->create();
                     // Creating Application User
         $customer = Client::create([
-            'name' => 'Naghman Ali', 
-            'email' => 'naghman@allphptricks.com',
+            'name' => 'John Dont', 
+            'email' => 'john@gmail.com',
             'password' => Hash::make('password'),
             'phone' => '095656565656',
             'address' => 'Dagupan City, Pangasinan',
