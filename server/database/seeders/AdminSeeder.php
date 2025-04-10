@@ -18,8 +18,8 @@ class AdminSeeder extends Seeder
 
                // Creating Super Admin User
             $admin = Admin::create([
-                'name' => 'Javed', 
-                'email' => 'javed@gmail.com',
+                'name' => 'Rogena Tibegar', 
+                'email' => 'rogena@gmail.com',
                 'phone' => '09323232323',
                 'address' => 'Mangaldan, Pangasinan',
                 'branch' => 'SM DAGUPAN CITY',
