@@ -20,7 +20,6 @@ echo "PostgreSQL is ready!"
 echo "Caching configuration..."
 php artisan config:cache
 
-
 # Publish Spatie permissions migration (force in case already published)
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations" --force
 
@@ -32,6 +31,6 @@ php artisan migrate --force
 echo "Seeding database..."
 php artisan db:seed --force
 
-# Start Laravel dev server
-echo "Starting Laravel's development server..."
-php artisan serve --host=0.0.0.0 --port=8000
+# Start supervisord to manage both the Laravel dev server and Reverb WebSocket server
+echo "Starting supervisord to manage processes..."
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
