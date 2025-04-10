@@ -31,6 +31,10 @@ php artisan migrate --force
 echo "Seeding database..."
 php artisan db:seed --force
 
-# Start supervisord to manage both the Laravel dev server and Reverb WebSocket server
-echo "Starting supervisord to manage processes..."
-exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+# Start Laravel Reverb WebSocket server in the background
+echo "Starting Laravel Reverb..."
+php artisan reverb:start &
+
+# Start Laravel dev server and keep it running
+echo "Starting Laravel's development server..."
+php artisan serve --host=0.0.0.0 --port=8000
