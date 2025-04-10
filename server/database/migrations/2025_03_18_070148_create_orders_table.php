@@ -11,25 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         Schema::create('orders', function (Blueprint $table) {
-            Schema::create('orders', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('user_id')->nullable()->constrained('clients')->onDelete('set null');
-                $table->enum('type', ['PickUp', 'Delivery']);
-                $table->string('pick_up_type')->nullable();
-                $table->json('location')->nullable();
-                $table->foreignId('branch_id')->constrained('branches')->onDelete('cascade');
-                $table->json('order_items'); // Storing order items as JSON
-                $table->decimal('base_price', 10, 2);
-                $table->timestamp('timestamp')->useCurrent();
-                $table->timestamp('date_time_pickup')->nullable();
-                $table->enum('status', ['pending', 'completed', 'canceled'])->default('pending');
-                $table->json('discount_card_details')->nullable();
-                $table->json('fees');
-                $table->timestamps();
-                $table->string('reference_number');
-            });
+            $table->id();
+            $table->foreignId('user_id')->nullable()->constrained('clients')->onDelete('set null');
+            $table->enum('type', ['PickUp', 'Delivery']);
+            $table->string('pick_up_type')->nullable();
+            $table->json('location')->nullable();
+            $table->foreignId('branch_id')->constrained('branches')->onDelete('cascade');
+            $table->json('order_items'); // Storing order items as JSON
+            $table->decimal('base_price', 10, 2);
+            $table->timestamp('timestamp')->useCurrent();
+            $table->timestamp('date_time_pickup')->nullable();
+            $table->enum('status', ['pending', 'completed', 'canceled'])->default('pending');
+            $table->json('discount_card_details')->nullable();
+            $table->json('fees');
+            $table->timestamps();
+            $table->string('reference_number');
         });
+
     }
 
     /**

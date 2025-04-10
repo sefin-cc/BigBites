@@ -1,8 +1,9 @@
 FROM php:8.2-cli
 
-# Install system dependencies and PHP extensions
+# Install system dependencies, PHP extensions, and supervisor
 RUN apt-get update && apt-get install -y \
     unzip zip curl git libzip-dev libonig-dev postgresql-client libpq-dev \
+    supervisor \
     && docker-php-ext-install zip pdo pdo_mysql pdo_pgsql mbstring
 
 # Install Composer
@@ -21,6 +22,11 @@ RUN composer install --no-dev --optimize-autoloader
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Copy supervisord configuration file
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Expose necessary ports
 EXPOSE 8000
 
-CMD ["/entrypoint.sh"]
+# Start supervisord
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
