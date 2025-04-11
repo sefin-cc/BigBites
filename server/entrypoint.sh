@@ -20,16 +20,6 @@ echo "PostgreSQL is ready!"
 echo "Caching configuration..."
 php artisan config:cache
 
-# Publish Spatie permissions migration (force in case already published)
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="migrations" --force
-
-# Run all migrations
-echo "Running migrations..."
-php artisan migrate --force
-
-# Seed the database
-echo "Seeding database..."
-php artisan db:seed --force
 
 # Start Laravel Reverb WebSocket server in the background
 echo "Starting Laravel Reverb..."
