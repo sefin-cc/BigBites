@@ -21,8 +21,8 @@ RUN composer install --no-dev --optimize-autoloader
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Expose WebSocket port
-EXPOSE 6001
+# Expose the port that Render expects
+EXPOSE 10000
 
 # Use the custom entrypoint script
 CMD ["/entrypoint.sh"]

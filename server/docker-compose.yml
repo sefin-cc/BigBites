@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: laravel-reverb
     ports:
-      - "6001:6001" # Expose Reverb WebSocket port (default 6001)
+      - "10000:10000" # Expose Reverb WebSocket port (matching what's used on Render)
     volumes:
       - .:/var/www
     depends_on:
@@ -24,7 +24,7 @@ services:
       REVERB_APP_ID: your_app_id
       REVERB_APP_KEY: your_app_key
       REVERB_APP_SECRET: your_app_secret
-    command: ["php", "artisan", "reverb:start"] # Start Reverb
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=10000"]
 
   db:
     image: postgres:14
