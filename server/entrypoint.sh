@@ -31,9 +31,6 @@ php artisan migrate --force
 echo "Seeding database..."
 php artisan db:seed --force
 
-# Start Laravel Reverb WebSocket server in the background
-echo "Starting Laravel Reverb..."
-php artisan reverb:start &
 
 # Start Laravel dev server and keep it running
 echo "Starting Laravel's development server..."
