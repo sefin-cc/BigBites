@@ -14,6 +14,11 @@ class MenuSeeder extends Seeder
     public function run(): void
     {
         $category = Category::create(['category' => 'BURGERS']);
+        $category = Category::create(['category' => 'BARKADAS']);
+        $category = Category::create(['category' => 'SIDES']);
+        $category = Category::create(['category' => 'DRINKS']);
+        $category = Category::create(['category' => 'DESSERTS']);
+
 
         $subCategory1 = $category->subCategories()->create(['label' => 'JR BURGERS']);
         $subCategory2 = $category->subCategories()->create(['label' => 'MONSTER BURGERS']);
