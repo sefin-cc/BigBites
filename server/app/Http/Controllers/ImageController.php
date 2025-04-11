@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Cloudinary\Cloudinary;
 
-
 class ImageController extends Controller
 {
-
     // 🔹 Upload Image
     public function upload(Request $request)
     {
@@ -23,10 +21,17 @@ class ImageController extends Controller
         }
 
         try {
+            // Set Cloudinary configuration (API Key, Secret, Cloud Name)
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ]
+            ]);
 
-            $cloudinary = new Cloudinary();
             $uploadApi = $cloudinary->uploadApi();
-            $uploadedFile = $uploadApi->upload($request->file('image')->getRealPath(),[
+            $uploadedFile = $uploadApi->upload($request->file('image')->getRealPath(), [
                 'upload_preset' => $request->type, 
             ]);
 
@@ -44,30 +49,36 @@ class ImageController extends Controller
         }
     }
 
-// Delete Image
-public function delete(Request $request)
-{
-    $request->validate(['url' => 'required|string']);
+    //  Delete Image
+    public function delete(Request $request)
+    {
+        $request->validate(['url' => 'required|string']);
 
-    try {
-        // Extract public_id from URL
-        $urlParts = explode("/", $request->url);
-        $filenameWithExtension = end($urlParts); 
-        $publicId = pathinfo($filenameWithExtension, PATHINFO_FILENAME); 
-        
-        // Delete image from Cloudinary
-        $cloudinary = new Cloudinary();
-        $uploadApi = $cloudinary->uploadApi();
-        $uploadApi->destroy($publicId);
+        try {
+            // Extract public_id from the image URL
+            $urlParts = explode('/', $request->url);
+            $filenameWithExtension = end($urlParts);
+            $publicId = pathinfo($filenameWithExtension, PATHINFO_FILENAME);
 
-        return response()->json(['message' => 'Image deleted successfully']);
+            // Set Cloudinary configuration (API Key, Secret, Cloud Name)
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ]
+            ]);
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Image deletion failed',
-            'error' => $e->getMessage(),
-        ], 500);
+            $uploadApi = $cloudinary->uploadApi();
+            $uploadApi->destroy($publicId);
+
+            return response()->json(['message' => 'Image deleted successfully']);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Image deletion failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-}
-
 }
