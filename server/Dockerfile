@@ -11,16 +11,18 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Set working directory
 WORKDIR /var/www
 
-# Copy everything
+# Copy application files
 COPY . .
 
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Copy entrypoint script
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Copy entrypoint script if needed (optional, or remove if not using)
+# COPY entrypoint.sh /entrypoint.sh
+# RUN chmod +x /entrypoint.sh
 
-EXPOSE 8000
+# Expose WebSocket port (default is 6001 for Reverb)
+EXPOSE 6001
 
-CMD ["/entrypoint.sh"]
+# Start Laravel Reverb
+CMD ["php", "artisan", "reverb:start"]

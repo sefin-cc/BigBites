@@ -35,6 +35,6 @@ php artisan db:seed --force
 echo "Starting Laravel Reverb..."
 php artisan reverb:start &
 
-# Start Laravel dev server and keep it running
-echo "Starting Laravel's development server..."
-php artisan serve --host=0.0.0.0 --port=8000
+# Keep the container running indefinitely so Reverb stays alive
+# This line is crucial since Reverb runs in the background as a WebSocket server
+tail -f /dev/null

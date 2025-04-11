@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-  app:
+  reverb:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: laravel-app
+    container_name: laravel-reverb
     ports:
-      - "8000:8000"
+      - "6001:6001" # Expose Reverb WebSocket port (default 6001)
     volumes:
       - .:/var/www
     depends_on:
@@ -21,7 +21,10 @@ services:
       DB_DATABASE: laravel
       DB_USERNAME: laravel
       DB_PASSWORD: secret
-    command: ["/entrypoint.sh"]
+      REVERB_APP_ID: your_app_id
+      REVERB_APP_KEY: your_app_key
+      REVERB_APP_SECRET: your_app_secret
+    command: ["php", "artisan", "reverb:start"] # Start Reverb
 
   db:
     image: postgres:14
