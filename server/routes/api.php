@@ -18,14 +18,6 @@ use App\Http\Controllers\ImageController;
 //Admin User Routes
 Route::post('admin/login', [AdminController::class, 'login'])->middleware(['admin.api']);
 
-Route::get('/debug-cloudinary', function () {
-    return [
-        'cloud_url'   => config('cloudinary.cloud_url'),
-        'cloud_name'  => env('CLOUDINARY_CLOUD_NAME'),
-        'api_key'     => env('CLOUDINARY_API_KEY'),
-        'api_secret'  => env('CLOUDINARY_API_SECRET'), 
-    ];
-});
 
 
 
