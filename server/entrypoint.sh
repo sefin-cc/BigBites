@@ -29,7 +29,7 @@ php artisan migrate --force
 
 # Seed the database
 echo "Seeding database..."
-php artisan db:seed --force
+php artisan migrate:fresh --seed
 
 
 # Start Laravel dev server and keep it running
