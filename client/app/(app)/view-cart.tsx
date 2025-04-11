@@ -223,7 +223,7 @@ export default function ViewCart() {
                       <Text style={styles.editBtnText}>Edit</Text>
                     </TouchableOpacity>
                     <View>
-                      <Text style={[styles.textCartItem, { fontSize: 24 }]}>PHP {item.qty * item.price + item.selectedAddOns.reduce((sum, addOn) => sum + addOn.price, 0)}</Text> 
+                      <Text style={[styles.textCartItem, { fontSize: 24 }]}>PHP {item.qty * item.price + item.selectedAddOns.reduce((sum, addOn) => sum + Number(addOn.price), 0)}</Text> 
                     </View>
                   </View>
                 </View>

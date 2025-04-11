@@ -11,7 +11,7 @@ import { Branch } from "@/types/clients";
 
 
 // Function to check if current time is within opening hours
-const isBranchOpen = (openingTime: string, closingTime: string) => {
+export const isBranchOpen = (openingTime: string, closingTime: string) => {
   const currentTime = new Date();
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();

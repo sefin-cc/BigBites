@@ -25,14 +25,20 @@ export default function AppLayout() {
   }, []);
 
   useEffect(() => {
+ 
     if (isLayoutReady && !token) {
       router.replace("/auth/choose");
     }
-    if (!isProfileLoading && !profile) {
-      router.replace("/auth/choose");
-    }
 
-  }, [isLayoutReady, token]);
+    if(!isProfileLoading){
+      const user = profile?.name;
+      if (!user && profileError) {
+        router.replace("/auth/choose");
+      }
+    }
+  
+
+  }, [isLayoutReady, token, profileError,isProfileLoading]);
 
   if (!isLayoutReady) {
     return (

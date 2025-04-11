@@ -31,14 +31,15 @@ const useCartTotal = (items: MenuItems[]) => {
 
       // Add selected add-ons price
       item.selectedAddOns.forEach(addOn => {
-        itemTotal += addOn.price;
+        itemTotal += Number(addOn.price);
       });
 
       // Add the item total to the grand total
       calculatedTotal += itemTotal;
     });
 
-    setTotal(calculatedTotal); // Set the computed total
+    setTotal(Number(calculatedTotal.toFixed(2)));
+
   }, [items]); // Re-run whenever items change
 
   return total;

@@ -24,9 +24,9 @@ export default function Categories() {
 
     <SearchMenu />
       <ScrollView>
-          <TouchableOpacity onPress={() =>{}} style={styles.featuredContainer}>
+          <View style={styles.featuredContainer}>
             <Slideshow />
-          </TouchableOpacity>
+          </View>
           <View style={styles.contentContainer}>
 
             <View style={categoryTitleStyle.component}>

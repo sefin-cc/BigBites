@@ -285,28 +285,46 @@ export default function MapLocationStep3() {
         </View>
       }
 
+      {
+        savedLocation ?
 
-      <View style={{flex: 1, justifyContent: "center", alignItems: "center", padding: 10}}>
-        <View>
-          <Text style={{
-              fontFamily: 'MadimiOne',
-              fontSize: 16,
-              color:"#FB7F3B"
-            }}>
-              {savedLocation?.description ? "Pinned Location:" : ""}
-            </Text>
+      <View style={{flex: 0.7, justifyContent: "center", alignItems: "center", padding: 10}}>
+          <View>
             <Text style={{
-              fontFamily: 'MadimiOne',
-              fontSize: 16,
-              color:"#2C2C2C"
-            }}>
+                fontFamily: 'MadimiOne',
+                fontSize: 16,
+                color:"#FB7F3B"
+              }}>
+                {savedLocation?.description ? "Pinned Location:" : ""}
+              </Text>
+              <Text style={{
+                fontFamily: 'MadimiOne',
+                fontSize: 16,
+                color:"#2C2C2C"
+              }}>
 
-              {savedLocation?.description || "ENTER YOUR ADDRESS"}
-            </Text>
+                {savedLocation?.description}
+              </Text>
+          </View>
+        </View> :
+        <View style={{flex: 3, justifyContent: "center", alignItems: "center", padding: 10}}>
+          <View>
+              <Text style={{
+                fontFamily: 'MadimiOne',
+                fontSize: 16,
+                color:"#2C2C2C"
+              }}>
+
+                ENTER YOUR ADDRESS
+              </Text>
+          </View>
         </View>
-      </View>
+      }
+
       
+
       <View style={{
+        flex: 1,
         backgroundColor: 'white', 
         paddingVertical: 20,
         borderTopWidth: 1,

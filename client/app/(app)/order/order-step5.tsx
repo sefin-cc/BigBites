@@ -3,6 +3,7 @@ import globalStyle from "../../../assets/styles/globalStyle";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "@/app/context/AppContext";
+import { isBranchOpen } from "./order-step4"
 
 export default function ChooseOrderType() {
   const router = useRouter();
@@ -23,12 +24,20 @@ export default function ChooseOrderType() {
             style={[globalStyle.button, {width: "100%"}]}>
             <Text style={globalStyle.buttonText}>ADVANCED ORDER</Text>
           </TouchableOpacity>
+          {
+            order.branch?.[0] &&
+            isBranchOpen(order.branch[0].openingTime, order.branch[0].closingTime) && (
+              <TouchableOpacity
+                onPress={() => router.push("/(app)/menu/menu-categories")}
+                style={[globalStyle.button, { width: "100%" }]}>
+                <Text style={globalStyle.buttonText}>ORDER NOW</Text>
+              </TouchableOpacity>
+            )
+          }
+
+
   
-          <TouchableOpacity
-            onPress={() => {router.push("/(app)/menu/menu-categories")}}
-            style={[globalStyle.button, {width: "100%"}]}>
-            <Text style={globalStyle.buttonText}>ORDER NOW</Text>
-          </TouchableOpacity>
+          
         </View>
 
     </ImageBackground>
