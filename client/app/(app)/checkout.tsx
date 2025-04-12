@@ -142,7 +142,7 @@ export default function Checkout() {
     };
 
   return (
-    <View style={[{padding: "5%", backgroundColor: "#FFEEE5"}]}>
+    <View style={[{padding: "5%", backgroundColor: "#FFEEE5", flex: 1}]}>
      
       <ScrollView>
         <View style={{marginBottom: 10}}>

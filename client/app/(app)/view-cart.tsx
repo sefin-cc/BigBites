@@ -180,10 +180,10 @@ export default function ViewCart() {
     }
   }, [visible]); 
   return (
-   
+    <View style={[globalStyle.container, {paddingBottom: StatusBar.currentHeight}]} >
     <BottomSheetModalProvider >
     <GestureHandlerRootView  >
-    <View style={[globalStyle.container, {paddingBottom: StatusBar.currentHeight}]} >
+   
 
       <View style ={{padding: "5%", flexGrow: 1}}>
         <View style={{ flexDirection: "row", paddingBottom: 10 }}>
@@ -362,12 +362,12 @@ export default function ViewCart() {
           </View>
         </SafeAreaView>
 
-        </View>
+       
       </GestureHandlerRootView> 
           
       </BottomSheetModalProvider>
       
-
+    </View>
   );
 }
 
