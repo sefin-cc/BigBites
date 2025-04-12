@@ -1,7 +1,10 @@
 import { useMemo } from "react";
 
-export function useOptimizedCloudinaryUrl(originalUrl: string): string {
+export function useOptimizedCloudinaryUrl(originalUrl: string | null | undefined) {
   return useMemo(() => {
+    if(!originalUrl){
+        return;
+    }
     // Check if it's a Cloudinary URL and has `/upload/`
     const isCloudinary = originalUrl.includes("res.cloudinary.com") && originalUrl.includes("/upload/");
 

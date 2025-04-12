@@ -66,6 +66,7 @@ export default function MenuFavourite() {
   }
 
   const selectedItem = getSelectedItem();
+  const optimizedImageUrl = useOptimizedCloudinaryUrl(selectedItem?.image);
 
   useEffect(() => {
     setMenuData();
@@ -269,7 +270,7 @@ export default function MenuFavourite() {
           {selectedItem &&
             <View>
                   <Image 
-                    source={{ uri:  useOptimizedCloudinaryUrl(selectedItem.image)}}  
+                    source={{ uri:  optimizedImageUrl}}  
                     style={globalStyle.image}
                   />
                   <View style={globalStyle.modalContainer}>

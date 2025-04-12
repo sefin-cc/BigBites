@@ -76,6 +76,7 @@ export default function Menu() {
   }
 
   const selectedItem = getSelectedItem();
+  const optimizedImageUrl = useOptimizedCloudinaryUrl(selectedItem?.image);
 
   useEffect(() => {
     setMenuData();
@@ -290,7 +291,7 @@ export default function Menu() {
           {selectedItem &&
             <View>
                   <Image 
-                    source={{ uri: useOptimizedCloudinaryUrl(selectedItem.image) }}  
+                    source={{ uri: optimizedImageUrl }}  
                     style={globalStyle.image}
                   />
                   <View style={globalStyle.modalContainer}>
