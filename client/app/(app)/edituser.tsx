@@ -170,7 +170,8 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     paddingLeft: 10,
     borderRadius: 5,
-    borderColor: "#FB7F3B"
+    borderColor: "#FB7F3B",
+    minHeight: 50, 
   },
   errorText:{
     color: "#FFEEE5", marginBottom: 5, fontFamily: "MadimiOne", alignSelf: "flex-end"

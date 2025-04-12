@@ -21,6 +21,7 @@ export default function Register() {
     address: '',
     email: '',
     password: '',
+    password_confirmation: '',
     general: ''
 });
   const [formData, setFormData] = useState({
@@ -81,137 +82,135 @@ export default function Register() {
   };
 
   return (
+    <ImageBackground source={require('../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
+      <ScrollView style={{flexGrow: 1}}>
+        <Portal>
+          <Loading isLoading={isLoading} />
+        </Portal>
 
-<ScrollView style={{flexGrow: 1}}>
-  <Portal>
-    <Loading isLoading={isLoading} />
-  </Portal>
-
-<ImageBackground source={require('../../assets/images/BG.png')} resizeMode="cover" style={styles.container}>
-  <Image
-    style={styles.logo}
-    source={require('../../assets/images/logo.png')}
-    />
-  <SafeAreaView style={{backgroundColor: "white",  padding: 20, borderRadius: 10, justifyContent: "center"}} >  
-    
-    {/* Global error message */}
-    {errors.general && (
-      <Text style={styles.errorText}>{errors.general}</Text>
-    )}
-
-    {/* Full Name */}
-    <View>
-      <Text style={styles.label}>FULL NAME</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="John Doe"
-        placeholderTextColor="#888"
-        value={formData.name}
-        onChangeText={(text) => setFormData((prev) => ({ ...prev, name: text }))}
-      />
-      {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-    </View>
-
-    {/* Phone */}
-    <View>
-      <Text style={styles.label}>PHONE</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="0987654321"
-        placeholderTextColor="#888"
-        value={formData.phone}
-        onChangeText={(text) => setFormData((prev) => ({ ...prev, phone: text }))}
-      />
-      {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
-    </View>
-
-    {/* Email */}
-    <View>
-      <Text style={styles.label}>EMAIL</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="example@email.com"
-        placeholderTextColor="#888"
-        value={formData.email}
-        onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))}
-      />
-      {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-    </View>
-
-    {/* Address */}
-    <View>
-      <Text style={styles.label}>ADDRESS</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Sampaloc, Manila 1008 Metro Manila"
-        multiline
-        numberOfLines={2}
-        placeholderTextColor="#888"
-        value={formData.address}
-        onChangeText={(text) => setFormData((prev) => ({ ...prev, address: text }))}
-      />
-      {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
-    </View>
-
-    {/* Password */}
-    <View>
-          <Text style={styles.label}>PASSWORD</Text>
-          <View>
-            <TextInput
-              style={styles.input}
-              placeholder="●●●●●●●●●●"
-              placeholderTextColor="#888"
-              secureTextEntry={!passwordVisible}
-              value={formData.password}
-              onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))}
+        
+          <Image
+            style={styles.logo}
+            source={require('../../assets/images/logo.png')}
             />
-            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-              <Text style={styles.eyeIcon}>{passwordVisible ? <Ionicons name="eye-off" size={24} color="#C1272D" /> : <Ionicons name="eye" size={24} color="#C1272D" /> }</Text>
+          <SafeAreaView style={{backgroundColor: "white",  margin: 20, padding: 20, borderRadius: 10, justifyContent: "center"}} >  
+            
+            {/* Global error message */}
+            {errors.general && (
+              <Text style={styles.errorText}>{errors.general}</Text>
+            )}
+
+            {/* Full Name */}
+            <View>
+              <Text style={styles.label}>FULL NAME</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="John Doe"
+                placeholderTextColor="#888"
+                value={formData.name}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, name: text }))}
+              />
+              {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+            </View>
+
+            {/* Phone */}
+            <View>
+              <Text style={styles.label}>PHONE</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="0987654321"
+                placeholderTextColor="#888"
+                value={formData.phone}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, phone: text }))}
+              />
+              {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
+            </View>
+
+            {/* Email */}
+            <View>
+              <Text style={styles.label}>EMAIL</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="example@email.com"
+                placeholderTextColor="#888"
+                value={formData.email}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))}
+              />
+              {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+            </View>
+
+            {/* Address */}
+            <View>
+              <Text style={styles.label}>ADDRESS</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Sampaloc, Manila 1008 Metro Manila"
+                multiline
+                numberOfLines={2}
+                placeholderTextColor="#888"
+                value={formData.address}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, address: text }))}
+              />
+              {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
+            </View>
+
+            {/* Password */}
+            <View>
+                  <Text style={styles.label}>PASSWORD</Text>
+                  <View>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="●●●●●●●●●●"
+                      placeholderTextColor="#888"
+                      secureTextEntry={!passwordVisible}
+                      value={formData.password}
+                      onChangeText={(text) => setFormData((prev) => ({ ...prev, password: text }))}
+                    />
+                    <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                      <Text style={styles.eyeIcon}>{passwordVisible ? <Ionicons name="eye-off" size={24} color="#C1272D" /> : <Ionicons name="eye" size={24} color="#C1272D" /> }</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {errors.password && <Text style={[styles.errorText, {bottom: 25}]}>{errors.password}</Text>}
+                </View>
+
+            {/* Confirm Password */}
+            <View style={{bottom: 25}}>
+              <Text style={styles.label}>CONFIRM PASSWORD</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="●●●●●●●●●●"
+                placeholderTextColor="#888"
+                secureTextEntry
+                value={formData.password_confirmation}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, password_confirmation: text }))}
+              />
+              {errors.password_confirmation && <Text style={[styles.errorText]}>{errors.password_confirmation}</Text>}
+            </View>
+          
+
+          {/* Register Button */}
+          <View style={{ marginTop: 20 }}>
+            <TouchableOpacity onPress={handleRegister} style={styles.loginBtn} disabled={isLoading}>
+              <Text style={styles.loginBtnText}>
+                {isLoading ? "REGISTERING..." : "REGISTER"}
+              </Text>
             </TouchableOpacity>
           </View>
-          {errors.password && <Text style={[styles.errorText, {bottom: 25}]}>{errors.password}</Text>}
-        </View>
 
-    {/* Confirm Password */}
-    <View style={{bottom: 25}}>
-      <Text style={styles.label}>CONFIRM PASSWORD</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="●●●●●●●●●●"
-        placeholderTextColor="#888"
-        secureTextEntry
-        value={formData.password_confirmation}
-        onChangeText={(text) => setFormData((prev) => ({ ...prev, password_confirmation: text }))}
-      />
-    </View>
-  
-
-  {/* Register Button */}
-  <View style={{ marginTop: 20 }}>
-    <TouchableOpacity onPress={handleRegister} style={styles.loginBtn} disabled={isLoading}>
-      <Text style={styles.loginBtnText}>
-        {isLoading ? "REGISTERING..." : "REGISTER"}
-      </Text>
-    </TouchableOpacity>
-  </View>
-
-  </SafeAreaView>
-  </ImageBackground>
-  </ScrollView>
-
-
+          </SafeAreaView>
+      </ScrollView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: "center",
-    padding: "5%",
     backgroundColor: "#FB7F3B",
     textAlign: "center",
-    paddingBottom: 70,
-    paddingTop: (StatusBar?.currentHeight || 30) * 2 
+    paddingTop: (StatusBar?.currentHeight || 30) * 2 ,
+    paddingBottom: 20
   },
   input: {
     marginBottom: 10,
@@ -221,7 +220,8 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     paddingLeft: 10,
     borderRadius: 5,
-    borderColor: "#FB7F3B"
+    borderColor: "#FB7F3B",
+    minHeight: 50, 
   },
   errorText:{
     color: "#C1272D", marginBottom: 5, fontFamily: "MadimiOne", alignSelf: "flex-end"
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     resizeMode: 'contain',
     alignSelf: "center",
-    top: 10
+    top: 30
   },
   eyeIcon: {
     fontSize: 24,

@@ -1,6 +1,6 @@
 // app.config.js
 export default {
-  name: "client",
+  name: "Big Bites",
   slug: "client",
   version: "1.0.0",
   orientation: "portrait",
