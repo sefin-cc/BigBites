@@ -1,9 +1,9 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, Dimensions, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, ActivityIndicator } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { useGetPromosQuery } from "../redux/feature/apiSlice";
-import { useOptimizedCloudinaryUrl } from '@/hooks/useOptimizedCloudinaryUrl';
+import { Image } from 'expo-image'; 
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,7 +29,7 @@ export default function Slideshow() {
               data={promos}
               renderItem={({ index, item }) => (
                 <View style={styles.slide}>
-                  <Image source={{ uri: useOptimizedCloudinaryUrl(item?.image) }} style={styles.image} />
+                  <Image source={{ uri: item?.image.replace('http://', 'https://')}} style={styles.image} />
                 </View>
               )}
               onSnapToItem={(index) => setActiveIndex(index)}

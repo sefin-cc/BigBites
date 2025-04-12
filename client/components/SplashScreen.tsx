@@ -10,7 +10,7 @@ export default function SplashScreen({ onFinish }: { onFinish: () => void }) {
     const [show, setShow] = useState(false);
     const screenWidth = Dimensions.get('window').width;
     const screenHeight = Dimensions.get('window').height;
-    const maxCircleSize = (Math.sqrt(Math.pow(screenWidth, 2) + Math.pow(screenHeight, 2)) * 2) + 50;
+    const maxCircleSize = (Math.sqrt(Math.pow(screenWidth, 2) + Math.pow(screenHeight, 2)) * 2) + 70;
 
     useEffect(() => {
       SplashScreens.preventAutoHideAsync();
@@ -72,9 +72,9 @@ export default function SplashScreen({ onFinish }: { onFinish: () => void }) {
         {
           show &&
           <Image
-          source={require('../assets/images/bigbites.gif')}
-          style={styles.logo}
-          contentFit="contain"
+            source={require('../assets/images/bigbites.gif')}
+            style={styles.logo}
+            contentFit="contain"
           />
         }
       </Animated.View>

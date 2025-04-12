@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Text } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useOptimizedCloudinaryUrl } from '@/hooks/useOptimizedCloudinaryUrl';
+
 
 
 
@@ -26,7 +26,7 @@ export default function MenuContainer({ menuData, handleTapItem, setItemId, setS
       {menuData.map((item) => (
         <TouchableOpacity key={item.id} style={styles.card} onPress={() =>{handleTapItem(); setItemId(item.id); setSubCategoryId(item.sub_category_id)}}>
           <ImageBackground 
-            source={{ uri:  useOptimizedCloudinaryUrl(item.image )}}  // Update to handle URL images
+            source={{ uri:  item?.image.replace('http://', 'https://') }}  // Update to handle URL images
             style={styles.image} 
             imageStyle={styles.imageStyle} 
             resizeMode="cover"

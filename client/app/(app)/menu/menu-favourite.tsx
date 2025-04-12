@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity } from "react-native";
+import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, TouchableOpacity } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
 import { useState, useEffect, useRef, useMemo, useCallback, useContext } from "react";
 import TitleDashed from "@/components/titledashed";
@@ -13,9 +13,8 @@ import { AppContext } from "@/app/context/AppContext";
 import ViewCartContainer from "@/components/ViewCartContainer";
 import SearchMenu from "@/components/SearchMenu";
 import { Item, AddOn} from "@/types/clients";
-import { Snackbar } from "react-native-paper";
-import { useOptimizedCloudinaryUrl } from "@/hooks/useOptimizedCloudinaryUrl";
-
+import { Portal, Snackbar } from "react-native-paper";
+import { Image } from 'expo-image'; 
 
 interface User {
   favourites: Item[];
@@ -66,7 +65,6 @@ export default function MenuFavourite() {
   }
 
   const selectedItem = getSelectedItem();
-  const optimizedImageUrl = useOptimizedCloudinaryUrl(selectedItem?.image);
 
   useEffect(() => {
     setMenuData();
@@ -205,7 +203,25 @@ export default function MenuFavourite() {
   
   
   return (
-    <View style={[globalStyle.container, { paddingTop: 0 }]}>
+    <View style={[globalStyle.container]}>
+          <Portal>
+              <View style={{flex: 1}}>
+              <Snackbar
+                visible={visible}
+                onDismiss={() =>setVisible(false)}
+                duration={Snackbar.DURATION_LONG} 
+                style={{
+                  bottom: 80,     
+                  backgroundColor: '#2C2C2C', 
+                  borderRadius: 10,     
+                  zIndex: 10000,          
+                }}
+              >
+              <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> <FontAwesome6 name="check" size={16} color="white" />  SUCCESSFULLY ADDED!</Text>
+            </Snackbar>
+              </View>
+      
+            </Portal>
     <GestureHandlerRootView >
       <BottomSheetModalProvider>
     
@@ -240,22 +256,7 @@ export default function MenuFavourite() {
 
             </View>
 
-            <Snackbar
-              visible={visible}
-              onDismiss={() =>setVisible(false)}
-              duration={Snackbar.DURATION_LONG} 
-              style={{
-                position: 'absolute',  
-                bottom: -130,          
-                left: 60,             
-                right: 60,           
-                backgroundColor: '#2C2C2C', 
-                borderRadius: 10,     
-                zIndex: 10000,          
-              }}
-            >
-              <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> <FontAwesome6 name="check" size={16} color="white" />  SUCCESSFULLY ADDED!</Text>
-            </Snackbar>
+          
           </ScrollView>
         </View>
        
@@ -263,14 +264,14 @@ export default function MenuFavourite() {
         {/* Modal */}
         <Modalize 
           ref={modalizeRef} 
-          snapPoint={630} 
+          snapPoint={580} 
           adjustToContentHeight
-          childrenStyle={{ height: 630 }}
+          childrenStyle={{ height: 580 }}
         >
           {selectedItem &&
             <View>
                   <Image 
-                    source={{ uri:  optimizedImageUrl}}  
+                    source={{ uri:  selectedItem.image.replace('http://', 'https://')}}  
                     style={globalStyle.image}
                   />
                   <View style={globalStyle.modalContainer}>

@@ -1,4 +1,4 @@
-import { FlatList, Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import globalStyle from "../../assets/styles/globalStyle";
 import TitleDashed from "@/components/titledashed";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -13,7 +13,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Modalize } from "react-native-modalize";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Snackbar } from "react-native-paper";
-import { useOptimizedCloudinaryUrl } from "@/hooks/useOptimizedCloudinaryUrl";
+import { Image } from 'expo-image'; 
 
 interface AddOns {
   label: string;
@@ -181,7 +181,7 @@ export default function ViewCart() {
     }
   }, [visible]); 
   return (
-    <View style={[globalStyle.container, {paddingBottom: StatusBar.currentHeight}]} >
+    <View style={[globalStyle.container]} >
     <BottomSheetModalProvider >
     <GestureHandlerRootView  >
    
@@ -199,7 +199,7 @@ export default function ViewCart() {
             return (
               <View style={styles.cartItemContainer}>
                 <Image
-                  source={{ uri: useOptimizedCloudinaryUrl(item.image) }}
+                  source={{ uri: item.image.replace('http://', 'https://') }}
                   style={styles.image}
                 />
                 <View style={{ flexGrow: 1 }}>
@@ -268,14 +268,14 @@ export default function ViewCart() {
         {/* Modal */}
         <Modalize 
           ref={modalizeRef} 
-          snapPoint={630} 
+          snapPoint={580} 
           adjustToContentHeight
-          childrenStyle={{ height: 630 }}
+          childrenStyle={{ height: 580 }}
         >
           {selectedItem &&
             <View>
                   <Image 
-                    source={{ uri: selectedItem.image }}  
+                    source={{ uri: selectedItem.image.replace('http://', 'https://')  }}  
                     style={globalStyle.image}
                   />
                   <View style={globalStyle.modalContainer}>
@@ -345,7 +345,7 @@ export default function ViewCart() {
         </Modalize>
 
         <SafeAreaView >
-          <View  style={[styles.bottomContainer,  { paddingBottom: insets.bottom + 55 }]}>
+          <View  style={[styles.bottomContainer,  { paddingBottom: insets.bottom + 35 }]}>
             <View style={styles.totalContainer}>
               <Text style={[styles.totalText, { fontSize: 24 }]}>TOTAL:</Text>
               <Text style={[styles.totalText, { fontSize: 34 }]}>PHP {orderTotal}</Text>
@@ -367,7 +367,7 @@ export default function ViewCart() {
       </GestureHandlerRootView> 
           
       </BottomSheetModalProvider>
-      
+
     </View>
   );
 }

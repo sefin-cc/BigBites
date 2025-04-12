@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, Image, TouchableOpacity, SafeAreaView, Dimensions, ToastAndroid } from "react-native";
+import { Text, TextInput, View, StyleSheet, ScrollView, Button, NativeSyntheticEvent, TouchableOpacity, SafeAreaView, Dimensions, ToastAndroid } from "react-native";
 import globalStyle from "../../../assets/styles/globalStyle";
 
 import Feather from "@expo/vector-icons/Feather";
@@ -18,7 +18,7 @@ import Loading from "@/components/loading";
 import { Portal, Snackbar } from "react-native-paper";
 import { useGetMenuQuery } from "../../../redux/feature/apiSlice";
 import { Category, Item} from "@/types/clients";
-import { useOptimizedCloudinaryUrl } from "@/hooks/useOptimizedCloudinaryUrl";
+import { Image } from 'expo-image'; 
 
 
 
@@ -76,7 +76,7 @@ export default function Menu() {
   }
 
   const selectedItem = getSelectedItem();
-  const optimizedImageUrl = useOptimizedCloudinaryUrl(selectedItem?.image);
+
 
   useEffect(() => {
     setMenuData();
@@ -205,6 +205,22 @@ export default function Menu() {
     <View style={[globalStyle.container]}>
       <Portal>
         <Loading isLoading={menuLoading} />
+        <View style={{flex: 1}}>
+          <Snackbar
+              visible={visible}
+              onDismiss={hideSnackbar}
+              duration={Snackbar.DURATION_LONG} 
+              style={{
+                bottom: 80,         
+                backgroundColor: '#2C2C2C', 
+                borderRadius: 10,     
+                zIndex: 10000,          
+              }}
+            >
+              <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> <FontAwesome6 name="check" size={16} color="white" />  SUCCESSFULLY ADDED!</Text>
+            </Snackbar>
+        </View>
+
       </Portal>
    
       <BottomSheetModalProvider >
@@ -258,22 +274,7 @@ export default function Menu() {
 
 
             
-          <Snackbar
-            visible={visible}
-            onDismiss={hideSnackbar}
-            duration={Snackbar.DURATION_LONG} 
-            style={{
-              position: 'absolute',  
-              bottom: -90,          
-              left: 60,             
-              right: 60,           
-              backgroundColor: '#2C2C2C', 
-              borderRadius: 10,     
-              zIndex: 10000,          
-            }}
-          >
-            <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}> <FontAwesome6 name="check" size={16} color="white" />  SUCCESSFULLY ADDED!</Text>
-          </Snackbar>
+
          
             
         </ScrollView>
@@ -284,14 +285,14 @@ export default function Menu() {
         {/* Modal */}
         <Modalize 
           ref={modalizeRef} 
-          snapPoint={630} 
+          snapPoint={580} 
           adjustToContentHeight
-          childrenStyle={{ height: 630 }}
+          childrenStyle={{ height: 580 }}
         >
           {selectedItem &&
             <View>
                   <Image 
-                    source={{ uri: optimizedImageUrl }}  
+                    source={{ uri: selectedItem.image.replace('http://', 'https://') }}  
                     style={globalStyle.image}
                   />
                   <View style={globalStyle.modalContainer}>

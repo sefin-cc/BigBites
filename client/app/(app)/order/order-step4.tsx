@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import location from "../../../data/location.json"
 import { AppContext } from "@/app/context/AppContext";
-import { Snackbar } from "react-native-paper";
+import { Portal, Snackbar } from "react-native-paper";
 import { useGetBranchesQuery } from "../../../redux/feature/apiSlice";
 import { Branch } from "@/types/clients";
 
@@ -123,6 +123,23 @@ export default function BranchesStep3() {
    }, [visible]); 
   return (
     <View style={[globalStyle.container, { paddingHorizontal: "5%" }]}>
+      <Portal>
+        <View style={{flex: 1}}>
+        <Snackbar
+            visible={visible}
+            onDismiss={hideSnackbar}
+            duration={Snackbar.DURATION_LONG} 
+            style={{                     
+              bottom: 30,         
+              backgroundColor: '#2C2C2C', 
+              borderRadius: 10,     
+              zIndex: 10000,         
+            }}
+          >
+            <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}>CURRENTLY CLOSED!</Text>
+          </Snackbar>
+      </View>
+      </Portal>
       <View style={dropdownStyles.dropdownMainContainer}>
           <DropDownPicker
             open={provinceOpen}
@@ -200,20 +217,7 @@ export default function BranchesStep3() {
       />
     )}
 
-    <View style={{width: "100%", backgroundColor:"black", justifyContent: "center", marginBottom: 20}}>
-      <Snackbar
-          visible={visible}
-          onDismiss={hideSnackbar}
-          duration={Snackbar.DURATION_LONG} 
-          style={{                     
-            backgroundColor: '#2C2C2C', 
-            borderRadius: 10,     
-            zIndex: 10000,          
-          }}
-        >
-          <Text style={{fontFamily: 'MadimiOne', alignSelf:"center", color: "white", fontSize: 16}}>CURRENTLY CLOSED!</Text>
-        </Snackbar>
-    </View>
+
    
     </View>
   );
