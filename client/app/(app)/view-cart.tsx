@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Modalize } from "react-native-modalize";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Snackbar } from "react-native-paper";
+import { useOptimizedCloudinaryUrl } from "@/hooks/useOptimizedCloudinaryUrl";
 
 interface AddOns {
   label: string;
@@ -198,7 +199,7 @@ export default function ViewCart() {
             return (
               <View style={styles.cartItemContainer}>
                 <Image
-                  source={{ uri: item.image }}
+                  source={{ uri: useOptimizedCloudinaryUrl(item.image) }}
                   style={styles.image}
                 />
                 <View style={{ flexGrow: 1 }}>

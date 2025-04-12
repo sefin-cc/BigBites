@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, Dimensions, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { useGetPromosQuery } from "../redux/feature/apiSlice";
+import { useOptimizedCloudinaryUrl } from '@/hooks/useOptimizedCloudinaryUrl';
 
 const { width, height } = Dimensions.get('window');
 
@@ -28,7 +29,7 @@ export default function Slideshow() {
               data={promos}
               renderItem={({ index, item }) => (
                 <View style={styles.slide}>
-                  <Image source={{ uri: item?.image }} style={styles.image} />
+                  <Image source={{ uri: useOptimizedCloudinaryUrl(item?.image) }} style={styles.image} />
                 </View>
               )}
               onSnapToItem={(index) => setActiveIndex(index)}

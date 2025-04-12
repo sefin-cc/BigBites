@@ -14,6 +14,7 @@ import ViewCartContainer from "@/components/ViewCartContainer";
 import SearchMenu from "@/components/SearchMenu";
 import { Item, AddOn} from "@/types/clients";
 import { Snackbar } from "react-native-paper";
+import { useOptimizedCloudinaryUrl } from "@/hooks/useOptimizedCloudinaryUrl";
 
 
 interface User {
@@ -268,7 +269,7 @@ export default function MenuFavourite() {
           {selectedItem &&
             <View>
                   <Image 
-                    source={{ uri: selectedItem.image }}  
+                    source={{ uri:  useOptimizedCloudinaryUrl(selectedItem.image)}}  
                     style={globalStyle.image}
                   />
                   <View style={globalStyle.modalContainer}>

@@ -18,6 +18,7 @@ import Loading from "@/components/loading";
 import { Portal, Snackbar } from "react-native-paper";
 import { useGetMenuQuery } from "../../../redux/feature/apiSlice";
 import { Category, Item} from "@/types/clients";
+import { useOptimizedCloudinaryUrl } from "@/hooks/useOptimizedCloudinaryUrl";
 
 
 
@@ -289,7 +290,7 @@ export default function Menu() {
           {selectedItem &&
             <View>
                   <Image 
-                    source={{ uri: selectedItem.image }}  
+                    source={{ uri: useOptimizedCloudinaryUrl(selectedItem.image) }}  
                     style={globalStyle.image}
                   />
                   <View style={globalStyle.modalContainer}>
