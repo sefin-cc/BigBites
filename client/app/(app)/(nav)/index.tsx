@@ -3,12 +3,13 @@ import globalStyle from "../../../assets/styles/globalStyle";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from "expo-router";
 import Slideshow from "@/components/slideShow";
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "@/app/context/AppContext";
 import { useFocusEffect } from '@react-navigation/native';
 import { BackHandler } from 'react-native';
 import TitleDashed from "@/components/titledashed";
 import * as Animatable from 'react-native-animatable';
+import NetInfo from "@react-native-community/netinfo";
 
 export default function Index() {
   const context = useContext(AppContext);
@@ -17,7 +18,7 @@ export default function Index() {
   }
   const { resetOrder } = context;
   const router = useRouter();
-
+  const [tappable, setTappable] = useState(true);
   useEffect(() => {
     resetOrder();
   },[]);
@@ -31,6 +32,13 @@ export default function Index() {
     }, [])
   );
 
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setTappable(state.isConnected ?? false); 
+    });
+  
+    return () => unsubscribe(); 
+  }, []);
   return (
     
     <Animatable.View animation="fadeIn" style={globalStyle.container}>
@@ -54,8 +62,11 @@ export default function Index() {
               />
               <TouchableOpacity
                 onPress={() =>{router.push(`/order/order-type`);}}
-                // disabled={isPosting}
-                style={[globalStyle.button]}>
+                disabled={!tappable}
+                style={[
+                  globalStyle.button,
+                  { opacity: tappable ? 1 : 0.6 } 
+                ]}>
                   <Text style={globalStyle.buttonText}>
                       ORDER NOW!
                   </Text>
