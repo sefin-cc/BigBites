@@ -29,10 +29,11 @@ export default function AppLayout() {
     if (isLayoutReady && !token) {
       router.replace("/auth/choose");
     }
-
-    if(!isProfileLoading){
+    
+    // for invalid tokens
+    if(!isProfileLoading && isLayoutReady){
       const user = profile?.name;
-      if (!user && profileError) {
+      if (!user && profileError && token) {
         router.replace("/auth/choose");
       }
     }
