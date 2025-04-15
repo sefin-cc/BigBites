@@ -5,6 +5,17 @@
 
 The BigBites is a full-stack project designed to enhance the food ordering experience for customers. It offers a variety of features, including the ability to browse the menu, choose between delivery and pickup options, access exclusive promotions, and much more.
 
+## Tech Stack
+
+| Category   | Technology                     |
+|------------|--------------------------------|
+| Website    | React JS                       |
+| Mobile     | React Native                   |
+| API        | Laravel                        |
+| Database   | SQLite (Local), PostgreSQL (Production) |
+| Hosting    | Render                         |
+
+
 ## Website Admin Features
 <img src="readmefiles/bigbitesweb1.gif" width="600" />
 
