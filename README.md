@@ -1,8 +1,12 @@
-# BigBites
+
+
+
+# BigBites <img src="readmefiles/icon.png" width="30" /> 
 
 The BigBites is a full-stack project designed to enhance the food ordering experience for customers. It offers a variety of features, including the ability to browse the menu, choose between delivery and pickup options, access exclusive promotions, and much more.
 
 ## Website Admin Features
+<img src="readmefiles/bigbitesweb1.gif" width="600" />
 
 - **Order Notifications:** When an order is placed by a customer, the website will receive a notification.
 - **Dashboard:** This section displays an overview of today's activity as well as data from the past five months.
@@ -13,6 +17,7 @@ The BigBites is a full-stack project designed to enhance the food ordering exper
 - **User Settings:** Users can update their information in this section.
 
 ## Client Mobile Application Features:
+<img src="readmefiles/bigbitesmobile.gif" height="300" />
 
 - **Orders:**  
   This outlines the steps involved in the order process:  
@@ -26,6 +31,7 @@ The BigBites is a full-stack project designed to enhance the food ordering exper
 
 
 ## Role Permissions Table
+<img src="readmefiles/bigbitesweb2.gif" width="600" />
 
 | Permission            | Administrator | Manager | Staff | Customer |
 |-----------------------|:-------------:|:-------:|:-----:|:--------:|
